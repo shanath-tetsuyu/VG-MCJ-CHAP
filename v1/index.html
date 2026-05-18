@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CARES — Publish MJ Job (v3)</title>
+<title>CARES — MJ Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -19,212 +20,784 @@
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
 
+/* ── Sidebar ── */
 .sidebar{width:56px;background:var(--ink);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:2px;flex-shrink:0}
 .s-logo{width:32px;height:32px;border-radius:8px;background:var(--gm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;margin-bottom:12px}
-.s-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);cursor:pointer;font-size:17px}
+.s-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);cursor:pointer;font-size:17px;text-decoration:none}
 .s-item.on{background:rgba(255,255,255,0.12);color:#fff}
 
+/* ── Shell ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0}
-.crumb a{color:var(--g);text-decoration:none;font-size:13px;font-weight:500}
-.crumb span{color:var(--ink4);margin:0 5px;font-size:13px}
-.chip-draft{background:var(--al);color:var(--am);border:1px solid var(--ab);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600}
-
+.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:6px;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:600}
 .layout{flex:1;display:flex;overflow:hidden}
-.left-scroll{flex:1;overflow-y:auto;padding:20px}
-.right-panel{width:316px;border-left:1px solid var(--bdr);background:var(--s);overflow-y:auto;flex-shrink:0}
+.left-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.right-panel{width:298px;border-left:1px solid var(--bdr);background:var(--s);overflow-y:auto;flex-shrink:0}
 
-/* Cards */
-.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px;margin-bottom:14px}
-.card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+/* ── Cards ── */
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;position:relative}
 .card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ci-g{background:var(--gl)} .ci-b{background:var(--bl)} .ci-a{background:var(--al)}
+.ci-g{background:var(--gl)}.ci-b{background:var(--bl)}.ci-a{background:var(--al)}.ci-p{background:var(--pl)}
 .card-label{font-size:12px;font-weight:600;color:var(--ink2);flex:1}
 
-/* Form */
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fg-full{grid-column:1/-1}
-.fl{display:flex;flex-direction:column;gap:4px;position:relative}
-.fl-label{display:flex;align-items:center;gap:5px}
-label{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0.03em;text-transform:uppercase}
-input,select,textarea{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%;transition:border-color 0.15s}
-input:focus,select:focus,textarea:focus{border-color:var(--gm);background:var(--s);box-shadow:0 0 0 3px rgba(29,158,117,0.08)}
-textarea{resize:vertical;min-height:60px}
+/* ── KPI row ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kpi-box{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:14px 16px}
+.kpi-n{font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.5px}
+.kpi-l{font-size:11px;color:var(--ink4);margin-top:4px;line-height:1.35}
+.kpi-sub{font-size:10px;font-weight:600;margin-top:8px;padding:2px 7px;border-radius:20px;display:inline-block}
+.k-pub .kpi-n{color:var(--bm)}.k-pub .kpi-sub{background:var(--bl);color:var(--bm)}
+.k-tak .kpi-n{color:var(--g)}.k-tak .kpi-sub{background:var(--gl);color:var(--g)}
+.k-risk .kpi-n{color:#C04A00}.k-risk .kpi-sub{background:#FFF0E8;color:#C04A00}
+.k-can .kpi-n{color:var(--rm)}.k-can .kpi-sub{background:var(--rl);color:var(--rm)}
+.k-com .kpi-n{color:var(--ink)}.k-com .kpi-sub{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
 
-/* ⓘ blue button */
-.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif;line-height:1}
+/* ── Popovers ── */
+.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1}
 .br-btn:hover,.br-btn.active{background:var(--bm);color:#fff}
-
-/* ❓ red question button */
-.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif;line-height:1}
+.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1}
 .q-btn:hover,.q-btn.active{background:var(--rm);color:#fff}
-
-/* Popover shared */
-.pop{display:none;position:absolute;z-index:200;width:286px;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,0.22);font-size:12px;line-height:1.6;top:calc(100% + 6px);left:0}
-.pop.right{left:auto;right:0}
-.pop.above{top:auto;bottom:calc(100% + 6px)}
-.pop.on{display:block}
-
-/* ⓘ popover — dark */
+.pop{display:none;position:absolute;z-index:400;width:290px;border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:12px;line-height:1.6;top:calc(100% + 6px);left:0}
+.pop.right{left:auto;right:0}.pop.on{display:block}
 .pop-info{background:var(--ink);color:#fff}
-.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .pop-info .pop-title::before{content:'⚙';font-size:12px}
 .pop-info .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5}
 .pop-info .pr:last-child{margin-bottom:0}
 .pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
-.pd-g{background:var(--gm)} .pd-a{background:#F0C060} .pd-r{background:#F0AAAA} .pd-p{background:var(--pb)}
-
-/* ❓ popover — warm red */
-.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,0.3)}
-.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pd-g{background:var(--gm)}.pd-a{background:#F0C060}.pd-r{background:#F0AAAA}.pd-q{background:#F0AAAA}
+.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,.3)}
+.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .pop-q .pop-title::before{content:'?';font-size:12px;color:var(--rb)}
 .pop-q .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;color:#FFD0D0}
 .pop-q .pr:last-child{margin-bottom:0}
-.pop-q .pd-q{background:#F0AAAA}
-.pop-q .note{font-size:10px;color:rgba(255,200,200,0.45);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,0.15)}
+.pop-q .note{font-size:10px;color:rgba(255,200,200,.45);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,.15)}
 
-/* Complexity */
-.cplx{display:flex;gap:6px}
-.cb{flex:1;padding:8px 4px;border:1px solid var(--bdr);border-radius:var(--r);text-align:center;font-size:13px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--ink3);transition:all 0.15s}
-.cb.cH{background:var(--rl);border-color:var(--rb);color:var(--rm)}
-.cb.cM{background:var(--al);border-color:var(--ab);color:var(--am)}
-.cb.cL{background:var(--gl);border-color:var(--gb);color:var(--g)}
+/* ── Training table ── */
+.tr-tbl{width:100%;border-collapse:collapse}
+.tr-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;border-bottom:1px solid var(--bdr);text-align:left;white-space:nowrap}
+.tr-tbl td{font-size:12px;padding:9px 10px;border-bottom:1px solid var(--bdr2);color:var(--ink2);vertical-align:middle}
+.tr-tbl tr:last-child td{border-bottom:none}
+.tr-role{font-weight:600}
+.pill-stat{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.ps-pend{background:var(--al);color:var(--am)}.ps-sched{background:var(--bl);color:var(--bm)}
+.ps-prog{background:var(--pl);color:var(--pm)}.ps-done{background:var(--gl);color:var(--g)}
+.bar-wrap{display:inline-flex;align-items:center;gap:5px}
+.bar{height:5px;width:64px;background:var(--bdr2);border-radius:3px;overflow:hidden;display:inline-block}
+.bar-fill{height:100%;border-radius:3px}
+.bf-g{background:var(--gm)}.bf-a{background:#F0C060}.bf-r{background:var(--rb)}
+.eligible-chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;background:var(--gl);color:var(--g)}
 
-/* Tags */
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:12px;cursor:pointer}
-.tag-g{background:var(--gl);color:var(--g);font-weight:500}
-.tag-add{background:var(--bg);color:var(--ink3);border:1px dashed var(--bdr)}
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.filter-bar select,.filter-bar input[type=text]{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;transition:border-color .15s}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--gm);background:var(--s)}
+.btn-clear{font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 11px;border:1px solid var(--bdr);border-radius:7px;background:var(--s);color:var(--ink3);cursor:pointer}
+.btn-clear:hover{background:var(--bg)}
+.btn-pub-new{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border:none;border-radius:8px;background:var(--g);color:#fff;cursor:pointer;white-space:nowrap}
+.btn-pub-new:hover{background:#0A5C46}
 
-/* Toggles */
-.tog-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2);font-size:13px;color:var(--ink2);position:relative}
-.tog-row:last-child{border-bottom:none}
-.tog{width:34px;height:20px;border-radius:10px;background:#DDD;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
-.tog.on{background:var(--gm)}
-.tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
-.tog.on::after{left:16px}
-.tog-lbl{flex:1;font-size:13px}
-.tog-note{font-size:11px;color:var(--ink4)}
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.b-pub{background:var(--bl);color:var(--bm)}.b-tak{background:var(--gl);color:var(--g)}
+.b-com{background:#E8E8ED;color:#555}.b-can{background:var(--rl);color:var(--rm)}
+.b-wl{background:var(--al);color:var(--am)}.b-risk{background:#FF6B35;color:#fff}
+.b-urg{background:#FF6B35;color:#fff}.b-std{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
 
-/* Slots */
-.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.slot-box{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 8px;text-align:center}
-.slot-box.s-c{border-color:var(--gb);background:var(--gl)}
-.slot-box.s-w{border-color:var(--ab);background:var(--al)}
-.sn{font-size:20px;font-weight:700}
-.sl{font-size:10px;color:var(--ink4);margin-top:2px;line-height:1.3}
-.s-c .sn{color:var(--g)} .s-w .sn{color:var(--am)}
+/* ── DataTable overrides ── */
+.dataTables_wrapper{font-family:'DM Sans',sans-serif}
+.dataTables_length,.dataTables_filter{display:none}
+.dataTables_info{font-size:11px;color:var(--ink4);padding:8px 2px}
+.dt-pg-wrap{display:flex;justify-content:space-between;align-items:center}
+.dt-pg-wrap .dataTables_info{display:none}
+.dt-pg-wrap .dataTables_paginate{display:flex;gap:4px;padding:8px 0;justify-content:flex-end}
+.dataTables_paginate .paginate_button{padding:4px 10px;border:1px solid var(--bdr)!important;border-radius:6px;font-size:12px;cursor:pointer;background:var(--s)!important;color:var(--ink2)!important;transition:background .12s}
+.dataTables_paginate .paginate_button:hover{background:var(--bg)!important;color:var(--ink)!important}
+.dataTables_paginate .paginate_button.current{background:var(--g)!important;color:#fff!important;border-color:var(--g)!important}
+.dataTables_paginate .paginate_button.disabled{opacity:.4;cursor:default}
+.dt-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:4px}
+#dt-pag .dataTables_paginate{display:flex;gap:4px;padding:4px 0}
+#dt-pag .paginate_button{padding:4px 10px;border:1px solid var(--bdr)!important;border-radius:6px;font-size:12px;cursor:pointer;background:var(--s)!important;color:var(--ink2)!important;transition:background .12s}
+#dt-pag .paginate_button:hover{background:var(--bg)!important;color:var(--ink)!important}
+#dt-pag .paginate_button.current{background:var(--g)!important;color:#fff!important;border-color:var(--g)!important}
+#dt-pag .paginate_button.disabled{opacity:.4;cursor:default}
+#jobTable{width:100%!important;border-collapse:collapse}
+#jobTable thead th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:2px solid var(--bdr);background:var(--s);white-space:nowrap;cursor:pointer;user-select:none}
+#jobTable thead th.sorting::after{content:' ↕';color:var(--bdr);font-size:9px}
+#jobTable thead th.sorting_asc::after{content:' ↑';color:var(--gm);font-size:9px}
+#jobTable thead th.sorting_desc::after{content:' ↓';color:var(--gm);font-size:9px}
+#jobTable thead th.no-sort::after{content:''}
+#jobTable tbody tr{border-bottom:1px solid var(--bdr2);transition:background .1s}
+#jobTable tbody tr:hover{background:#FAFBFC}
+#jobTable tbody td{font-size:12px;padding:10px 12px;color:var(--ink2);vertical-align:middle}
+.job-id-cell{font-family:monospace;font-size:11px;color:var(--ink4);font-weight:600}
+.type-cell{font-weight:500;font-size:12px}
+.mj-name{font-size:12px;color:var(--ink2)}.mj-empty{font-size:11px;color:var(--ink4);font-style:italic}
+.wl-chip{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:18px;padding:0 5px;border-radius:20px;background:var(--al);color:var(--am);font-size:10px;font-weight:700}
+.wl-zero{font-size:11px;color:var(--ink4)}
+.btn-manage{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--s);color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-manage:hover{background:var(--g);color:#fff;border-color:var(--g)}
 
-/* Banners */
-.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5;margin-top:10px}
-.b-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb)}
-.b-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
-.b-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb)}
-
-/* Updated badge */
-.upd-badge{display:inline-flex;align-items:center;gap:3px;background:var(--pl);color:var(--pm);border:1px solid var(--pb);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-left:6px}
-
-/* Right panel */
-.rp{padding:14px 16px}
-.rp-title{font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:14px}
+/* ── Right panel ── */
+.rp{padding:14px 15px}
+.rp-title{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;margin-top:14px}
 .rp-title:first-child{margin-top:4px}
-.preview-card{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:4px}
-.pc-top{background:var(--ink);padding:12px;display:flex;justify-content:space-between;align-items:flex-start}
-.pc-type{font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em}
-.pc-title{font-size:14px;font-weight:700;color:#fff;margin-top:2px}
-.pc-time{font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px}
-.pc-pay{font-size:20px;font-weight:800;color:#fff;text-align:right}
-.pc-body{padding:10px 12px;display:flex;flex-direction:column;gap:5px}
-.pc-row{font-size:12px;color:var(--ink3)}
-.pc-tag{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-right:3px}
-.pct-a{background:var(--al);color:var(--am)} .pct-g{background:var(--gl);color:var(--g)}
-.pc-urgent{background:#FF6B35;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-flex;align-items:center;gap:3px}
-.pc-foot{background:#EBEBEB;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
-
-/* Rules list in right panel */
-.rule-card{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.5;display:flex;gap:8px;margin-bottom:6px}
+.risk-item{background:var(--rl);border:1px solid var(--rb);border-radius:9px;padding:9px 11px;display:flex;gap:8px;margin-bottom:6px}
+.risk-dot{width:7px;height:7px;border-radius:50%;background:#FF6B35;flex-shrink:0;margin-top:4px}
+.risk-id{font-family:monospace;font-size:10px;font-weight:700}
+.risk-body{font-size:11px;color:var(--rm);line-height:1.45}
+.rule-card{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;display:flex;gap:8px;margin-bottom:6px}
 .rc-icon{font-size:13px;flex-shrink:0;margin-top:1px}
-.rc-body .rc-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:2px}
-.rt-s{background:var(--bl);color:var(--bm)}
-.rt-b{background:var(--gl);color:var(--g)}
-.rt-o{background:var(--al);color:var(--am)}
-.rt-q{background:var(--rl);color:var(--rm)}
-.rc-body .rc-title{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:1px}
-.rc-body .rc-text{font-size:11px;color:var(--ink4);line-height:1.4}
+.rc-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:2px}
+.rt-s{background:var(--bl);color:var(--bm)}.rt-b{background:var(--gl);color:var(--g)}
+.rt-o{background:var(--al);color:var(--am)}.rt-q{background:var(--rl);color:var(--rm)}
+.rc-title{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:1px}
+.rc-text{font-size:11px;color:var(--ink4);line-height:1.4}
 
-/* Timeline */
-.tl-row{display:flex;gap:8px;font-size:12px;padding:3px 0}
-.tl-lbl{color:var(--ink4);width:88px;flex-shrink:0;font-size:11px}
-.tl-val{color:var(--ink2);font-size:12px}
-.tl-val.hi{color:var(--g);font-weight:500}
-
-/* Footer */
-.footer{height:54px;background:var(--s);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0}
-.btn-pub{background:var(--g);color:#fff;border:none;border-radius:var(--r);padding:9px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
-.btn-pub:hover{background:#0A5C46}
-.btn-ghost{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 16px;font-size:13px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif}
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:500;display:flex;align-items:center;justify-content:center}
+.modal-box{background:var(--s);border-radius:var(--rl2);width:580px;max-width:92vw;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px}
+.modal-head-title{font-size:14px;font-weight:600;flex:1}
+.modal-close{background:none;border:1px solid var(--bdr);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:var(--ink3);font-family:'DM Sans',sans-serif}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--bdr);display:flex;gap:8px;align-items:center}
+.m-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.m-info-box{background:var(--bg);border-radius:var(--r);padding:10px 12px}
+.m-info-label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.m-info-val{font-size:13px;font-weight:500;color:var(--ink)}
+.sect-title{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;margin-top:16px}
+.sect-title:first-child{margin-top:0}
+.slot-row{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 13px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.slot-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sn-filled{background:var(--gl);color:var(--g)}.sn-empty{background:var(--bdr2);color:var(--ink4);border:1px dashed var(--bdr)}
+.slot-name{font-size:13px;font-weight:500}.slot-meta{font-size:11px;color:var(--ink4)}
+.wl-row{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.wl-pos{width:20px;height:20px;border-radius:50%;background:var(--al);color:var(--am);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wl-name{flex:1;font-size:12px;font-weight:500;color:var(--ink2)}.wl-time{font-size:10px;color:var(--ink4)}
+.wl-btn{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid}
+.wl-confirm{background:var(--gl);color:var(--g);border-color:var(--gb)}.wl-remove{background:var(--rl);color:var(--rm);border-color:var(--rb)}
+.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5;margin-bottom:12px}
+.bn-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb)}.bn-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
+.bn-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb)}
+.btn-primary{background:var(--g);color:#fff;border:none;border-radius:var(--r);padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-primary:hover{background:#0A5C46}
+.btn-danger{background:var(--rm);color:#fff;border:none;border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-ghost{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:8px 14px;font-size:13px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-ghost:disabled,.btn-primary:disabled,.btn-danger:disabled{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
 
 <div class="sidebar">
   <div class="s-logo">C</div>
-  <div class="s-item on" href="#">🏠</div>
-  <div class="s-item on"><a href="./proto2_v3_mj_profile.html">🧑‍💼</a></div>
-  <div class="s-item">👥</div>
-  <div class="s-item on"><a href="./proto1_v3_publish.html">📅</a></div>
-  <div class="s-item">📊</div>
+  <a class="s-item on" href="./index.html" title="Dashboard">🏠</a>
+  <a class="s-item" href="./proto2_v3_mj_profile.html" title="MJ Profile">🧑‍💼</a>
+  <div class="s-item" title="MJ Pool">👥</div>
+  <a class="s-item" href="./proto1_v3_publish.html" title="Publish Job">📅</a>
+  <div class="s-item" title="Reports">📊</div>
   <div style="margin-top:auto"></div>
-  <div class="s-item">⚙️</div>
+  <div class="s-item" title="Settings">⚙️</div>
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div class="crumb">Welcome to Microjobber Portal</div>
-    <span style="margin-left:auto;font-size:12px;color:var(--ink4)">12/05/2026</span>
+    <div class="topbar-title">MJ Dashboard</div>
+    <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
+    <span style="font-size:12px;color:var(--ink3)">AAC — Volunteer Group SCC</span>
+    <span style="margin-left:auto;font-size:12px;color:var(--ink4)">18 May 2026</span>
   </div>
 
   <div class="layout">
+
+    <!-- LEFT SCROLL AREA -->
     <div class="left-scroll">
-        <div class="card-head"><h1>Work In Progress</h1></div>
-        <div class="card-head"><h2>This is the home page for the microjobber module</h2></div>
-        <div class="card-head"><h3>Use the side bar on the left to navigate to the relevant sections</h3></div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi-box k-pub">
+          <div class="kpi-n">8</div>
+          <div class="kpi-l">Published — awaiting MJ takeup</div>
+          <div class="kpi-sub">↑ 2 from last week</div>
+        </div>
+        <div class="kpi-box k-tak">
+          <div class="kpi-n">5</div>
+          <div class="kpi-l">Taken by MJ (active)</div>
+          <div class="kpi-sub">This month</div>
+        </div>
+        <div class="kpi-box k-risk">
+          <div class="kpi-n">2</div>
+          <div class="kpi-l">At risk — no taker &lt; 2 BD</div>
+          <div class="kpi-sub">⚠ Needs action</div>
+        </div>
+        <div class="kpi-box k-can">
+          <div class="kpi-n">3</div>
+          <div class="kpi-l">Cancelled this month</div>
+          <div class="kpi-sub">May 2026</div>
+        </div>
+        <div class="kpi-box k-com">
+          <div class="kpi-n">21</div>
+          <div class="kpi-l">Completed this month</div>
+          <div class="kpi-sub">May 2026</div>
+        </div>
+      </div>
+
+      <!-- Training Status -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ci-p">🎓</div>
+          <div class="card-label">Training &amp; OJT Status</div>
+          <button class="br-btn" onclick="togglePop('pop-training',this)" style="margin-left:auto">i</button>
+          <button class="q-btn" onclick="togglePop('popq-training',this)">?</button>
+          <div class="pop pop-info right" id="pop-training" style="top:30px">
+            <div class="pop-title">Business rules — Training &amp; OJT (§4.3)</div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>OJT = Completed is the eligibility gate.</strong> Training Completed alone is not sufficient. Both must be done before an MJ can receive job listings for a role.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div>System <strong>blocks assignment</strong> if OJT ≠ Completed for the target role and displays an error message to staff.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div>Status values (Training and OJT): <em>NA / Pending / Scheduled / In Progress / Completed</em>.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div>Schema is role-agnostic: (MJ_ID, Role_Code, Training_Type_Code, Status) — extensible for future roles.</div></div>
+          </div>
+          <div class="pop pop-q right" id="popq-training" style="top:30px">
+            <div class="pop-title">Open questions — Training (§4.3)</div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H4 — High]</strong> Training role list is <strong>incomplete and overdue</strong>. 4 roles confirmed, 5+ unnamed additional roles exist. OJT data model and eligibility engine cannot be finalised. Escalate to Maisarah.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[M10 — Medium]</strong> Withdrawn/Terminated exit requires offline acknowledgement — but there is no system field to record or audit this. Audit risk if disputed.</div></div>
+            <div class="note">Owner: AAC / Maisarah · Target: URG sign-off 8 Jun 2026</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tr-tbl">
+            <thead>
+              <tr>
+                <th>Service role</th>
+                <th>Pending</th>
+                <th>Scheduled</th>
+                <th>In progress</th>
+                <th>Training completed</th>
+                <th>OJT completed</th>
+                <th>Eligible MJs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tr-role">🤝 Chaperone</span></td>
+                <td><span class="pill-stat ps-pend">3</span></td>
+                <td><span class="pill-stat ps-sched">2</span></td>
+                <td><span class="pill-stat ps-prog">1</span></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-g" style="width:75%"></span></span>18</div></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-g" style="width:63%"></span></span>15</div></td>
+                <td><span class="eligible-chip">✓ 15</span></td>
+              </tr>
+              <tr>
+                <td><span class="tr-role">💬 Befriending</span></td>
+                <td><span class="pill-stat ps-pend">5</span></td>
+                <td><span class="pill-stat ps-sched">3</span></td>
+                <td><span class="pill-stat ps-prog">2</span></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-g" style="width:50%"></span></span>12</div></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-a" style="width:42%"></span></span>10</div></td>
+                <td><span class="eligible-chip">✓ 10</span></td>
+              </tr>
+              <tr>
+                <td><span class="tr-role">🏠 Home Assessment</span></td>
+                <td><span class="pill-stat ps-pend">8</span></td>
+                <td><span class="pill-stat ps-sched">4</span></td>
+                <td><span class="pill-stat ps-prog">0</span></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-a" style="width:29%"></span></span>7</div></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-r" style="width:21%"></span></span>5</div></td>
+                <td><span class="eligible-chip" style="background:var(--al);color:var(--am)">⚠ 5</span></td>
+              </tr>
+              <tr>
+                <td><span class="tr-role">🏛 Centre Assistant</span></td>
+                <td><span class="pill-stat ps-pend">2</span></td>
+                <td><span class="pill-stat ps-sched">1</span></td>
+                <td><span class="pill-stat ps-prog">1</span></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-g" style="width:92%"></span></span>22</div></td>
+                <td><div class="bar-wrap"><span class="bar"><span class="bar-fill bf-g" style="width:83%"></span></span>20</div></td>
+                <td><span class="eligible-chip">✓ 20</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--ink4);margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)">⚠ [H4] Training role list pending finalisation from Maisarah — counts above are based on 4 confirmed roles only.</div>
+      </div>
+
+      <!-- Job Listing & Assignment -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ci-b">📋</div>
+          <div class="card-label">Job Listing &amp; Assignment</div>
+          <button class="br-btn" onclick="togglePop('pop-jobs',this)" style="margin-left:auto">i</button>
+          <button class="q-btn" onclick="togglePop('popq-jobs',this)">?</button>
+          <div class="pop pop-info right" id="pop-jobs" style="top:30px">
+            <div class="pop-title">Business rules — Publishing &amp; Matching (§5.2–5.3)</div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Lead time:</strong> ≥ 3 business days minimum. &lt; 3 BD = system blocks publication. Public holidays excluded from BD count.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Urgent flag:</strong> Published 3–5 BD before job date = "Urgent" badge shown on C4Me listing.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Matching (all criteria must be met):</strong> OJT = Completed, language, gender, service boundary, required skills.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Slots:</strong> Chaperone/Befriending = 1 confirmed + 4 waitlist. Home Assessment = 2 confirmed + 4 waitlist.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div><strong>No-taker alert:</strong> 2 BD before — SCC Nurse, AE, and all AAC Staff notified. Client informed of risk.</div></div>
+            <div class="pr"><div class="pd pd-r"></div><div><strong>Auto-cancel:</strong> No confirmed MJ 1 BD before job → auto-cancelled. SCC Nurse assigns SCC staff or cancels appointment.</div></div>
+          </div>
+          <div class="pop pop-q right" id="popq-jobs" style="top:30px">
+            <div class="pop-title">Open questions — Jobs (§5–6)</div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H1 — High]</strong> Waitlist model conflict: sequential 12h-per-person chain vs open simultaneous grab. Open grab is working assumption. Not formally confirmed — core state machine logic.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H2 — High]</strong> Home Assessment partial cancel: if 1 of 2 confirmed MJs cancels &lt; 1 BD, does the whole job cancel or just re-open the slot?</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H3 — High]</strong> MJ fee table entirely absent. Payment module cannot be designed. Overdue from Finance.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[M4 — Medium]</strong> Service boundary: postal code exact match vs district range? Two different semantics — cannot build engine until resolved.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[M6 — Medium]</strong> Urgent flag — does it attract a higher MJ pay rate? If yes, must be in fee table before notification engine is built.</div></div>
+            <div class="note">Owner: AAC / Maisarah · Target: URG sign-off 8 Jun 2026</div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <label>Facility</label>
+          <select id="fFacility" onchange="applyFilters()">
+            <option value="">All</option>
+            <option>VG — Buona Vista</option>
+            <option>VG — Clementi</option>
+            <option>SCC — Queenstown</option>
+            <option>SCC — Toa Payoh</option>
+            <option>SCC — Bishan</option>
+          </select>
+          <label>Type</label>
+          <select id="fType" onchange="applyFilters()">
+            <option value="">All</option>
+            <option>Chaperone</option>
+            <option>Befriending</option>
+            <option>Home Assessment</option>
+            <option>Centre Assistant</option>
+          </select>
+          <label>Status</label>
+          <select id="fStatus" onchange="applyFilters()">
+            <option value="">All</option>
+            <option>Published</option>
+            <option>Taken</option>
+            <option>Waitlisted</option>
+            <option>At Risk</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+          </select>
+          <label>Urgency</label>
+          <select id="fUrgency" onchange="applyFilters()">
+            <option value="">All</option>
+            <option>Urgent</option>
+            <option>Standard</option>
+          </select>
+          <input type="text" id="fSearch" placeholder="Search ID, client, MJ…" oninput="applyFilters()" style="width:180px">
+          <button class="btn-clear" onclick="clearFilters()">Clear</button>
+          <a href="./proto1_v3_publish.html" style="margin-left:auto"><button class="btn-pub-new">+ Publish new job</button></a>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table id="jobTable">
+            <thead>
+              <tr>
+                <th>Job ID</th>
+                <th>Type</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Time slot</th>
+                <th>Client</th>
+                <th class="no-sort">Status</th>
+                <th>MJ assigned</th>
+                <th class="no-sort">Waitlist</th>
+                <th class="no-sort">Urgency</th>
+                <th class="no-sort">Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="dt-bottom">
+          <div id="dt-info" class="dataTables_info"></div>
+          <div id="dt-pag"></div>
+        </div>
+      </div>
+
+    </div><!-- /left-scroll -->
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <div class="rp">
+        <div class="rp-title" style="margin-top:4px">⚠️ At-risk jobs</div>
+        <div class="risk-item">
+          <div class="risk-dot"></div>
+          <div class="risk-body">
+            <div><span class="risk-id">MJ-2026-001</span> · Chaperone</div>
+            <div>SCC — Queenstown · <strong>20 May 14:00</strong></div>
+            <div>0 takers · Auto-cancel: Tue 19 May</div>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-dot"></div>
+          <div class="risk-body">
+            <div><span class="risk-id">MJ-2026-005</span> · Centre Assistant</div>
+            <div>SCC — Bishan · <strong>23 May 13:00</strong></div>
+            <div>0 takers · Auto-cancel: Thu 21 May</div>
+          </div>
+        </div>
+        <div class="rp-title">⚙️ Business rules</div>
+        <div class="rule-card">
+          <div class="rc-icon">🎯</div>
+          <div class="rc-body">
+            <div class="rc-type rt-s">System</div>
+            <div class="rc-title">OJT gate — eligibility</div>
+            <div class="rc-text">MJ must have OJT = Completed for the specific role. Assignment blocked if not met.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🔄</div>
+          <div class="rc-body">
+            <div class="rc-type rt-b">Waitlist</div>
+            <div class="rc-title">Open grab model (working assumption)</div>
+            <div class="rc-text">Slot opens → any waitlisted MJ can grab. First committed write wins. Sequential 12h model removed.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">⏱</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">Deadline</div>
+            <div class="rc-title">Auto-cancel at 1 BD</div>
+            <div class="rc-text">No confirmed MJ 1 BD before job → auto-cancelled. SCC Nurse assigns SCC staff or cancels client.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🔔</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">Alert</div>
+            <div class="rc-title">No-taker alert at 2 BD</div>
+            <div class="rc-text">SCC Nurse, AE and all AAC Staff notified. SCC informs client of risk. Staff must intervene.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🏠</div>
+          <div class="rc-body">
+            <div class="rc-type rt-b">Slots</div>
+            <div class="rc-title">Home Assessment — 2 confirmed required</div>
+            <div class="rc-text">Confirmed MJ names shown on listing. If 1 cancels &lt;1 BD, whole job status TBC (pending H2 resolution).</div>
+          </div>
+        </div>
+        <div class="rp-title">❓ Open questions</div>
+        <div class="rule-card">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-body">
+            <div class="rc-type rt-q">H1 — High</div>
+            <div class="rc-title">Waitlist model not formally confirmed</div>
+            <div class="rc-text">Open grab vs sequential — must be voted at URG. Core state machine logic.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-body">
+            <div class="rc-type rt-q">H2 — High</div>
+            <div class="rc-title">Home Assessment partial cancel undefined</div>
+            <div class="rc-text">If 1 of 2 MJs cancels within 1 BD — whole job cancel or re-open slot? Blocks cancel logic.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-body">
+            <div class="rc-type rt-q">H3 — High</div>
+            <div class="rc-title">MJ fee table absent</div>
+            <div class="rc-text">No confirmed rates per role. Payment module cannot be designed. Overdue from Finance.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🟡</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">M1 — Medium</div>
+            <div class="rc-title">Waitlist race condition</div>
+            <div class="rc-text">Simultaneous grab by 2 MJs → requires db-level optimistic locking or atomic slot claim.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🟡</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">M4 — Medium</div>
+            <div class="rc-title">Service boundary logic undefined</div>
+            <div class="rc-text">Postal code exact match vs district range — different semantics. Cannot build matching engine.</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /right-panel -->
+
+  </div><!-- /layout -->
+</div><!-- /main -->
+
+<!-- Job Assignment Modal -->
+<div id="assignModal" class="modal-overlay" style="display:none" onclick="handleOverlayClick(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="card-icon ci-b" style="font-size:16px">📋</div>
+      <div class="modal-head-title" id="modal-title">Manage Assignment</div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
     </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="closeModal()">Done</button>
+      <button class="btn-ghost" id="btn-complete">Mark Completed</button>
+      <button class="btn-danger" id="btn-cancel-job" style="margin-left:auto">Cancel Job</button>
     </div>
   </div>
-
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script>
-let activePop = null;
+/* ══ Mock data ══════════════════════════════════════════════════════ */
+const JOB_DATA = [
+  {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',    status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
+  {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',       status:'Taken',     mj:'Ahmad Razif',     wl:2, urgency:'Standard' },
+  {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',   date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',     status:'Completed', mj:'Lily Tan',        wl:0, urgency:'Standard' },
+  {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Published',  mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-005',type:'Centre Assistant',facility:'SCC — Bishan',    date:'23 May 2026',sd:'2026-05-23',time:'13:00–17:00',client:'—',                status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
+  {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed', mj:'Fatimah bte Ali', wl:0, urgency:'Urgent'  },
+  {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Published',  mj:null,              wl:1, urgency:'Standard' },
+  {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',     mj:'Susan Lim',       wl:0, urgency:'Standard' },
+  {id:'MJ-2026-009',type:'Centre Assistant',facility:'VG — Clementi',   date:'24 May 2026',sd:'2026-05-24',time:'08:00–17:00',client:'—',                status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Published',  mj:null,              wl:3, urgency:'Urgent'  },
+  {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Published',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Published',  mj:null,              wl:3, urgency:'Standard' },
+  {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed', mj:'Ravi Kumar',      wl:0, urgency:'Standard' },
+  {id:'MJ-2026-014',type:'Centre Assistant',facility:'SCC — Queenstown',date:'29 May 2026',sd:'2026-05-29',time:'09:00–18:00',client:'—',                status:'Published',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',    date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',      status:'Cancelled', mj:null,              wl:0, urgency:'Urgent'  },
+  {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',     mj:'Grace Chua',      wl:0, urgency:'Standard' },
+  {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Published',  mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-019',type:'Centre Assistant',facility:'SCC — Toa Payoh', date:'01 Jun 2026',sd:'2026-06-01',time:'08:00–13:00',client:'—',                status:'Published',  mj:null,              wl:3, urgency:'Standard' },
+  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Published',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Published',  mj:null,              wl:1, urgency:'Standard' },
+  {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Published',  mj:null,              wl:0, urgency:'Standard' },
+];
+
+const WAITLIST_DATA = {
+  'MJ-2026-002':[{n:'Ramesh Kumar',t:'17 May 08:12'},{n:'Joanna Lim',t:'17 May 09:44'}],
+  'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
+  'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
+  'MJ-2026-009':[{n:'Tan Siew Lian',t:'16 May 08:30'},{n:'Abdul Halim',t:'16 May 09:15'},{n:'Mei Ling Chua',t:'16 May 12:00'},{n:'Raj Gopal',t:'17 May 07:45'}],
+  'MJ-2026-010':[{n:'Wong Kah Meng',t:'16 May 10:00'},{n:'Lim Soo Bee',t:'16 May 13:30'},{n:'Ng Ah Cheh',t:'17 May 08:00'}],
+  'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
+  'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
+  'MJ-2026-014':[{n:'Sarah Tan',t:'18 May 07:45'},{n:'Vijay Kumar',t:'18 May 09:30'}],
+  'MJ-2026-017':[{n:'Grace Ho',t:'15 May 16:00'},{n:'Fatimah bte Salleh',t:'16 May 08:20'},{n:'Ravi Shankar',t:'16 May 11:45'},{n:'Yeo Bee Kheng',t:'17 May 07:30'}],
+  'MJ-2026-018':[{n:'Abdul Rahman',t:'17 May 15:00'},{n:'Lee Ah Kow Jr',t:'17 May 16:30'},{n:'Tan Sock Kiang',t:'18 May 08:00'},{n:'Gopalan s/o Rajan',t:'18 May 09:00'}],
+  'MJ-2026-019':[{n:'Lily Ng',t:'17 May 08:00'},{n:'Chen Wei Ling',t:'17 May 10:00'},{n:'Mohd Farid',t:'18 May 07:30'}],
+  'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
+  'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
+};
+
+const TYPE_ICON = {'Chaperone':'🤝','Befriending':'💬','Home Assessment':'🏠','Centre Assistant':'🏛'};
+const STATUS_HTML = {
+  'Published': '<span class="badge b-pub">● Published</span>',
+  'Taken':     '<span class="badge b-tak">✓ Taken</span>',
+  'Completed': '<span class="badge b-com">✔ Completed</span>',
+  'Cancelled': '<span class="badge b-can">✕ Cancelled</span>',
+  'Waitlisted':'<span class="badge b-wl">⏳ Waitlisted</span>',
+  'At Risk':   '<span class="badge b-risk">⚠ At Risk</span>',
+};
+
+/* ══ DataTable ═════════════════════════════════════════════════════ */
+let dt;
+$(document).ready(function () {
+  const rows = JOB_DATA.map(j => [
+    '<span class="job-id-cell">' + j.id + '</span>',
+    '<span class="type-cell">' + TYPE_ICON[j.type] + ' ' + j.type + '</span>',
+    j.facility,
+    '<span data-sort="' + j.sd + '">' + j.date + '</span>',
+    j.time,
+    j.client,
+    STATUS_HTML[j.status] || j.status,
+    j.mj ? '<span class="mj-name">' + j.mj + '</span>' : '<span class="mj-empty">Unassigned</span>',
+    j.wl > 0 ? '<span class="wl-chip">' + j.wl + '</span>' : '<span class="wl-zero">—</span>',
+    j.urgency === 'Urgent' ? '<span class="badge b-urg">🔶 Urgent</span>' : '<span class="badge b-std">Standard</span>',
+    '<button class="btn-manage" onclick="openModal(\'' + j.id + '\')">Manage →</button>',
+  ]);
+
+  dt = $('#jobTable').DataTable({
+    data: rows,
+    columns: [
+      {title:'Job ID'},{title:'Type'},{title:'Facility'},{title:'Date'},
+      {title:'Time slot',orderable:false},{title:'Client'},
+      {title:'Status',orderable:false},{title:'MJ assigned'},
+      {title:'Waitlist',className:'dt-center',orderable:false},
+      {title:'Urgency',orderable:false},{title:'Actions',orderable:false},
+    ],
+    pageLength: 10,
+    order: [[3,'asc']],
+    dom: 't<"dt-pg-wrap"ip>',
+    language: {
+      info: 'Showing _START_–_END_ of _TOTAL_ jobs',
+      infoFiltered: '(filtered from _MAX_)',
+      paginate: {previous:'‹ Prev', next:'Next ›'},
+    },
+    drawCallback: function () {
+      var api = this.api(), pi = api.page.info();
+      var info = 'Showing ' + (pi.start + 1) + '–' + pi.end + ' of ' + pi.recordsDisplay + ' jobs';
+      if (pi.recordsDisplay < pi.recordsTotal) info += ' (filtered from ' + pi.recordsTotal + ')';
+      document.getElementById('dt-info').textContent = info;
+      var pgSrc = document.querySelector('.dt-pg-wrap .dataTables_paginate');
+      var pgDst = document.getElementById('dt-pag');
+      if (pgSrc && pgDst) { pgDst.innerHTML = pgSrc.innerHTML; pgSrc.style.display = 'none'; }
+    },
+  });
+});
+
+/* ══ Custom filters ════════════════════════════════════════════════ */
+$.fn.dataTable.ext.search.push(function (settings, data, idx) {
+  var j = JOB_DATA[idx]; if (!j) return true;
+  var fac  = document.getElementById('fFacility')  ? document.getElementById('fFacility').value  : '';
+  var type = document.getElementById('fType')      ? document.getElementById('fType').value      : '';
+  var stat = document.getElementById('fStatus')    ? document.getElementById('fStatus').value    : '';
+  var urg  = document.getElementById('fUrgency')   ? document.getElementById('fUrgency').value   : '';
+  var srch = document.getElementById('fSearch')    ? document.getElementById('fSearch').value.toLowerCase().trim() : '';
+  if (fac  && j.facility !== fac)   return false;
+  if (type && j.type !== type)      return false;
+  if (stat && j.status !== stat)    return false;
+  if (urg  && j.urgency !== urg)    return false;
+  if (srch) {
+    var hay = (j.id + ' ' + j.client + ' ' + (j.mj || '') + ' ' + j.facility + ' ' + j.type).toLowerCase();
+    if (hay.indexOf(srch) === -1) return false;
+  }
+  return true;
+});
+
+function applyFilters() { if (dt) dt.draw(); }
+function clearFilters() {
+  ['fFacility','fType','fStatus','fUrgency'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var fs = document.getElementById('fSearch'); if (fs) fs.value = '';
+  if (dt) dt.draw();
+}
+
+/* ══ Popover ═══════════════════════════════════════════════════════ */
+var activePop = null;
 function togglePop(id, btn) {
-  const pop = document.getElementById(id);
+  var pop = document.getElementById(id);
+  if (!pop) return;
   if (activePop && activePop !== pop) {
     activePop.classList.remove('on');
-    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
   }
-  const isOn = pop.classList.contains('on');
-  pop.classList.toggle('on');
+  var isOn = pop.classList.contains('on');
+  pop.classList.toggle('on', !isOn);
   btn.classList.toggle('active', !isOn);
   activePop = isOn ? null : pop;
 }
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
-    document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
-    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pop.on').forEach(function(p){p.classList.remove('on');});
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
     activePop = null;
   }
 });
-function setCplx(el, v) {
-  document.querySelectorAll('.cb').forEach(b => b.className = 'cb');
-  el.className = 'cb c' + v;
+
+/* ══ Modal ══════════════════════════════════════════════════════════ */
+function openModal(jobId) {
+  var j = JOB_DATA.find(function(x){return x.id === jobId;});
+  if (!j) return;
+  var wl = WAITLIST_DATA[jobId] || [];
+  var isHA = j.type === 'Home Assessment';
+  var isBef = j.type === 'Befriending';
+  var slots = isHA ? 2 : 1;
+  var locked = j.status === 'Completed' || j.status === 'Cancelled';
+
+  document.getElementById('modal-title').textContent = j.id + ' — ' + j.type + ' · ' + j.facility;
+
+  var banner = '';
+  if (j.status === 'At Risk')
+    banner = '<div class="banner bn-r">⚠️ <div><strong>At Risk:</strong> No confirmed MJ. Auto-cancel triggers 1 BD before job date. Escalate to SCC Nurse and assign manually if needed.</div></div>';
+  else if (j.status === 'Cancelled')
+    banner = '<div class="banner bn-r">✕ <div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
+  else if (j.status === 'Completed')
+    banner = '<div class="banner bn-g">✓ <div><strong>Completed:</strong> Job was successfully completed. Records are locked.</div></div>';
+  else if (isHA)
+    banner = '<div class="banner bn-a">ℹ️ <div><strong>Home Assessment:</strong> Minimum 2 confirmed MJs required. Confirmed MJ names are visible to all eligible MJs on the C4Me listing.</div></div>';
+
+  var grid = '<div class="m-info-grid">' +
+    '<div class="m-info-box"><div class="m-info-label">Date &amp; time</div><div class="m-info-val">' + j.date + ', ' + j.time + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Client</div><div class="m-info-val">' + j.client + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Urgency</div><div class="m-info-val">' + (j.urgency === 'Urgent' ? '🔶 Urgent' : 'Standard') + '</div></div>' +
+    '</div>';
+
+  var slotHtml = '<div class="sect-title">Confirmed slot' + (slots > 1 ? 's' : '') + ' (' + slots + ' required)</div>';
+  for (var i = 0; i < slots; i++) {
+    var hasMJ = i === 0 && j.mj;
+    slotHtml += '<div class="slot-row" id="slot-' + i + '">' +
+      '<div class="slot-num ' + (hasMJ ? 'sn-filled' : 'sn-empty') + '">' + (hasMJ ? '✓' : (i + 1)) + '</div>' +
+      '<div style="flex:1"><div class="slot-name"' + (hasMJ ? '' : ' style="color:var(--ink4);font-style:italic"') + '>' + (hasMJ ? j.mj : 'Empty — awaiting MJ') + '</div>' +
+      '<div class="slot-meta">' + (hasMJ ? 'Confirmed · Grabbed 16 May 09:30' : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')) + '</div></div>';
+    if (!locked) {
+      if (hasMJ) slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
+      else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
+    }
+    slotHtml += '</div>';
+  }
+
+  var wlHtml = '';
+  if (!isBef) {
+    wlHtml = '<div class="sect-title">Waitlist (' + wl.length + ' / 4)</div>';
+    if (!wl.length) {
+      wlHtml += '<div style="font-size:12px;color:var(--ink4);padding:8px 0">No MJs on waitlist yet.</div>';
+    } else {
+      wl.forEach(function(w, idx) {
+        wlHtml += '<div class="wl-row" id="wl-' + idx + '">' +
+          '<div class="wl-pos">' + (idx + 1) + '</div>' +
+          '<div class="wl-name">' + w.n + '</div>' +
+          '<div class="wl-time">' + w.t + '</div>';
+        if (!locked) wlHtml += '<button class="wl-btn wl-confirm" onclick="confirmWL(this,\'' + jobId + '\',' + idx + ')">Confirm</button>' +
+          '<button class="wl-btn wl-remove" onclick="removeWL(this,' + idx + ')">Remove</button>';
+        wlHtml += '</div>';
+      });
+    }
+  } else {
+    wlHtml = '<div class="sect-title">Assignment</div>' +
+      '<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr)">' +
+      'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.' +
+      (!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(\'' + jobId + '\',0)">+ Assign MJ manually</button>' : '') + '</div>';
+  }
+
+  document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
+  document.getElementById('btn-complete').disabled = locked;
+  document.getElementById('btn-cancel-job').disabled = locked;
+  document.getElementById('assignModal').style.display = 'flex';
 }
-function onJobType() {
-  const t = document.getElementById('jobType').value;
-  const note = document.getElementById('ha-note');
-  const sc = document.getElementById('confirmedSlots');
-  if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
-  else { note.style.display = 'none'; sc.textContent = '1'; }
+
+function closeModal() { document.getElementById('assignModal').style.display = 'none'; }
+function handleOverlayClick(e) { if (e.target.id === 'assignModal') closeModal(); }
+
+function confirmWL(btn, jobId, idx) {
+  var row = btn.closest('.wl-row');
+  row.style.background = 'var(--gl)'; row.style.borderColor = 'var(--gb)';
+  btn.textContent = '✓ Confirmed'; btn.disabled = true;
+  btn.style.background = 'var(--gm)'; btn.style.color = '#fff';
+}
+function removeWL(btn, idx) {
+  var row = btn.closest('.wl-row');
+  row.style.opacity = '.45';
+  row.querySelectorAll('button').forEach(function(b){b.disabled = true;});
+  btn.textContent = 'Removed';
+}
+function removeSlot(btn, jobId, idx) {
+  var row = document.getElementById('slot-' + idx);
+  row.querySelector('.slot-name').textContent = 'Empty — slot re-opened';
+  row.querySelector('.slot-name').style.cssText = 'color:var(--ink4);font-style:italic';
+  row.querySelector('.slot-meta').textContent = 'Open for grab · Slot re-opened';
+  row.querySelector('.slot-num').className = 'slot-num sn-empty';
+  row.querySelector('.slot-num').textContent = String(idx + 1);
+  btn.textContent = 'Removed'; btn.disabled = true;
+}
+function assignManually(jobId, idx) {
+  var name = prompt('Enter MJ name to assign manually:');
+  if (!name || !name.trim()) return;
+  var row = document.getElementById('slot-' + idx);
+  if (row) {
+    row.querySelector('.slot-name').textContent = name.trim();
+    row.querySelector('.slot-name').style.cssText = '';
+    row.querySelector('.slot-meta').textContent = 'Manually assigned · Just now';
+    row.querySelector('.slot-num').className = 'slot-num sn-filled';
+    row.querySelector('.slot-num').textContent = '✓';
+  }
 }
 </script>
 </body>
