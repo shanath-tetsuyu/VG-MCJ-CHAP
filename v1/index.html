@@ -361,7 +361,6 @@
       <button class="btn-primary" onclick="closeModal()">Done</button>
       <button class="btn-ghost" id="btn-complete">Mark Completed</button>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn-danger" id="btn-noshow" onclick="openNoShowModal()">No Show</button>
         <button class="btn-danger" id="btn-cancel-job">Cancel Job</button>
       </div>
     </div>
@@ -564,6 +563,7 @@ function openModal(jobId) {
   var isBef = j.type === 'Befriending';
   var slots = isHA ? 2 : 1;
   var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
+  var displayNoShow = j.status === 'Completed' || j.status === 'In Progress'|| j.status === 'Cancelled';
 
   document.getElementById('modal-title').textContent = j.id + ' — ' + j.type + ' · ' + j.facility;
 
@@ -594,6 +594,8 @@ function openModal(jobId) {
       if (hasMJ) slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
       else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
     }
+
+    if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>';
     slotHtml += '</div>';
   }
 
@@ -623,7 +625,6 @@ function openModal(jobId) {
   document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
   document.getElementById('btn-complete').disabled = locked;
   document.getElementById('btn-cancel-job').disabled = locked;
-  document.getElementById('btn-noshow').disabled = locked;
   document.getElementById('assignModal').style.display = 'flex';
 }
 
