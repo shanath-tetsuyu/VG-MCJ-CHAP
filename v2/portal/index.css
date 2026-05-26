@@ -13,10 +13,121 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
 
 /* ── Sidebar ── */
-.sidebar{width:56px;background:#6B21A8;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:2px;flex-shrink:0}
-.s-logo{width:32px;height:32px;border-radius:8px;background:var(--gm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;margin-bottom:12px}
-.s-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);cursor:pointer;font-size:17px;text-decoration:none}
-.s-item.on{background:rgba(255,255,255,0.12);color:#fff}
+/* ── Sidebar ──────────────────────────────────────────────────────── */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background-color: #1e3535;
+  flex-shrink: 0;
+  transition: width 0.25s ease, transform 0.25s ease;
+  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+#sidebar::-webkit-scrollbar { display: none; }
+
+/* Collapsed state */
+#sidebar.sidebar-collapsed {
+  width: 0;
+}
+
+/* ── Sidebar Profile ──────────────────────────────────────────────── */
+.sidebar-profile {
+  background-color: #162929;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #e8f5f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.sidebar-avatar .bi {
+  color: #1e3535 !important;
+  font-size: 1.6rem !important;
+}
+
+.sidebar-username {
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+
+.sidebar-role {
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+/* ── Sidebar Nav Links ────────────────────────────────────────────── */
+.sidebar-nav {
+  padding: 4px 0;
+}
+
+.sidebar-link {
+  color: rgba(255, 255, 255, 0.78);
+  padding: 9px 16px;
+  font-size: 0.825rem;
+  display: flex;
+  align-items: center;
+  border-radius: 0;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(255,255,255,0.07);
+  color: #ffffff;
+}
+
+.sidebar-link.active {
+  background-color: rgba(255,255,255,0.13);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.sidebar-link .bi:first-child {
+  font-size: 0.9rem;
+  min-width: 18px;
+}
+
+/* Collapse chevron */
+.collapse-icon {
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+/* ── Submenu ──────────────────────────────────────────────────────── */
+.sidebar-submenu {
+  background-color: rgba(0,0,0,0.15);
+  padding: 2px 0;
+  list-style: none;
+  margin: 0;
+}
+
+.sidebar-sublink {
+  color: rgba(255,255,255,0.6);
+  padding: 7px 16px 7px 40px;
+  font-size: 0.8rem;
+  display: block;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.sidebar-sublink:hover {
+  background-color: rgba(255,255,255,0.07);
+  color: #ffffff;
+}
+
 
 /* ── Shell ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
