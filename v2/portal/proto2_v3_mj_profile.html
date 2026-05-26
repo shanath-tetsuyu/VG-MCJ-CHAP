@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARES — MJ Profile v3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./index.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#13795B;--gm:#1D9E75;--gl:#E8F7F2;--gb:#9FE1CB;
+  --am:#C07A1A;--al:#FDF3E3;--ab:#F0C060;
+  --rm:#B03030;--rl:#FDF0F0;--rb:#F0AAAA;
+  --bm:#1A5FA8;--bl:#EBF3FD;--bb:#90BFED;
+  --pm:#6B21A8;--pl:#F5F0FF;--pb:#C4B5FD;
+  --ink:#1C1C1E;--ink2:#444;--ink3:#777;--ink4:#AAA;
+  --s:#fff;--bg:#F5F6F8;--bdr:#E4E4E4;--bdr2:#F0F0F0;
+  --r:10px;--rl2:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
+.sidebar{width:56px;background:#6B21A8;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:2px;flex-shrink:0}
+.s-logo{width:32px;height:32px;border-radius:8px;background:var(--gm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;margin-bottom:12px}
+.s-i{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);cursor:pointer;font-size:17px}
+.s-i.on{background:rgba(255,255,255,0.12);color:#fff}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0}
+.crumb a{color:var(--g);text-decoration:none;font-size:13px;font-weight:500}
+.crumb span{color:var(--ink4);margin:0 5px}
+
+/* ⓘ blue button */
+.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif}
+.br-btn:hover,.br-btn.active{background:var(--bm);color:#fff}
+/* ❓ red button */
+.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif}
+.q-btn:hover,.q-btn.active{background:var(--rm);color:#fff}
+
+/* Popover */
+.pop{display:none;position:absolute;z-index:200;width:288px;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,0.22);font-size:12px;line-height:1.6}
+.pop.on{display:block}
+.pop.right{left:auto;right:0}
+.pop-info{background:var(--ink);color:#fff}
+.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pop-info .pop-title::before{content:'⚙';font-size:12px}
+.pop-info .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5}
+.pop-info .pr:last-child{margin-bottom:0}
+.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,0.3)}
+.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pop-q .pop-title::before{content:'?';font-size:12px;color:var(--rb)}
+.pop-q .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;color:#FFD0D0}
+.pop-q .pr:last-child{margin-bottom:0}
+.pop-q .note{font-size:10px;color:rgba(255,200,200,0.4);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,0.15)}
+.pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.pd-g{background:var(--gm)} .pd-a{background:#F0C060} .pd-r{background:#F0AAAA} .pd-q{background:#F0AAAA}
+
+/* Hero */
+.hero{background:var(--s);border-bottom:1px solid var(--bdr);padding:16px 24px;display:flex;gap:16px;align-items:flex-start;flex-shrink:0;position:relative}
+.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1D9E75,#0A5C46);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.p-g{background:var(--gl);color:var(--g);border:1px solid var(--gb)}
+.p-b{background:var(--bl);color:var(--bm)}
+.p-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
+.p-r{background:var(--rl);color:var(--rm)}
+.p-gr{background:#F1F1F0;color:#777}
+.p-p{background:var(--pl);color:var(--pm);border:1px solid var(--pb)}
+.upd-badge{display:inline-flex;align-items:center;gap:3px;background:var(--pl);color:var(--pm);border:1px solid var(--pb);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-left:6px}
+
+/* Tabs */
+.tabs{background:var(--s);border-bottom:1px solid var(--bdr);padding:0 24px;display:flex;flex-shrink:0;overflow-x:auto}
+.tab{padding:11px 14px;font-size:13px;cursor:pointer;color:var(--ink3);border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
+.tab.on{color:var(--g);border-bottom-color:var(--gm)}
+.tc{display:none;overflow-y:auto;padding:20px 24px;flex:1}
+.tc.on{display:block}
+
+/* Grid helpers */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* Stat */
+.stat{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;text-align:center}
+.sn{font-size:22px;font-weight:700;color:var(--g)}
+.sl{font-size:11px;color:var(--ink4);margin-top:3px}
+.stat.warn .sn{color:var(--am)}
+
+/* Card */
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:16px;margin-bottom:14px;position:relative}
+.card-t{font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.dl{display:grid;grid-template-columns:112px 1fr;gap:5px 12px;font-size:13px}
+.dl dt{color:var(--ink4)}
+.dl dd{color:var(--ink2);font-weight:500}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.filter-bar select,.filter-bar input{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;transition:border-color .15s}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--gm);background:var(--s)}
+
+/* Engagement */
+.eng-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:6px 0 8px}
+.eng{height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.eng-y{background:var(--gl);color:var(--g)}
+.eng-n{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
+.eng-p{background:#EBEBEB;color:#CCC}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;font-weight:600;color:var(--ink4);text-align:left;padding:6px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.03em}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.st{display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-g{background:var(--gm)} .d-a{background:#EF9F27} .d-n{background:#DDD}
+
+/* Status table (MJ app statuses) */
+.status-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.status-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.04em;background:var(--bg)}
+.status-tbl td{padding:7px 8px;border-bottom:1px solid var(--bdr2);vertical-align:top;line-height:1.4;font-size:12px}
+.status-tbl tr:last-child td{border:none}
+
+/* Job rows */
+.jrow{display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr2);font-size:13px}
+.jrow:last-child{border:none}
+
+/* Cancellation table */
+.cancel-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.cancel-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.04em;background:var(--bg)}
+.cancel-tbl td{padding:7px 8px;border-bottom:1px solid var(--bdr2);vertical-align:top;line-height:1.4}
+.cancel-tbl tr:last-child td{border:none}
+
+/* Payment */
+.pay-row{display:grid;grid-template-columns:82px 110px 52px 68px 105px 90px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bdr2);font-size:13px}
+.pay-row:last-child{border:none}
+
+/* Notes */
+.note-item{border-left:3px solid var(--gm);padding:10px 12px;background:var(--bg);border-radius:0 8px 8px 0;margin-bottom:8px}
+.note-item.flag{border-left-color:var(--rm);background:var(--rl)}
+.note-by{font-size:11px;color:var(--ink4);margin-bottom:4px}
+.note-txt{font-size:13px;color:var(--ink2);line-height:1.5}
+textarea.n-input{width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);resize:vertical;min-height:60px;outline:none;margin-top:8px}
+textarea.n-input:focus{border-color:var(--gm)}
+
+/* Buttons */
+.btn-sm{border:1px solid var(--gb);background:var(--gl);color:var(--g);border-radius:var(--r);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
+.btn-act{border:1px solid var(--bdr);background:var(--s);color:var(--ink2);border-radius:var(--r);padding:7px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-red{border:1px solid var(--rb);background:var(--rl);color:var(--rm);border-radius:var(--r);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Banner */
+.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5}
+.b-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb)}
+.b-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
+.b-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb)}
+
+/* Inline rule block */
+.rule-inline{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.5;margin-top:10px}
+.rib-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.rib-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:3px}
+.rt-s{background:var(--bl);color:var(--bm)}
+.rt-b{background:var(--gl);color:var(--g)}
+.rt-o{background:var(--al);color:var(--am)}
+.rt-q{background:var(--rl);color:var(--rm)}
+
+select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="s-logo">C</div>
+  <a class="s-item on" href="./index.html" title="Dashboard">🏠</a>
+  <a class="s-item on" href="./proto2_v3_mj_profile.html" title="MJ Profile">🧑‍💼</a>
+  <a class="s-item on" href="./v1_mj_listing.html" title="MJ Listing">👥</a>
+  <a class="s-item on" href="./proto1_v3_publish.html" title="Publish Job">📅</a>
+  <a class="s-item on" href="./v1_aic_report.html" title="Reports">📊</a>
+  <div style="margin-top:auto"></div>
+  <div class="s-item" title="Settings">⚙️</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="#">MJ Registry</a><span>›</span><a href="#">Active MJs</a><span>›</span>Tan Siew Ling</div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn-act">Edit profile</button>
+      <button class="btn-red">Suspend MJ</button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="avatar">TSL</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px;position:relative">
+        <div style="font-size:17px;font-weight:700">Tan Siew Ling</div>
+        <button class="br-btn" onclick="togglePop('pop-status-hero',this)">i</button>
+        <button class="q-btn" onclick="togglePop('popq-status-hero',this)">?</button>
+        <div class="pop pop-info" id="pop-status-hero" style="top:28px;left:0">
+          <div class="pop-title">Business rules — MJ status lifecycle</div>
+          <div class="pr"><div class="pd pd-g"></div><div><strong>Active:</strong> Can be assigned jobs for roles where OJT = Completed.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div><strong>Suspended / Withdrawn / Terminated:</strong> Cannot be assigned new jobs. Offline acknowledgement from MJ required for deactivation.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div><strong>Blacklisted:</strong> Cannot be assigned ANY service. Can be changed back to Active by AAC Staff.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div><strong>Auto-blacklist:</strong> 3+ no-shows → system flags. No new tasks until AAC Staff removes flag manually.</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div>Screening status options: Screening → Training → Active → Blacklisted / Withdrawn / Suspended / Terminated.</div></div>
+        </div>
+        <div class="pop pop-q" id="popq-status-hero" style="top:28px;left:0">
+          <div class="pop-title">Open questions — Status</div>
+          <div class="pr"><div class="pd pd-q"></div><div>For Withdrawn/Terminated — what exactly constitutes "offline acknowledgement"? Is there a form, or is it a verbal confirmation that staff records as a note?</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>C4Me app access — is revoking access a separate manual step from changing MJ status, or should it auto-revoke on Suspended/Terminated?</div></div>
+          <div class="note">Owner: HR / AAC · Target: URG sign-off</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--ink3);margin-top:3px">Female · 68 yrs · Mandarin, Hokkien · Clementi (District 12) · Joined March 2025</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">
+        <span class="pill p-g">● Active</span>
+        <span class="pill p-b">Senior + MJ</span>
+        <span class="pill p-g">Chaperone</span>
+        <span class="pill p-g">Befriending</span>
+        <span class="pill p-a">Home Assessment — OJT Pending</span>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;position:relative">
+      <button class="q-btn" onclick="togglePop('popq-noshow',this)" style="margin-bottom:4px">?</button>
+      <div class="pop pop-q" id="popq-noshow" style="top:28px;right:0">
+        <div class="pop-title">Open questions — No-show</div>
+        <div class="pr"><div class="pd pd-q"></div><div>No-show reason dropdown list not yet defined. Pending Maisarah (was due 6 May — overdue).</div></div>
+        <div class="pr"><div class="pd pd-q"></div><div>For "repeated no-shows" threshold — is 3 the confirmed number? Can AAC Staff blacklist before hitting 3 manually?</div></div>
+        <div class="note">Owner: Maisarah · Overdue from 6 May</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:var(--rm);line-height:1">1</div>
+      <div style="font-size:11px;color:var(--ink4);margin-top:2px">No-show flags</div>
+      <div style="font-size:10px;color:var(--am);margin-top:3px;background:var(--al);padding:2px 6px;border-radius:20px">⚠ 2 more = auto-blacklist</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab on" onclick="showTab('ov',this)">Overview</div>
+    <div class="tab" onclick="showTab('tr',this)">Training & OJT</div>
+    <div class="tab" onclick="showTab('at',this)">Attendance</div>
+    <div class="tab" onclick="showTab('jh',this)">Job history</div>
+    <div class="tab" onclick="showTab('py',this)">Payment</div>
+    <div class="tab" onclick="showTab('cx',this)">Cancellations <span class="upd-badge">↻ Updated</span></div>
+    <div class="tab" onclick="showTab('st',this)">MJ App statuses</div>
+    <div class="tab" onclick="showTab('nt',this)">Notes</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="tc on" id="tc-ov">
+    <div class="g4" style="margin-bottom:14px">
+      <div class="stat"><div class="sn">14</div><div class="sl">Jobs completed</div></div>
+      <div class="stat"><div class="sn">28h</div><div class="sl">Hours this year</div></div>
+      <div class="stat"><div class="sn">$392</div><div class="sl">YTD earnings</div></div>
+      <div class="stat warn"><div class="sn">1</div><div class="sl">No-show flags</div></div>
+    </div>
+    <div class="card">
+      <div class="card-t" style="position:relative">
+        Engagement — 2026
+        <button class="br-btn" onclick="togglePop('pop-engagement',this)">i</button>
+        <button class="q-btn" onclick="togglePop('popq-engagement',this)">?</button>
+        <div class="pop pop-info" id="pop-engagement" style="top:24px;left:0">
+          <div class="pop-title">Business rules — Engagement</div>
+          <div class="pr"><div class="pd pd-g"></div><div><strong>Monthly:</strong> ≥1 job completed in that calendar month = engaged.</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div><strong>Quarterly:</strong> Min 3 engagements across the quarter = engaged.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>Feeds AAC KPI reporting to AIC. Volunteer-type MJs tracked separately.</div></div>
+        </div>
+        <div class="pop pop-q" id="popq-engagement" style="top:24px;left:180px">
+          <div class="pop-title">Open questions — KPI reporting</div>
+          <div class="pr"><div class="pd pd-q"></div><div>AIC report template specifies: No. of MJ, types of roles activated, hours, payment. Confirm if this is per facility or combined only.</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>Volunteer-type MJs — how are they counted differently in KPI? Is this a flag or a separate counter?</div></div>
+          <div class="note">Owner: AAC / Maisarah · Target: URG #3</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--ink4);margin-bottom:6px">Green = ≥1 job completed · Grey = no data yet</div>
+      <div class="eng-grid">
+        <div class="eng eng-y">Jan</div><div class="eng eng-y">Feb</div><div class="eng eng-y">Mar</div><div class="eng eng-y">Apr</div><div class="eng eng-y">May</div>
+        <div class="eng eng-p">Jun</div><div class="eng eng-p">Jul</div><div class="eng eng-p">Aug</div><div class="eng eng-p">Sep</div><div class="eng eng-p">Oct</div><div class="eng eng-p">Nov</div><div class="eng eng-p">Dec</div>
+      </div>
+      <div style="display:flex;gap:16px;font-size:11px;color:var(--ink4)">
+        <span>5 months engaged</span><span>·</span><span>Last job: 3 May 2026</span><span>·</span><span style="color:var(--g);font-weight:500">Q2: on track (2/3 months)</span>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-t">Profile</div>
+        <dl class="dl">
+          <dt>NRIC</dt><dd>SXXXX456A</dd>
+          <dt>Date of birth</dt><dd>12 Apr 1958 (68 yr)</dd>
+          <dt>Mobile</dt><dd>9123 4567</dd>
+          <dt>Address</dt><dd>Blk 301 Clementi Ave 4, S120301</dd>
+          <dt>Languages</dt><dd>Mandarin, Hokkien</dd>
+          <dt>MJ type</dt><dd>Senior + MJ</dd>
+          <dt>Interests</dt><dd>Health, Gardening</dd>
+          <dt>C4Me access</dt><dd style="color:var(--g)">✓ Granted — MJ module</dd>
+        </dl>
+      </div>
+      <div class="card" style="position:relative">
+        <div class="card-t">
+          Status management
+          <button class="br-btn" onclick="togglePop('pop-statusmgmt',this)">i</button>
+          <button class="q-btn" onclick="togglePop('popq-statusmgmt',this)">?</button>
+          <div class="pop pop-info right" id="pop-statusmgmt" style="top:24px">
+            <div class="pop-title">Business rules — Status changes</div>
+            <div class="pr"><div class="pd pd-g"></div><div>Only AAC Staff can change MJ status in CARES.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div>Withdrawn / Terminated: offline acknowledgement from MJ required before status change.</div></div>
+            <div class="pr"><div class="pd pd-r"></div><div>Blacklisted MJ cannot be assigned ANY service until staff manually removes flag.</div></div>
+          </div>
+          <div class="pop pop-q right" id="popq-statusmgmt" style="top:24px">
+            <div class="pop-title">Open questions — C4Me access</div>
+            <div class="pr"><div class="pd pd-q"></div><div>Should C4Me app access auto-revoke when status changes to Suspended/Terminated, or is it always a separate manual action?</div></div>
+            <div class="note">Owner: IT / AAC · Target: URG sign-off</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="font-size:12px;color:var(--ink4);margin-bottom:4px">MJ status</div>
+            <select class="st-sel"><option>Active</option><option>Undergoing Training</option><option>Screening</option><option>Suspended</option><option>Withdrawn</option><option>Terminated</option><option>Blacklisted</option></select>
+          </div>
+          <div class="banner b-a">⚠️ <strong>1 no-show</strong> recorded (10 Apr 2026). Auto-blacklist at 3.</div>
+          <div class="banner b-g">✓ Service contract signed · Bank details on file · GIRO active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="tc" id="tc-tr">
+    <div class="card" style="position:relative">
+      <div class="card-t">
+        Training & OJT by service role
+        <button class="br-btn" onclick="togglePop('pop-ojt',this)">i</button>
+        <button class="q-btn" onclick="togglePop('popq-ojt',this)">?</button>
+        <div class="pop pop-info" id="pop-ojt" style="top:24px">
+          <div class="pop-title">Business rules — OJT eligibility</div>
+          <div class="pr"><div class="pd pd-g"></div><div>MJ can only be assigned / see listings for roles where <strong>OJT = Completed</strong>.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>Training Completed ≠ OJT Completed. Both required.</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div>Status values: NA / Pending / Scheduled / In Progress / Completed. Staff updates manually.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div>If assigned and OJT not Completed → system shows error and blocks assignment.</div></div>
+        </div>
+        <div class="pop pop-q" id="popq-ojt" style="top:24px;left:220px">
+          <div class="pop-title">Open questions — Training</div>
+          <div class="pr"><div class="pd pd-q"></div><div>Full training list for all 4 roles still pending from Maisarah. Sheet shows 4 confirmed roles + 5+ more TBC. Cannot build training table without this list.</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>For Home Assessment (Safe Steps Associate) — is the OJT structured differently (e.g. min supervised visits) vs other roles?</div></div>
+          <div class="note">Owner: Maisarah · Overdue from 30 Apr</div>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Role</th><th>Training</th><th>OJT</th><th>Job eligible</th><th>Certificate / Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Chaperone</strong></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><span class="pill p-g">Yes</span></td><td style="font-size:12px;color:var(--ink4)">Cert #CH-2025-014 · Jan 2025</td></tr>
+          <tr><td><strong>Befriending</strong></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><span class="pill p-g">Yes</span></td><td style="font-size:12px;color:var(--ink4)">Cert #BF-2025-008 · Feb 2025</td></tr>
+          <tr><td><strong>Home Assessment</strong><br><span style="font-size:11px;color:var(--ink4)">Safe Steps Associate</span></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-a"></div>In Progress</div></td><td><span class="pill p-a">No — OJT pending</span></td><td style="font-size:12px;color:var(--ink4)">OJT scheduled 20 May 2026</td></tr>
+          <tr><td><strong>Centre Assistant</strong></td><td><div class="st"><div class="dot d-n"></div>Not enrolled</div></td><td><div class="st"><div class="dot d-n"></div>N/A</div></td><td><span class="pill p-gr">Not enrolled</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rule-inline">
+      <div class="rib-icon">⚠️</div>
+      <div>
+        <div class="rib-type rt-q">Open item — Maisarah (overdue 30 Apr)</div>
+        <div style="font-size:12px;line-height:1.5;color:var(--ink2)">Full training list for all 4 roles (and 5+ additional roles) not yet received. Training table above is partial — cannot be marked complete until list is confirmed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="tc" id="tc-at">
+    <div class="card" style="position:relative">
+
+        <div class="filter-bar">
+          <label>From</label>
+          <input type="date" id="attFrom" onchange="filterAttendance()">
+          <label>To</label>
+          <input type="date" id="attTo" onchange="filterAttendance()">
+          <label>Job ID</label>
+          <input type="text" id="attJobId" placeholder="e.g. MJ-2026-037" oninput="filterAttendance()" style="width:160px">
+          <button class="btn-act" onclick="clearAttFilters()">Clear</button>
+        </div>
+
+      <div class="card-t">Attendance record</div>
+      <div style="overflow-x:auto">
+        <table class="tbl" id="attTbl">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Duration</th>
+              <th>Location</th>
+              <th>Job ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-date="2026-05-03" data-jobid="mj-2026-037">
+              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">3 May 2026</td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--g)">14:02</span></td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">16:10</span></td>
+              <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
+              <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
+              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
+            </tr>
+            <tr data-date="2026-04-22" data-jobid="mj-2026-029">
+              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--g)">10:05</span></td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:08</span></td>
+              <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
+              <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
+              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
+            </tr>
+            <tr data-date="2026-04-02" data-jobid="mj-2026-018">
+              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:58</span></td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">10:55</span></td>
+              <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
+              <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
+              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
+            </tr>
+            <tr data-date="2026-03-10" data-jobid="mj-2026-009">
+              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--g)">13:01</span></td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">15:05</span></td>
+              <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
+              <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
+              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
+            </tr>
+            <tr data-date="2026-02-14" data-jobid="mj-2026-004">
+              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:55</span></td>
+              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:10</span></td>
+              <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
+              <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
+              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--ink4);margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)">Check-in and check-out times are recorded via the C4Me mobile app. MJ payment is calculated from these timestamps.</div>
+    </div>
+  </div>
+
+  <!-- JOB HISTORY -->
+  <div class="tc" id="tc-jh">
+    <div class="card" style="position:relative">
+      <div class="card-t" style="justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:6px">
+          Job history
+          <button class="br-btn" onclick="togglePop('pop-jobhist',this)">i</button>
+          <div class="pop pop-info" id="pop-jobhist" style="top:24px">
+            <div class="pop-title">Business rules — Job statuses</div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Completed:</strong> MJ tapped Start + End in C4Me. Payment calculated on actual timestamps.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div><strong>Cancelled:</strong> By client, MJ, or staff. Payment depends on scenario.</div></div>
+            <div class="pr"><div class="pd pd-r"></div><div><strong>No-show (MJ):</strong> Flagged in profile. 3 = auto-blacklist.</div></div>
+            <div class="pr"><div class="pd pd-r"></div><div><strong>No-show (Client):</strong> MJ still paid 1h. SCC charges client in full.</div></div>
+          </div>
+        </span>
+        <select style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 8px;border:1px solid var(--bdr);border-radius:6px;background:var(--bg);color:var(--ink4)"><option>All types</option><option>Chaperone</option><option>Befriending</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)"><span>Date</span><span>Status</span><span>Type</span><span>Details</span><span>Earned</span></div>
+      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Lee Geok Eng → SGH A&E · 2h</span><span style="color:var(--g);font-weight:600">$28</span></div>
+      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Befriending</span><span style="color:var(--ink3)">Ng Ah Beng (AAC) · 1h · Recurring</span><span style="color:var(--g);font-weight:600">$14</span></div>
+      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">10 Apr 2026</span><span class="pill p-r" style="font-size:10px">No-show</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Tan Ah Kow → NUH · Flagged by SCC</span><span style="color:var(--ink4)">—</span></div>
+      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">2 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Chan Bee Kim → Polyclinic · 1h</span><span style="color:var(--g);font-weight:600">$14</span></div>
+      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">15 Mar 2026</span><span class="pill p-a" style="font-size:10px">Cancelled</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Client cancelled with sufficient notice</span><span style="color:var(--ink4)">—</span></div>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="tc" id="tc-py">
+    <div class="g4" style="margin-bottom:14px">
+      <div class="stat"><div class="sn">$392</div><div class="sl">YTD paid</div></div>
+      <div class="stat warn"><div class="sn">$42</div><div class="sl">Pending verification</div></div>
+      <div class="stat"><div class="sn">$14/h</div><div class="sl">Chaperone rate*</div></div>
+      <div class="stat"><div class="sn">$14/h</div><div class="sl">Befriending rate*</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders — fee table pending Finance (Filbert)</div>
+    <div class="card" style="position:relative">
+      <div class="card-t">
+        Claims — May 2026
+        <button class="br-btn" onclick="togglePop('pop-payment',this)">i</button>
+        <button class="q-btn" onclick="togglePop('popq-payment',this)">?</button>
+        <div class="pop pop-info" id="pop-payment" style="top:24px">
+          <div class="pop-title">Business rules — MJ payment</div>
+          <div class="pr"><div class="pd pd-g"></div><div><strong>Rounding:</strong> Min 1h. 1h–1h29m = 1h. 1h30m–2h29m = 2h. 2h30m–3h29m = 3h. Etc.</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div>Basis: actual C4Me check-in/out timestamps. Independent of SCC scheduled billing.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>AAC Staff verifies claim in CARES before export to HR. Status: Payment Owing → Paid.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>Phase 1: Excel export to HR. SAP API integration is post-Phase 1.</div></div>
+        </div>
+        <div class="pop pop-q" id="popq-payment" style="top:24px;left:200px">
+          <div class="pop-title">Open questions — Payment</div>
+          <div class="pr"><div class="pd pd-q"></div><div>Will CARES send payment data to SAP via API monthly? SAP to return payment-made status to CARES? Phase 1 is manual Excel — but system should be designed to accommodate this future API.</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>Can centre staff manually amend MJ start/end times in CARES (e.g. if MJ forgot to check out)? Needs configurable permission level.</div></div>
+          <div class="note">Owner: Finance / IT · Future phase but flag now</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:82px 110px 52px 68px 105px 90px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)"><span>Date</span><span>Role</span><span>Hours</span><span>Amount</span><span>Status</span><span></span></div>
+      <div class="pay-row">
+        <span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span>Chaperone</span><span>2h</span><span style="font-weight:600">$28</span>
+        <span class="pill p-a" style="font-size:10px">Pending</span>
+        <button style="border:1px solid var(--gb);background:var(--gl);color:var(--g);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Verify ✓</button>
+      </div>
+      <div class="pay-row">
+        <span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span>Befriending</span><span>1h</span><span style="font-weight:600">$14</span>
+        <span class="pill p-g" style="font-size:10px">Paid</span>
+        <span style="font-size:11px;color:var(--ink4)">2 May 2026</span>
+      </div>
+      <div style="margin-top:10px"><button class="btn-sm">Export timesheet (Excel)</button></div>
+    </div>
+  </div>
+
+  <!-- CANCELLATIONS (updated) -->
+  <div class="tc" id="tc-cx">
+    <div class="card" style="position:relative">
+      <div class="card-t">
+        MJ cancellation policy
+        <span class="upd-badge">↻ Waitlist model revised</span>
+        <button class="br-btn" onclick="togglePop('pop-mjcancel',this)" style="margin-left:4px">i</button>
+        <button class="q-btn" onclick="togglePop('popq-mjcancel',this)">?</button>
+        <div class="pop pop-info" id="pop-mjcancel" style="top:24px">
+          <div class="pop-title">Business rules — MJ cancellation</div>
+          <div class="pr"><div class="pd pd-g"></div><div>MJ must cancel ≥ 48h before appointment (business hours).</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div>Cancel via app or verbally to staff (staff cancels in CARES web).</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div>After deadline: system blocks cancellation. Error prompts MJ to call centre.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div>System does not allow cancellation on Public Holidays. Call centre staff.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div><strong>Revised waitlist:</strong> On MJ cancel, all waitlisted MJs can grab — not sequential. First confirmed ≥ 1 BD before wins.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div>If no one confirms ≥ 1 BD before: job auto-cancels, client informed.</div></div>
+        </div>
+        <div class="pop pop-q" id="popq-mjcancel" style="top:24px;left:220px">
+          <div class="pop-title">Open questions — Waitlist (revised model)</div>
+          <div class="pr"><div class="pd pd-q"></div><div>With open grab (not sequential): if 2 waitlisted MJs grab at the same time, does first-timestamp-wins apply? How does the system handle the near-simultaneous case?</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>Should waitlisted MJs receive a push notification when a slot opens due to cancellation? All at once?</div></div>
+          <div class="note">Owner: Dev team · Needs confirmation before build</div>
+        </div>
+      </div>
+      <table class="cancel-tbl">
+        <thead><tr><th>Appointment day</th><th>MJ must cancel by</th><th>Auto-cancel if no taker by</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Monday</strong></td><td>Prev Thursday, 9AM</td><td>Friday, 9AM (1 BD before)</td></tr>
+          <tr><td><strong>Tuesday</strong></td><td>Prev Friday, 9AM</td><td>Monday, 9AM</td></tr>
+          <tr><td><strong>Wednesday</strong></td><td>Monday, 9AM</td><td>Tuesday, 9AM</td></tr>
+          <tr><td><strong>Thursday</strong></td><td>Tuesday, 9AM</td><td>Wednesday, 9AM</td></tr>
+          <tr><td><strong>Friday</strong></td><td>Wednesday, 9AM</td><td>Thursday, 9AM</td></tr>
+          <tr><td colspan="3" style="background:var(--al);color:var(--am);font-size:11px;padding:7px 8px">⚠️ If deadline falls on / before a PH: system blocks. Staff to handle manually by phone.</td></tr>
+        </tbody>
+      </table>
+      <div class="rule-inline" style="margin-top:10px">
+        <div class="rib-icon">🔄</div>
+        <div>
+          <div class="rib-type rt-s">System rule — revised waitlist model</div>
+          <div style="font-size:12px;line-height:1.6;color:var(--ink2)">When confirmed MJ cancels → all waitlisted MJs notified simultaneously and can grab. First MJ confirmed ≥ 1 BD before job date gets the slot. If nobody confirms → auto-cancel → client informed.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="position:relative">
+      <div class="card-t">
+        Client cancellation & no-show rules
+        <button class="br-btn" onclick="togglePop('pop-clientcx',this)" style="margin-left:auto">i</button>
+        <button class="q-btn" onclick="togglePop('popq-clientcx',this)">?</button>
+        <div class="pop pop-info right" id="pop-clientcx" style="top:24px">
+          <div class="pop-title">Business rules — Client cancellation</div>
+          <div class="pr"><div class="pd pd-g"></div><div><strong>Sufficient notice:</strong> ≥24h before (Tue–Fri). Mon: cancel by Fri 5PM.</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>Short notice: SCC charges client in full (option to waive). MJ paid 1h by AAC.</div></div>
+          <div class="pr"><div class="pd pd-r"></div><div>Client no-show: SCC charges in full. MJ paid accordingly. Staff completes in CARES with "No Show" + timing.</div></div>
+        </div>
+        <div class="pop pop-q right" id="popq-clientcx" style="top:24px">
+          <div class="pop-title">Open questions — No-show labels</div>
+          <div class="pr"><div class="pd pd-q"></div><div>The remarks field for "No Show" — what are the standard dropdown options? Sheet says "naming to be discussed". Pending from Maisarah (overdue).</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>Should "No Show (Client)" and "No Show (MJ)" be separate dropdown values, or separate fields?</div></div>
+          <div class="note">Owner: Maisarah · Overdue from 6 May</div>
+        </div>
+      </div>
+      <table class="cancel-tbl">
+        <thead><tr><th>Scenario</th><th>SCC action</th><th>AAC / MJ payment</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Sufficient notice</strong><br><span style="font-size:11px;color:var(--ink4)">≥24h (Tue–Fri) · Fri 5PM for Mon</span></td><td>Cancel in CARES. Inform client.</td><td>MJ not paid (job cancelled).</td></tr>
+          <tr><td><strong>Short notice</strong></td><td>Charge client in full (option to waive).</td><td>MJ paid <strong>1 hour</strong> by AAC.</td></tr>
+          <tr><td><strong>Client no-show</strong></td><td>Charge client in full.</td><td>MJ paid accordingly. Record "No Show" in CARES.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MJ APP STATUSES (new tab) -->
+  <div class="tc" id="tc-st">
+    <div class="card" style="position:relative">
+      <div class="card-t">
+        MJ app job statuses (C4Me)
+        <button class="br-btn" onclick="togglePop('pop-appstatus',this)" style="margin-left:auto">i</button>
+        <button class="q-btn" onclick="togglePop('popq-appstatus',this)">?</button>
+        <div class="pop pop-info right" id="pop-appstatus" style="top:24px">
+          <div class="pop-title">Business rules — App statuses</div>
+          <div class="pr"><div class="pd pd-g"></div><div>Jobs remain visible on listing until event is completed (immediately after MJ marks complete).</div></div>
+          <div class="pr"><div class="pd pd-a"></div><div>For Home Assessment: confirmed MJ names shown on listing for all MJs to see.</div></div>
+          <div class="pr"><div class="pd pd-g"></div><div>Messaging on rejection: "Job is no longer available / Job has been taken" (not "Rejected").</div></div>
+        </div>
+        <div class="pop pop-q right" id="popq-appstatus" style="top:24px">
+          <div class="pop-title">Open questions — Status labels</div>
+          <div class="pr"><div class="pd pd-q"></div><div>For Centre Assistant: when AAC staff rejects a registration, what message does MJ see? "Job No Longer Available" or something else?</div></div>
+          <div class="pr"><div class="pd pd-q"></div><div>Befriending has no "Grab" — does MJ only see "Assigned" or do they also see a pending state before staff confirms?</div></div>
+          <div class="note">Owner: AAC / UX · Target: URG #3</div>
+        </div>
+      </div>
+      <table class="status-tbl">
+        <thead><tr><th>Status</th><th>Chaperone</th><th>Home Assessment</th><th>Centre Assistant</th><th>Befriending</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="pill p-b" style="font-size:11px">Registered</span></td>
+            <td>MJ grabbed job</td><td>MJ grabbed job</td><td>MJ expressed interest</td><td>Staff assigned MJ</td>
+          </tr>
+          <tr>
+            <td><span class="pill p-g" style="font-size:11px">Confirmed</span></td>
+            <td>1st grab = confirmed</td><td>Up to 2 = confirmed (names shown)</td><td>Staff confirmed in CARES</td><td>Up to 2 = confirmed</td>
+          </tr>
+          <tr>
+            <td><span class="pill p-a" style="font-size:11px">Waitlisted</span></td>
+            <td>Up to 4</td><td>Up to 4</td><td>Staff waitlists backend</td><td>Staff waitlists backend</td>
+          </tr>
+          <tr>
+            <td><span class="pill p-gr" style="font-size:11px">No longer available</span></td>
+            <td>1 confirmed + 4 waitlist taken</td><td>2 confirmed + 4 waitlist taken</td><td>Event is over</td><td>Event over or care staff assigned</td>
+          </tr>
+          <tr>
+            <td><span class="pill p-r" style="font-size:11px">Cancelled</span></td>
+            <td colspan="4">Staff cancels backend. For Home Assessment: if cannot get 2 MJs 24h before → auto-cancelled by system.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="rule-inline" style="margin-top:10px">
+        <div class="rib-icon">💬</div>
+        <div>
+          <div class="rib-type rt-b">Business rule — Messaging on rejection</div>
+          <div style="font-size:12px;line-height:1.5;color:var(--ink2)">When a Centre Assistant MJ is not confirmed, the message shown is <em>"Job is no longer available"</em> or <em>"Job has been taken"</em> — not "Rejected". Exact copy TBC with AAC.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="tc" id="tc-nt">
+    <div class="card">
+      <div class="card-t">Staff notes</div>
+      <div class="note-item flag">
+        <div class="note-by">Maisarah Binte Hassan · 10 Apr 2026 · No-show incident</div>
+        <div class="note-txt">MJ called in sick on day of job (10 Apr — Chaperone for Tan Ah Kow → NUH). Late notice, verbal only. No-show flag recorded. MJ verbally advised of 48h cancellation policy. To monitor.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-by">Aileen Chua · 2 Mar 2026</div>
+        <div class="note-txt">Excellent feedback from Tan Bee Lian for Feb and Mar Chaperone jobs. Client specifically asked for Siew Ling again. Reliable, calm, patient with anxious seniors. Recommended for Befriending recurring assignment.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-by">Maisarah Binte Hassan · 15 Jan 2026 · Onboarding</div>
+        <div class="note-txt">Onboarding done. Service contract signed, GIRO set up. Chaperone + Befriending OJT completed. Home Assessment training done Jan 2026 — OJT to be scheduled separately.</div>
+      </div>
+      <textarea class="n-input" placeholder="Add a staff note…"></textarea>
+      <button class="btn-sm">Add note</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+let activePop = null;
+function togglePop(id, btn) {
+  const pop = document.getElementById(id);
+  if (activePop && activePop !== pop) {
+    activePop.classList.remove('on');
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+  }
+  const isOn = pop.classList.contains('on');
+  pop.classList.toggle('on');
+  btn.classList.toggle('active', !isOn);
+  activePop = isOn ? null : pop;
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
+    document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+    activePop = null;
+  }
+});
+function showTab(id, el) {
+  document.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('tc-' + id).classList.add('on');
+  el.classList.add('on');
+}
+
+function filterAttendance() {
+  const from  = document.getElementById('attFrom').value;
+  const to    = document.getElementById('attTo').value;
+  const jobId = document.getElementById('attJobId').value.toLowerCase().trim();
+  document.querySelectorAll('#attTbl tbody tr').forEach(function(row) {
+    const d = row.getAttribute('data-date');
+    const j = row.getAttribute('data-jobid') || '';
+    let show = true;
+    if (from && d < from) show = false;
+    if (to   && d > to)   show = false;
+    if (jobId && j.indexOf(jobId) === -1) show = false;
+    row.style.display = show ? '' : 'none';
+  });
+}
+
+function clearAttFilters() {
+  document.getElementById('attFrom').value  = '';
+  document.getElementById('attTo').value    = '';
+  document.getElementById('attJobId').value = '';
+  filterAttendance();
+}
+</script>
+</body>
+</html>

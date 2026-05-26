@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARES — AIC Reporting</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./index.css">
+<style>
+/* ─── AIC Report — page-specific ─────────────────────────────── */
+
+/* KPI row (4 cols on desktop) */
+.kpi-row-rpt{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* Charts row */
+.charts-row{display:flex;gap:14px}
+.chart-card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px;position:relative}
+.chart-main{flex:3}
+.chart-side{flex:2;min-width:0}
+.chart-wrap{position:relative;height:220px}
+
+/* Role bar rows */
+.role-rows{margin-top:12px}
+.role-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.role-lbl{font-size:11px;font-weight:500;color:var(--ink2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-bar-wrap{flex:1;background:var(--bdr2);border-radius:4px;height:7px;overflow:hidden}
+.role-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.role-val{font-size:12px;font-weight:700;color:var(--ink);width:24px;text-align:right;flex-shrink:0}
+.role-pct{font-size:10px;color:var(--ink4);width:32px;text-align:right;flex-shrink:0}
+
+/* Legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Donut centre label */
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dc-num{font-size:22px;font-weight:700;color:var(--ink);line-height:1.1}
+.dc-lbl{font-size:10px;color:var(--ink4);text-align:center}
+
+/* Center detail table */
+.rpt-tbl{width:100%;border-collapse:collapse}
+.rpt-tbl thead th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:2px solid var(--bdr);background:var(--s);white-space:nowrap;text-align:left}
+.rpt-tbl tbody tr{border-bottom:1px solid var(--bdr2);transition:background .1s}
+.rpt-tbl tbody tr:hover{background:#FAFBFC}
+.rpt-tbl tbody tr.tot-row{background:var(--gl)}
+.rpt-tbl td{font-size:12px;padding:9px 12px;color:var(--ink2);vertical-align:middle}
+.c-name{font-weight:600;color:var(--ink)}
+.n-cell{font-family:monospace;font-size:12px;text-align:right}
+.n-hl{font-weight:700;color:var(--g)}
+.n-warn{color:var(--am);font-weight:600}
+.pay-cell{font-family:monospace;font-size:12px;font-weight:600;color:var(--g);text-align:right}
+
+/* Period tabs */
+.period-tabs{display:flex;gap:4px}
+.ptab{font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 11px;border:1px solid var(--bdr);border-radius:20px;background:var(--s);color:var(--ink3);cursor:pointer;transition:all .15s}
+.ptab.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* Export btns */
+.btn-xls{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 13px;border:none;border-radius:8px;background:var(--g);color:#fff;cursor:pointer;width:100%;text-align:left}
+.btn-xls:hover{background:#0A5C46}
+.btn-xls-ghost{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 13px;border:1px solid var(--bdr);border-radius:8px;background:var(--s);color:var(--ink2);cursor:pointer;width:100%;text-align:left}
+.btn-xls-ghost:hover{background:var(--bg)}
+.export-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+
+/* Toast */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Mobile responsive ─────────────────────────────────────────── */
+@media (max-width:900px){
+  .charts-row{flex-direction:column}
+  .chart-side,.chart-main{flex:none;width:100%}
+}
+@media (max-width:768px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  .sidebar{
+    width:100%;height:54px;flex-direction:row;justify-content:center;
+    padding:4px 8px;gap:4px;
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    border-top:1px solid rgba(255,255,255,.12)
+  }
+  .s-logo{display:none}
+  .mob-spacer{display:none}
+  .main{margin-bottom:54px;overflow:auto;height:auto}
+  .topbar{position:sticky;top:0;z-index:100}
+  .layout{flex-direction:column;overflow:visible;height:auto}
+  .left-scroll{overflow:visible;height:auto;padding:14px}
+  .right-panel{width:100%;border-left:none;border-top:1px solid var(--bdr)}
+  .kpi-row-rpt{grid-template-columns:1fr 1fr}
+  .charts-row{flex-direction:column}
+  .filter-bar{flex-wrap:wrap}
+  #toast{bottom:62px}
+}
+@media (max-width:480px){
+  .kpi-row-rpt{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════════════ -->
+<div class="sidebar">
+  <div class="s-logo">C</div>
+  <a class="s-item on" href="./index.html" title="Dashboard">🏠</a>
+  <a class="s-item on" href="./proto2_v3_mj_profile.html" title="MJ Profile">🧑‍💼</a>
+  <a class="s-item on" href="./v1_mj_listing.html" title="MJ Listing">👥</a>
+  <a class="s-item on" href="./proto1_v3_publish.html" title="Publish Job">📅</a>
+  <a class="s-item on" href="./v1_aic_report.html" title="Reports">📊</a>
+  <div class="mob-spacer" style="margin-top:auto"></div>
+  <div class="s-item" title="Settings">⚙️</div>
+</div>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">AIC Reporting</div>
+    <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
+    <span style="font-size:12px;color:var(--ink3)">§9.1 — By Center &amp; All Centers</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="period-tabs">
+        <button class="ptab on" id="ptab-month" onclick="setPeriod('month',this)">Month</button>
+        <button class="ptab" id="ptab-quarter" onclick="setPeriod('quarter',this)">Quarter</button>
+        <button class="ptab" id="ptab-year" onclick="setPeriod('year',this)">YTD</button>
+      </div>
+      <span style="font-size:12px;color:var(--ink4)">21 May 2026</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- ─── LEFT SCROLL ──────────────────────────────────────── -->
+    <div class="left-scroll">
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label>Center</label>
+        <select id="fCenter" onchange="applyReport()">
+          <option value="">All Centers</option>
+          <option>VG — Buona Vista</option>
+          <option>VG — Clementi</option>
+          <option>SCC — Queenstown</option>
+          <option>SCC — Toa Payoh</option>
+          <option>SCC — Bishan</option>
+        </select>
+        <label>Month</label>
+        <select id="fMonth" onchange="applyReport()">
+          <option value="">All months</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5" selected>May</option>
+        </select>
+        <label>Year</label>
+        <select id="fYear" onchange="applyReport()">
+          <option value="2026" selected>2026</option>
+          <option value="2025">2025</option>
+        </select>
+        <button class="btn-clear" onclick="clearFilters()">Clear</button>
+        <div style="margin-left:auto">
+          <button class="btn-pub-new" onclick="showToast()">⬇ Export Excel</button>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row-rpt" id="kpiRow"></div>
+
+      <!-- Charts row -->
+      <div class="charts-row">
+
+        <!-- Monthly role trend -->
+        <div class="chart-card chart-main">
+          <div class="card-head">
+            <div class="card-icon ci-b">📈</div>
+            <div class="card-label">Roles Activated — Monthly Trend (<span id="chartYearLabel">2026</span>)</div>
+            <button class="br-btn" onclick="togglePop('pop-trend',this)" style="margin-left:auto">i</button>
+            <button class="q-btn" onclick="togglePop('popq-trend',this)">?</button>
+            <div class="pop pop-info right" id="pop-trend" style="top:30px">
+              <div class="pop-title">Business rules — Monthly Trend (§9.1)</div>
+              <div class="pr"><div class="pd pd-g"></div><div><strong>Each bar segment</strong> = count of distinct MJs who completed at least 1 job in that role during the month.</div></div>
+              <div class="pr"><div class="pd pd-g"></div><div>An MJ active in 2 roles (e.g., Chaperone + Befriender) is counted <em>once per role</em> in this chart, but once in the unique MJ total.</div></div>
+              <div class="pr"><div class="pd pd-a"></div><div>Trend reflects <strong>completed jobs only</strong>. Cancelled and at-risk jobs are excluded. Confirmed-but-not-completed jobs are also excluded until check-out is recorded.</div></div>
+              <div class="pr"><div class="pd pd-a"></div><div>Chart always shows the full year. Use the <strong>Month</strong> filter to scope the KPI cards, donut and table to a specific period.</div></div>
+            </div>
+            <div class="pop pop-q right" id="popq-trend" style="top:30px">
+              <div class="pop-title">Open questions — Trend (§11.3, §11.8)</div>
+              <div class="pr"><div class="pd pd-q"></div><div><strong>[H3 — High]</strong> Payment column uses a <strong>placeholder rate of $20/hr</strong>. No fee table received from Finance. Payment module and this report cannot be finalised until rates are confirmed.</div></div>
+              <div class="pr"><div class="pd pd-q"></div><div><strong>[M1 — Medium]</strong> Rounding rule "0.50 round to 1 hr" is ambiguous. Does 1h 20m = 1h or 2h? Industry standard (round up at 30 min) is assumed. Finance sign-off required.</div></div>
+              <div class="pr"><div class="pd pd-q"></div><div><strong>[M5 — Medium]</strong> Historical data: How many years back should trend charts support? Affects database schema and reporting query performance.</div></div>
+              <div class="note">Owner: Finance / AAC · Target: URG sign-off 8 Jun 2026</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div class="legend" id="trendLegend"></div>
+        </div>
+
+        <!-- Role distribution donut -->
+        <div class="chart-card chart-side">
+            <h1>Blank canvas</h1>
+          <!-- <div class="card-head">
+            <div class="card-icon ci-p">🎯</div>
+            <div class="card-label">Role Distribution</div>
+            <button class="br-btn" onclick="togglePop('pop-donut',this)" style="margin-left:auto">i</button>
+            <button class="q-btn" onclick="togglePop('popq-donut',this)">?</button>
+            <div class="pop pop-info right" id="pop-donut" style="top:30px">
+              <div class="pop-title">Business rules — Roles Activated (§9.1)</div>
+              <div class="pr"><div class="pd pd-g"></div><div><strong>"Roles activated for"</strong> = per-role count of distinct MJs with at least 1 completed job in the selected period and center.</div></div>
+              <div class="pr"><div class="pd pd-g"></div><div>The <strong>centre number</strong> shows total role-activations (sum across all 4 role types). This may exceed total unique MJ count if some MJs are active in multiple roles.</div></div>
+              <div class="pr"><div class="pd pd-a"></div><div><strong>OJT gate:</strong> Only MJs with OJT = Completed for a role can be assigned to that role. Non-OJT-completed MJs cannot appear in any role's count.</div></div>
+            </div>
+            <div class="pop pop-q right" id="popq-donut" style="top:30px">
+              <div class="pop-title">Open questions — Roles Activated (§11.8)</div>
+              <div class="pr"><div class="pd pd-q"></div><div><strong>[M3 — Medium]</strong> Does "activated" mean <em>completed</em> a job, or <em>confirmed/assigned</em>? If MJ is confirmed but job is cancelled, should they count? Confirm with AAC / Maisarah.</div></div>
+              <div class="pr"><div class="pd pd-q"></div><div><strong>[M2 — Medium]</strong> Cross-center MJ: if an MJ works at 2 facilities in the same month, counted in both center reports? In "All Centers" view, counted once or twice? Affects MJ KPI accuracy.</div></div>
+              <div class="note">Owner: AAC / Maisarah · Target: URG sign-off 8 Jun 2026</div>
+            </div>
+          </div> -->
+        <div class="chart-wrap" style="height:185px">
+            <!-- <canvas id="roleChart"></canvas> -->
+            <div class="donut-center">
+              <div class="dc-num" id="donutNum">—</div>
+              <!-- <div class="dc-lbl">Role<br>activations</div> -->
+            </div>
+          </div>
+          <div class="role-rows" id="roleRows"></div>
+        </div>
+      </div>
+
+      <!-- Per-center breakdown table -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ci-g">🏢</div>
+          <div class="card-label">Per-Center Breakdown</div>
+          <div style="margin-left:auto;font-size:11px;color:var(--ink4)" id="tableScope"></div>
+          <button class="br-btn" onclick="togglePop('pop-tbl',this)" style="margin-left:8px">i</button>
+          <button class="q-btn" onclick="togglePop('popq-tbl',this)">?</button>
+          <div class="pop pop-info right" id="pop-tbl" style="top:30px">
+            <div class="pop-title">Business rules — Center Table (§9.1)</div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Each row = one facility.</strong> "All Centers Total" footer sums all rows. Does not double-count cross-center MJs in the total MJ column.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>No. of MJ</strong> = unique MJs with ≥1 completed job at that facility in the selected period.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Hours</strong> = sum of MJ check-in to check-out durations for all completed jobs at that facility.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div>This table feeds the <strong>Excel export for HR &amp; Finance</strong> payment processing (§9.2, Maisarah to provide template). AP Listing export uses this data.</div></div>
+            <div class="pr"><div class="pd pd-a"></div><div>Chaperone Utilisation Report (§9.3, Michelle to provide) will include both MJ and SCC staff completions broken out by center.</div></div>
+          </div>
+          <div class="pop pop-q right" id="popq-tbl" style="top:30px">
+            <div class="pop-title">Open questions — Table &amp; Export (§9.2, §9.3)</div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H4 — High]</strong> MJ HR Timesheet export template <strong>not yet provided by Maisarah</strong>. Cannot confirm exact columns needed for payroll. Blocks AP Listing export design.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[H5 — High]</strong> Chaperone Utilisation Report template <strong>not yet provided by Michelle</strong>. Combined MJ + SCC staff reporting design blocked.</div></div>
+            <div class="pr"><div class="pd pd-q"></div><div><strong>[M6 — Medium]</strong> GL code / department code mapping per facility needed from Finance before export can be implemented (§10 — System Setup).</div></div>
+            <div class="note">Owner: AAC / Maisarah, Michelle · Target: URG sign-off 8 Jun 2026</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="rpt-tbl">
+            <thead>
+              <tr>
+                <th>Center</th>
+                <th style="text-align:right">No. of MJ</th>
+                <th style="text-align:right">🤝 Chaperone</th>
+                <th style="text-align:right">🏠 Home Assess.</th>
+                <th style="text-align:right">💬 Befriender</th>
+                <th style="text-align:right">🏛 Ctr. Assist.</th>
+                <th style="text-align:right">Hours</th>
+                <th style="text-align:right">Est. Payment (S$) ⚠</th>
+              </tr>
+            </thead>
+            <tbody id="rptBody"></tbody>
+            <tfoot id="rptFoot"></tfoot>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--am);background:var(--al);border:1px solid var(--ab);border-radius:7px;padding:8px 10px;margin-top:12px">
+          ⚠ <strong>[H3]</strong> Payment column uses a placeholder rate of <strong>$20/hr flat</strong> across all roles. Actual rates are role-specific and have not been confirmed by Finance. Do not use this column for payment processing until fee table is received.
+        </div>
+      </div>
+
+    </div><!-- /left-scroll -->
+
+    <!-- ─── RIGHT PANEL ──────────────────────────────────────── -->
+    <div class="right-panel">
+      <div class="rp">
+
+        <div class="rp-title" style="margin-top:4px">📤 Exports</div>
+        <div class="export-group">
+          <button class="btn-xls" onclick="showToast()">⬇ AIC Report — Excel</button>
+          <button class="btn-xls-ghost" onclick="showToast()">⬇ MJ Timesheet (HR / Payroll)</button>
+          <button class="btn-xls-ghost" onclick="showToast()">⬇ Chaperone Billing Report</button>
+        </div>
+        <div style="font-size:11px;color:var(--am);background:var(--al);border:1px solid var(--ab);border-radius:7px;padding:8px 10px;margin-bottom:14px;line-height:1.5">
+          ⚠ Export templates pending from Maisarah (HR timesheet) and Michelle (Chaperone billing). Exports are placeholders.
+        </div>
+
+        <div class="rp-title">⚙️ Business rules</div>
+        <div class="rule-card">
+          <div class="rc-icon">📊</div>
+          <div class="rc-body">
+            <div class="rc-type rt-s">Scope</div>
+            <div class="rc-title">AIC report — all 5 facilities</div>
+            <div class="rc-text">Covers VG Buona Vista, VG Clementi, SCC Queenstown, Toa Payoh, Bishan. Filter by center for facility view. "All Centers" aggregates across all.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">👤</div>
+          <div class="rc-body">
+            <div class="rc-type rt-b">MJ Count</div>
+            <div class="rc-title">Unique MJs — completed jobs</div>
+            <div class="rc-text">"No. of MJ" = distinct MJs with ≥1 completed job in the period. MJ engagement = ≥1 job/month (monthly) or ≥3 jobs/quarter (quarterly).</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🕐</div>
+          <div class="rc-body">
+            <div class="rc-type rt-b">Hours</div>
+            <div class="rc-title">MJ attendance time (not SCC billing)</div>
+            <div class="rc-text">Hours = actual check-in to check-out per MJ. SCC client billing is based on scheduled slot — these differ. Rounding: first hour minimum; ≥0.50h additional rounds to next full hour.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">💰</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">Payment</div>
+            <div class="rc-title">Periodic extraction for HR/Finance</div>
+            <div class="rc-text">Staff export hours and job data to Excel periodically. Finance processes MJ payments via HR payroll workflow. Rates are role-specific (fee table from Finance — pending).</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🎯</div>
+          <div class="rc-body">
+            <div class="rc-type rt-s">Roles</div>
+            <div class="rc-title">OJT gate applies to all counts</div>
+            <div class="rc-text">Only MJs with OJT = Completed for a role can be assigned. Role counts here reflect only those who completed OJT and then completed an actual job.</div>
+          </div>
+        </div>
+
+        <div class="rp-title">❓ Open questions</div>
+        <div class="rule-card">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-body">
+            <div class="rc-type rt-q">H3 — High</div>
+            <div class="rc-title">MJ fee table absent</div>
+            <div class="rc-text">No confirmed rates per role from Finance. Payment displays are estimates. Blocks payment module &amp; this report's payment column.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🔴</div>
+          <div class="rc-body">
+            <div class="rc-type rt-q">H4 — High</div>
+            <div class="rc-title">Export templates overdue</div>
+            <div class="rc-text">MJ HR Timesheet (Maisarah) and Chaperone Billing Report (Michelle) templates not received. Blocks AP Listing and billing export design.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🟡</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">M1 — Medium</div>
+            <div class="rc-title">Rounding rule ambiguous</div>
+            <div class="rc-text">"0.50 round to 1 hr" unclear. 1h 20min = 1hr or 2hr? Industry: round up at 30 min. Finance confirmation required before go-live.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rc-icon">🟡</div>
+          <div class="rc-body">
+            <div class="rc-type rt-o">M2 — Medium</div>
+            <div class="rc-title">Cross-center MJ counting</div>
+            <div class="rc-text">If an MJ works at 2 facilities in the same month — counted in both center rows or only the primary? Affects "All Centers" total MJ accuracy.</div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /right-panel -->
+
+  </div><!-- /layout -->
+</div><!-- /main -->
+
+<div id="toast">⬇ Export requires backend integration — not available in prototype</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   MOCK DATA
+   All figures are illustrative. Payment uses $20/hr placeholder rate.
+   Roles counts = distinct MJs who completed ≥1 job in that role.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const MONTHLY = {
+  '2026': [
+    { m:'Jan', mj:35, chap:5, ha:7,  bef:3, ca:14, hrs:140, pay:2800 },
+    { m:'Feb', mj:37, chap:6, ha:8,  bef:3, ca:16, hrs:155, pay:3100 },
+    { m:'Mar', mj:38, chap:6, ha:9,  bef:4, ca:18, hrs:162, pay:3240 },
+    { m:'Apr', mj:40, chap:7, ha:9,  bef:4, ca:19, hrs:168, pay:3360 },
+    { m:'May', mj:41, chap:7, ha:10, bef:4, ca:20, hrs:175, pay:3500 },
+  ],
+  '2025': [
+    { m:'Jan', mj:28, chap:4, ha:5, bef:2, ca:11, hrs:108, pay:2160 },
+    { m:'Feb', mj:29, chap:4, ha:6, bef:2, ca:12, hrs:115, pay:2300 },
+    { m:'Mar', mj:30, chap:5, ha:6, bef:3, ca:12, hrs:120, pay:2400 },
+    { m:'Apr', mj:31, chap:5, ha:6, bef:3, ca:13, hrs:128, pay:2560 },
+    { m:'May', mj:32, chap:5, ha:7, bef:3, ca:13, hrs:132, pay:2640 },
+    { m:'Jun', mj:32, chap:5, ha:7, bef:3, ca:14, hrs:135, pay:2700 },
+    { m:'Jul', mj:33, chap:5, ha:7, bef:3, ca:14, hrs:138, pay:2760 },
+    { m:'Aug', mj:33, chap:6, ha:7, bef:3, ca:14, hrs:140, pay:2800 },
+    { m:'Sep', mj:34, chap:6, ha:7, bef:3, ca:15, hrs:143, pay:2860 },
+    { m:'Oct', mj:34, chap:6, ha:7, bef:3, ca:15, hrs:146, pay:2920 },
+    { m:'Nov', mj:35, chap:6, ha:7, bef:3, ca:15, hrs:148, pay:2960 },
+    { m:'Dec', mj:35, chap:6, ha:7, bef:3, ca:15, hrs:150, pay:3000 },
+  ]
+};
+
+/* Per-center data keyed as "center|monthIdx|year"
+   monthIdx: 1-based month number; 0 = all months                   */
+const CTR_SEEDS = {
+  'VG — Buona Vista':  { mjW:.22, chapW:.29, haW:.20, befW:.25, caW:.20, hrsW:.217 },
+  'VG — Clementi':     { mjW:.20, chapW:.14, haW:.20, befW:.25, caW:.20, hrsW:.194 },
+  'SCC — Queenstown':  { mjW:.24, chapW:.29, haW:.30, befW:.25, caW:.20, hrsW:.240 },
+  'SCC — Toa Payoh':   { mjW:.20, chapW:.14, haW:.20, befW:.25, caW:.20, hrsW:.194 },
+  'SCC — Bishan':      { mjW:.15, chapW:.14, haW:.10, befW:.00, caW:.20, hrsW:.154 },
+};
+
+const CENTERS = Object.keys(CTR_SEEDS);
+const ROLE_COLORS = ['#1D9E75','#1A5FA8','#6B21A8','#C07A1A'];
+const ROLE_LABELS = ['🤝 Chaperone','🏠 Home Assessment','💬 Befriender','🏛 Centre Assistant'];
+const ROLE_KEYS   = ['chap','ha','bef','ca'];
+
+/* ═══ Data helpers ════════════════════════════════════════════════ */
+function getMonthRow(year, monthIdx) {
+  /* monthIdx: 1-based; 0 = aggregate all */
+  var rows = MONTHLY[year] || MONTHLY['2026'];
+  if (monthIdx > 0) {
+    return rows[Math.min(monthIdx - 1, rows.length - 1)];
+  }
+  /* Aggregate: MJ = max (last month); roles = max; hrs/pay = sum */
+  return rows.reduce(function(acc, r) {
+    return {
+      m: 'YTD', mj: Math.max(acc.mj, r.mj),
+      chap: Math.max(acc.chap, r.chap), ha: Math.max(acc.ha, r.ha),
+      bef: Math.max(acc.bef, r.bef),   ca: Math.max(acc.ca, r.ca),
+      hrs: acc.hrs + r.hrs,            pay: acc.pay + r.pay,
+    };
+  }, { m:'', mj:0, chap:0, ha:0, bef:0, ca:0, hrs:0, pay:0 });
+}
+
+function scaleRow(row, seed) {
+  return {
+    mj:   Math.max(1, Math.round(row.mj   * seed.mjW)),
+    chap: Math.max(0, Math.round(row.chap * seed.chapW)),
+    ha:   Math.max(0, Math.round(row.ha   * seed.haW)),
+    bef:  Math.max(0, Math.round(row.bef  * seed.befW)),
+    ca:   Math.max(0, Math.round(row.ca   * seed.caW)),
+    hrs:  Math.max(1, Math.round(row.hrs  * seed.hrsW)),
+    pay:  Math.max(20, Math.round(row.pay * seed.hrsW)),
+  };
+}
+
+function getAggRow(centerFilter, monthIdx, year) {
+  var base = getMonthRow(year, monthIdx);
+  if (!centerFilter) return Object.assign({}, base);
+  return scaleRow(base, CTR_SEEDS[centerFilter]);
+}
+
+/* ═══ KPI ════════════════════════════════════════════════════════ */
+function renderKPI(d) {
+  var totalRoles = d.chap + d.ha + d.bef + d.ca;
+  document.getElementById('kpiRow').innerHTML =
+    kpiBox('k-tak', d.mj, 'Total MJ engaged', 'Unique MJs · completed jobs') +
+    kpiBox('k-pub', totalRoles, 'Total roles activated', 'Sum across 4 service types') +
+    kpiBox('k-com', d.hrs + ' hrs', 'Hours activated', 'Actual MJ attendance hrs') +
+    kpiBox('k-risk', '$' + d.pay.toLocaleString(), 'Est. payment (SGD)', '⚠ Placeholder rate $20/hr');
+}
+function kpiBox(cls, n, label, sub) {
+  return '<div class="kpi-box ' + cls + '"><div class="kpi-n">' + n + '</div>' +
+    '<div class="kpi-l">' + label + '</div>' +
+    '<div class="kpi-sub">' + sub + '</div></div>';
+}
+
+/* ═══ Trend Chart ════════════════════════════════════════════════ */
+var trendInst = null;
+function renderTrendChart(centerFilter, year) {
+  document.getElementById('chartYearLabel').textContent = year;
+  var rows = MONTHLY[year] || MONTHLY['2026'];
+  var labels = [], dChap=[], dHA=[], dBef=[], dCA=[];
+  var seed = centerFilter ? CTR_SEEDS[centerFilter] : null;
+  rows.forEach(function(r) {
+    labels.push(r.m);
+    var base = seed ? scaleRow(r, seed) : r;
+    dChap.push(base.chap); dHA.push(base.ha); dBef.push(base.bef); dCA.push(base.ca);
+  });
+
+  if (trendInst) trendInst.destroy();
+  trendInst = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label:'Chaperone',       data:dChap, backgroundColor:ROLE_COLORS[0], borderRadius:2, stack:'r' },
+        { label:'Home Assessment', data:dHA,   backgroundColor:ROLE_COLORS[1], borderRadius:2, stack:'r' },
+        { label:'Befriender',      data:dBef,  backgroundColor:ROLE_COLORS[2], borderRadius:2, stack:'r' },
+        { label:'Centre Assistant',data:dCA,   backgroundColor:ROLE_COLORS[3], borderRadius:2, stack:'r' },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          mode:'index', intersect:false,
+          callbacks: {
+            title: function(items){ return items[0].label + ' ' + year; },
+            footer: function(items){ return 'Total: ' + items.reduce(function(a,i){return a+i.raw;},0) + ' MJ roles'; }
+          }
+        }
+      },
+      scales:{
+        x:{ stacked:true, grid:{ display:false }, ticks:{ font:{ size:11, family:'DM Sans' } } },
+        y:{ stacked:true, beginAtZero:true, grid:{ color:'#F0F0F0' },
+            ticks:{ font:{ size:11, family:'DM Sans' }, stepSize:5, precision:0 },
+            title:{ display:true, text:'MJ roles activated', font:{ size:10, family:'DM Sans' }, color:'#AAA' } }
+      }
+    }
+  });
+
+  var lhtml = '';
+  ROLE_LABELS.forEach(function(l,i){
+    lhtml += '<div class="legend-item"><div class="legend-dot" style="background:'+ROLE_COLORS[i]+'"></div>'+l+'</div>';
+  });
+  document.getElementById('trendLegend').innerHTML = lhtml;
+}
+
+/* ═══ Role Donut ════════════════════════════════════════════════ */
+var roleInst = null;
+function renderRoleChart(d) {
+    return; // blank canvas for now
+  var vals = [d.chap, d.ha, d.bef, d.ca];
+  var total = vals.reduce(function(a,b){return a+b;},0);
+  document.getElementById('donutNum').textContent = total;
+
+  if (roleInst) roleInst.destroy();
+  roleInst = new Chart(document.getElementById('roleChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Chaperone','Home Assessment','Befriender','Centre Assistant'],
+      datasets:[{ data:vals, backgroundColor:ROLE_COLORS, borderWidth:2, borderColor:'#fff', hoverBorderColor:'#fff' }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{
+          label:function(ctx){ return ctx.label+': '+ctx.raw+' MJ ('+Math.round(ctx.raw/total*100)+'%)'; }
+        }}
+      }
+    }
+  });
+
+  var html = '';
+  ROLE_KEYS.forEach(function(k,i){
+    var v = d[k]; var pct = total>0 ? Math.round(v/total*100) : 0;
+    html += '<div class="role-row">' +
+      '<div class="role-lbl">'+ROLE_LABELS[i]+'</div>' +
+      '<div class="role-bar-wrap"><div class="role-bar-fill" style="width:'+pct+'%;background:'+ROLE_COLORS[i]+'"></div></div>' +
+      '<div class="role-val">'+v+'</div>' +
+      '<div class="role-pct">'+pct+'%</div>' +
+      '</div>';
+  });
+  document.getElementById('roleRows').innerHTML = html;
+}
+
+/* ═══ Center Table ════════════════════════════════════════════════ */
+function renderTable(centerFilter, monthIdx, year) {
+  var base = getMonthRow(year, monthIdx);
+  var rows = centerFilter
+    ? [Object.assign({ c: centerFilter }, scaleRow(base, CTR_SEEDS[centerFilter]))]
+    : CENTERS.map(function(c){ return Object.assign({ c:c }, scaleRow(base, CTR_SEEDS[c])); });
+
+  var totMJ=0, totChap=0, totHA=0, totBef=0, totCA=0, totHrs=0, totPay=0;
+  var html = '';
+  rows.forEach(function(r){
+    totMJ+=r.mj; totChap+=r.chap; totHA+=r.ha; totBef+=r.bef; totCA+=r.ca; totHrs+=r.hrs; totPay+=r.pay;
+    html += '<tr>' +
+      '<td><span class="c-name">'+r.c+'</span></td>' +
+      '<td class="n-cell n-hl">'+r.mj+'</td>' +
+      '<td class="n-cell">'+r.chap+'</td>' +
+      '<td class="n-cell">'+r.ha+'</td>' +
+      '<td class="n-cell '+(r.bef===0?'n-warn':'')+'">'+r.bef+'</td>' +
+      '<td class="n-cell">'+r.ca+'</td>' +
+      '<td class="n-cell n-hl">'+r.hrs+'</td>' +
+      '<td class="pay-cell">$'+r.pay.toLocaleString()+'</td>' +
+      '</tr>';
+  });
+  document.getElementById('rptBody').innerHTML = html;
+  document.getElementById('rptFoot').innerHTML =
+    '<tr class="tot-row">' +
+    '<td><strong>All Centers Total</strong></td>' +
+    '<td class="n-cell n-hl"><strong>'+totMJ+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totChap+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totHA+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totBef+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totCA+'</strong></td>' +
+    '<td class="n-cell n-hl"><strong>'+totHrs+'</strong></td>' +
+    '<td class="pay-cell"><strong>$'+totPay.toLocaleString()+'</strong></td>' +
+    '</tr>';
+
+  var scopeParts = [];
+  if (centerFilter) scopeParts.push(centerFilter);
+  var months2026 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var months2025 = months2026;
+  var monthNames = year==='2026' ? months2026 : months2025;
+  if (monthIdx > 0) scopeParts.push(monthNames[monthIdx-1]+' '+year);
+  else scopeParts.push('YTD '+year);
+  document.getElementById('tableScope').textContent = scopeParts.join(' · ');
+}
+
+/* ═══ Master apply ════════════════════════════════════════════════ */
+function applyReport() {
+  var center = document.getElementById('fCenter').value;
+  var month  = parseInt(document.getElementById('fMonth').value) || 0;
+  var year   = document.getElementById('fYear').value || '2026';
+
+  var d = getAggRow(center, month, year);
+  renderKPI(d);
+  renderTrendChart(center, year);
+  renderRoleChart(d);
+  renderTable(center, month, year);
+}
+
+function clearFilters() {
+  document.getElementById('fCenter').value = '';
+  document.getElementById('fMonth').value  = '5';
+  document.getElementById('fYear').value   = '2026';
+  document.querySelectorAll('.ptab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('ptab-month').classList.add('on');
+  applyReport();
+}
+
+function setPeriod(mode, btn) {
+  document.querySelectorAll('.ptab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  var fMonth = document.getElementById('fMonth');
+  if (mode === 'month') {
+    fMonth.value = '5';
+  } else {
+    fMonth.value = '';
+  }
+  applyReport();
+}
+
+/* ═══ Popovers ════════════════════════════════════════════════════ */
+var activePop = null;
+function togglePop(id, btn) {
+  var pop = document.getElementById(id); if (!pop) return;
+  if (activePop && activePop !== pop) {
+    activePop.classList.remove('on');
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+  }
+  var isOn = pop.classList.contains('on');
+  pop.classList.toggle('on', !isOn);
+  btn.classList.toggle('active', !isOn);
+  activePop = isOn ? null : pop;
+}
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
+    document.querySelectorAll('.pop.on').forEach(function(p){p.classList.remove('on');});
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+    activePop = null;
+  }
+});
+
+/* ═══ Toast ════════════════════════════════════════════════════════ */
+var toastTimer = null;
+function showToast() {
+  var t = document.getElementById('toast');
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+}
+
+/* ═══ Init ════════════════════════════════════════════════════════ */
+$(document).ready(function(){ applyReport(); });
+</script>
+</body>
+</html>
