@@ -677,7 +677,8 @@ $("#facilityToolTip").attr('title', 'On CARES system, it will only show whatever
 
       function openPortal() {
         if (confirm('Heading over to MJ Chap Portal')) {
-          window.location.href = './portal/index.html';
+          const url = './portal/index.html';
+          window.open(url, '_blank').focus();
         }
       }
 </script>
