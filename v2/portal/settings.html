@@ -70,12 +70,22 @@
       <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pane-users" type="button" role="tab">
-            <i class="bi bi-people-fill me-1"></i>Users &amp; Roles
+            <i class="bi bi-people-fill me-1"></i>Users
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-roles" type="button" role="tab">
+            <i class="bi bi-people-fill me-1"></i>Roles
           </button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-rules" type="button" role="tab">
             <i class="bi bi-sliders me-1"></i>Business Rules
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-facilities" type="button" role="tab">
+            <i class="bi bi-building-fill me-1"></i>Facilities
           </button>
         </li>
       </ul>
@@ -91,7 +101,7 @@
                 <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
                 <input id="users-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search user...">
               </div>
-              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;">
+              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddUser">
                 <i class="bi bi-plus-lg me-1"></i>Add User
               </button>
             </div>
@@ -111,6 +121,34 @@
             </table>
           </div><!-- /set-card -->
         </div><!-- /pane-users -->
+
+        <!-- ══ ROLES ══════════════════════════════════════════════════ -->
+        <div class="tab-pane fade" id="pane-roles" role="tabpanel">
+          <div class="set-card">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--ink2);">Role Permissions</div>
+                <div style="font-size:11px;color:var(--ink4);margin-top:2px;">Roles control which navigation modules and settings tabs each user can access.</div>
+              </div>
+              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddRole">
+                <i class="bi bi-plus-lg me-1"></i>Add Role
+              </button>
+
+            </div>
+            <table id="tbl-roles" class="table tbl-users mb-0">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Description</th>
+                  <th style="text-align:center;">Users</th>
+                  <th>Module Access</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div><!-- /set-card -->
+        </div><!-- /pane-roles -->
 
         <!-- ══ BUSINESS RULES ═════════════════════════════════════════ -->
         <div class="tab-pane fade" id="pane-rules" role="tabpanel">
@@ -240,11 +278,38 @@
           <!-- Save -->
           <div class="d-flex justify-content-end gap-2 mb-2">
             <button class="btn btn-sm btn-light border" style="font-size:13px;">Reset to Defaults</button>
-            <button class="btn btn-sm" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;" onclick="saveBizRules()">
+            <button class="btn btn-sm" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;" onclick="saveFacilities()">
               <i class="bi bi-check2 me-1"></i>Save Changes
             </button>
           </div>
 
+        </div><!-- /pane-rules -->
+
+        <!-- ══ FACILITIES ═════════════════════════════════════════ -->
+        <div class="tab-pane fade" id="pane-facilities" role="tabpanel">
+          <div class="set-card">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="position-relative" style="width:220px;">
+                <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
+                <input id="facilities-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search organisation/facility...">
+              </div>
+              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddFacility">
+                <i class="bi bi-plus-lg me-1"></i>Add Organisation/Facility
+              </button>
+            </div>
+
+            <table id="tbl-facilities" class="table tbl-users mb-0">
+              <thead>
+                <tr>
+                  <th>Organisation</th>
+                  <th>Facility</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div><!-- /set-card -->
         </div><!-- /pane-rules -->
 
       </div><!-- /tab-content -->
@@ -400,5 +465,759 @@ document.addEventListener('click', function (e) {
       });
     })();
   </script>
+<!-- ══ MODAL: Add User ═══════════════════════════════════════════════ -->
+<div class="modal fade" id="modalAddUser" tabindex="-1" aria-labelledby="modalAddUserLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:520px;">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
+        <div>
+          <h5 class="modal-title fw-semibold mb-0" id="modalAddUserLabel" style="font-size:15px;color:var(--ink);">Add User</h5>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Grant a staff member access to the CARES portal</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <form id="formAddUser" novalidate>
+
+          <!-- Name row -->
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">First Name <span class="text-danger">*</span></label>
+              <input type="text" id="addUserFirstName" class="form-control form-control-sm" placeholder="e.g. Sarah" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Last Name <span class="text-danger">*</span></label>
+              <input type="text" id="addUserLastName" class="form-control form-control-sm" placeholder="e.g. Lim" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Work Email <span class="text-danger">*</span></label>
+            <input type="email" id="addUserEmail" class="form-control form-control-sm" placeholder="e.g. sarah.lim@awwa.org.sg" required>
+            <div class="invalid-feedback" style="font-size:11px;">Enter a valid email address.</div>
+          </div>
+
+          <!-- Role & Facility -->
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Role <span class="text-danger">*</span></label>
+              <select id="addUserRole" class="form-select form-select-sm" required>
+                <option value="" disabled selected>Select role…</option>
+                <option value="admin">Admin</option>
+                <option value="aac">AAC Staff</option>
+                <option value="nurse">SCC Nurse</option>
+                <option value="ae">SCC AE</option>
+                <option value="finance">Finance</option>
+                <option value="hr">HR</option>
+              </select>
+              <div class="invalid-feedback" style="font-size:11px;">Select a role.</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facility</label>
+              <select id="addUserFacility" class="form-select form-select-sm">
+                <option value="All Facilities">All Facilities</option>
+                <option value="AAC Toa Payoh">AAC Toa Payoh</option>
+                <option value="AAC Jurong">AAC Jurong</option>
+                <option value="SCC Buona Vista">SCC Buona Vista</option>
+                <option value="SCC Clementi">SCC Clementi</option>
+                <option value="SCC Jurong">SCC Jurong</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Active -->
+          <div class="d-flex align-items-center gap-2" style="background:#F9F6FF;border-radius:8px;padding:10px 14px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);">Active Account</div>
+              <div style="font-size:11px;color:var(--ink4);">User can log in and access the portal immediately.</div>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="addUserActive" checked style="width:40px;height:22px;cursor:pointer;">
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
+        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
+        <button type="button" class="btn btn-sm" id="btnAddUserSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
+          <i class="bi bi-person-plus me-1"></i>Add User
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add Organisation / Facility ════════════════════════════ -->
+<div class="modal fade" id="modalAddFacility" tabindex="-1" aria-labelledby="modalAddFacilityLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:540px;">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
+        <div>
+          <h5 class="modal-title fw-semibold mb-0" id="modalAddFacilityLabel" style="font-size:15px;color:var(--ink);">Add Organisation / Facility</h5>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Register a new AAC or SCC centre in the system</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <form id="formAddFacility" novalidate>
+
+          <!-- Organisation & Type -->
+          <div class="row g-3 mb-3">
+            <div class="col-8">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Organisation Name <span class="text-danger">*</span></label>
+              <input type="text" id="addFacOrg" class="form-control form-control-sm" placeholder="e.g. AWWA Ltd" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+          </div>
+
+          <!-- Facility Name -->
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facility Name <span class="text-danger">*</span></label>
+              <input type="text" id="addFacName" class="form-control form-control-sm" placeholder="e.g. Toa Payoh" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+            <div class="col-4">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facility Type <span class="text-danger">*</span></label>
+              <select id="addFacType" class="form-select form-select-sm" required>
+                <option value="" disabled selected>Type…</option>
+                <option value="AAC">AAC</option>
+                <option value="SCC">SCC</option>
+              </select>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+          </div>
+
+          
+
+          <!-- GL Code & Service Boundary -->
+          <div class="row g-3 mb-3">
+            <div class="col-5">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">GL / Dept Code</label>
+              <input type="text" id="addFacGL" class="form-control form-control-sm" placeholder="e.g. GL-SCC-01">
+              <div style="font-size:11px;color:var(--ink4);margin-top:3px;">Configured by Finance</div>
+            </div>
+            <div class="col-7">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Service Boundary (Postal Code)</label>
+              <input type="text" id="addFacPostal" class="form-control form-control-sm" placeholder="e.g. 409051" maxlength="6" pattern="[0-9]{6}">
+              <div style="font-size:11px;color:var(--ink4);margin-top:3px;">Used for MJ job matching</div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="d-flex align-items-center gap-2" style="background:#F9F6FF;border-radius:8px;padding:10px 14px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);">Active</div>
+              <div style="font-size:11px;color:var(--ink4);">Facility is live and visible across the portal.</div>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="addFacActive" checked style="width:40px;height:22px;cursor:pointer;">
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
+        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
+        <button type="button" class="btn btn-sm" id="btnAddFacilitySave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
+          <i class="bi bi-building-add me-1"></i>Add Facility
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ ROLE LABEL MAP ════════════════════════════════════════════════ */
+var ROLE_LABELS = { admin:'Admin', aac:'AAC Staff', nurse:'SCC Nurse', ae:'SCC AE', finance:'Finance', hr:'HR' };
+var ROLE_COLORS = {
+  admin:  { bg:'#F5F0FF', clr:'#6B21A8' },
+  aac:    { bg:'#E8F7F2', clr:'#13795B' },
+  nurse:  { bg:'#EBF3FD', clr:'#1A5FA8' },
+  ae:     { bg:'#E6F4F4', clr:'#1e5f5f' },
+  finance:{ bg:'#FDF3E3', clr:'#C07A1A' },
+  hr:     { bg:'#FDF0F0', clr:'#B03030' }
+};
+
+/* ══ ADD USER ══════════════════════════════════════════════════════ */
+document.getElementById('btnAddUserSave').addEventListener('click', function () {
+  var form = document.getElementById('formAddUser');
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  var first    = document.getElementById('addUserFirstName').value.trim();
+  var last     = document.getElementById('addUserLastName').value.trim();
+  var email    = document.getElementById('addUserEmail').value.trim();
+  var roleVal  = document.getElementById('addUserRole').value;
+  var facility = document.getElementById('addUserFacility').value;
+  var active   = document.getElementById('addUserActive').checked;
+
+  var fullName = first + ' ' + last;
+  var initials = (first.charAt(0) + last.charAt(0)).toUpperCase();
+  var rc       = ROLE_COLORS[roleVal] || { bg:'#F0F0F0', clr:'#888' };
+  var roleLabel = ROLE_LABELS[roleVal] || roleVal;
+  var statusHtml = active
+    ? '<div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" checked></div>'
+    : '<div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox"></div>';
+  var nameStyle  = active ? '' : 'style="color:var(--ink4)"';
+  var cellStyle  = 'style="color:' + (active ? 'var(--ink3)' : 'var(--ink4)') + '"';
+
+  var row = '<tr>' +
+    '<td><div class="d-flex align-items-center gap-2">' +
+      '<div class="usr-av" style="background:' + rc.bg + ';color:' + rc.clr + ';">' + initials + '</div>' +
+      '<div><div class="fw-semibold" ' + nameStyle + '>' + fullName + '</div>' +
+      '<div style="font-size:11px;color:var(--ink4);">' + email + '</div></div>' +
+    '</div></td>' +
+    '<td><span class="role-badge r-' + roleVal + '">' + roleLabel + '</span></td>' +
+    '<td ' + cellStyle + '>' + facility + '</td>' +
+    '<td>' + statusHtml + '</td>' +
+    '<td ' + cellStyle + '>Just now</td>' +
+    '<td><button class="btn btn-sm btn-light border" style="font-size:11px;"><i class="bi bi-pencil"></i></button></td>' +
+  '</tr>';
+
+  var dt = $('#tbl-users').DataTable();
+  dt.destroy();
+  $('#tbl-users tbody').prepend(row);
+  /* re-render all rows so DataTable manages them */
+  dt = $('#tbl-users').DataTable({
+    pageLength: 10,
+    order: [],
+    columnDefs: [{ orderable: false, targets: [3], visible: true }],
+    dom: 't<"users-dt-foot d-flex justify-content-between align-items-center pt-2"ip>',
+    language: { info: 'Showing _START_\u2013_END_ of _TOTAL_ users', infoEmpty: 'No users found', paginate: { previous: '\u2039', next: '\u203a' } }
+  });
+  $('#users-search').off('keyup').on('keyup', function () { dt.search(this.value).draw(); });
+
+  /* reset & close */
+  form.classList.remove('was-validated');
+  form.reset();
+  bootstrap.Modal.getInstance(document.getElementById('modalAddUser')).hide();
+});
+
+/* reset validation state when modal is closed */
+document.getElementById('modalAddUser').addEventListener('hidden.bs.modal', function () {
+  var form = document.getElementById('formAddUser');
+  form.classList.remove('was-validated');
+  form.reset();
+});
+
+/* ══ FACILITIES DATA ══════════════════════════════════════════════ */
+var FACILITIES_DATA = [
+  { org:'AWWA Ltd', name:'AAC Toa Payoh', active:true },
+  { org:'AWWA Ltd', name:'AAC Jurong',    active:true },
+  { org:'AWWA Ltd', name:'SCC Buona Vista', active:true },
+  { org:'AWWA Ltd', name:'SCC Clementi',  active:true },
+  { org:'AWWA Ltd', name:'SCC Jurong',    active:true }
+];
+
+function renderFacilitiesTable() {
+  var rows = FACILITIES_DATA.map(function (f) {
+    var badge = f.active
+      ? '<span class="role-badge" style="background:#E8F7F2;color:#13795B;">Active</span>'
+      : '<span class="role-badge" style="background:#F0F0F0;color:#AAA;">Inactive</span>';
+    return '<tr>' +
+      '<td style="color:var(--ink2);font-size:13px;">' + f.org + '</td>' +
+      '<td style="color:var(--ink3);font-size:13px;">' + f.name + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td><button class="btn btn-sm btn-light border" style="font-size:11px;"><i class="bi bi-pencil"></i></button></td>' +
+    '</tr>';
+  });
+  $('#tbl-facilities tbody').html(rows.join(''));
+}
+
+$(document).ready(function () {
+  renderFacilitiesTable();
+
+  var facTable = $('#tbl-facilities').DataTable({
+    pageLength: 10,
+    order: [],
+    dom: 't<"users-dt-foot d-flex justify-content-between align-items-center pt-2"ip>',
+    language: { info: 'Showing _START_\u2013_END_ of _TOTAL_ facilities', infoEmpty: 'No facilities found', paginate: { previous: '\u2039', next: '\u203a' } }
+  });
+
+  $('#facilities-search').on('keyup', function () {
+    facTable.search(this.value).draw();
+  });
+});
+
+/* ══ ADD FACILITY ═════════════════════════════════════════════════ */
+document.getElementById('btnAddFacilitySave').addEventListener('click', function () {
+  var form = document.getElementById('formAddFacility');
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  var org    = document.getElementById('addFacOrg').value.trim();
+  var type   = document.getElementById('addFacType').value;
+  var name   = type + ' ' + document.getElementById('addFacName').value.trim();
+  var active = document.getElementById('addFacActive').checked;
+
+  FACILITIES_DATA.unshift({ org: org, name: name, active: active });
+
+  var dt = $('#tbl-facilities').DataTable();
+  dt.destroy();
+  renderFacilitiesTable();
+  dt = $('#tbl-facilities').DataTable({
+    pageLength: 10,
+    order: [],
+    dom: 't<"users-dt-foot d-flex justify-content-between align-items-center pt-2"ip>',
+    language: { info: 'Showing _START_\u2013_END_ of _TOTAL_ facilities', infoEmpty: 'No facilities found', paginate: { previous: '\u2039', next: '\u203a' } }
+  });
+  $('#facilities-search').off('keyup').on('keyup', function () { dt.search(this.value).draw(); });
+
+  form.classList.remove('was-validated');
+  form.reset();
+  bootstrap.Modal.getInstance(document.getElementById('modalAddFacility')).hide();
+});
+
+document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', function () {
+  var form = document.getElementById('formAddFacility');
+  form.classList.remove('was-validated');
+  form.reset();
+});
+</script>
+
+<!-- ══ MODAL: Add Role ════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalAddRole" tabindex="-1" aria-labelledby="modalAddRoleLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
+        <div>
+          <h5 class="modal-title fw-semibold mb-0" id="modalAddRoleLabel" style="font-size:15px;color:var(--ink);">Add Role</h5>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Define a new role and configure its module and settings access</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <form id="formAddRole" novalidate>
+          <div class="row g-3 mb-3">
+            <div class="col-7">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Role Name <span class="text-danger">*</span></label>
+              <input type="text" id="addRoleName" class="form-control form-control-sm" placeholder="e.g. Centre Manager" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+            <div class="col-5">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Badge Colour</label>
+              <div class="d-flex gap-2 mt-1" id="addRoleSwatches">
+                <span class="role-swatch selected" data-bg="#F5F0FF" data-clr="#6B21A8" style="background:#6B21A8;" title="Purple"></span>
+                <span class="role-swatch" data-bg="#E8F7F2" data-clr="#13795B" style="background:#13795B;" title="Teal"></span>
+                <span class="role-swatch" data-bg="#EBF3FD" data-clr="#1A5FA8" style="background:#1A5FA8;" title="Blue"></span>
+                <span class="role-swatch" data-bg="#E6F4F4" data-clr="#1e5f5f" style="background:#1e5f5f;" title="Dark Teal"></span>
+                <span class="role-swatch" data-bg="#FDF3E3" data-clr="#C07A1A" style="background:#C07A1A;" title="Amber"></span>
+                <span class="role-swatch" data-bg="#FDF0F0" data-clr="#B03030" style="background:#B03030;" title="Red"></span>
+                <span class="role-swatch" data-bg="#F0F0F0" data-clr="#666" style="background:#666;" title="Grey"></span>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Description</label>
+            <textarea id="addRoleDesc" class="form-control form-control-sm" rows="2" placeholder="What does this role do?"></textarea>
+          </div>
+
+          <div class="row g-4">
+            <!-- Nav Modules -->
+            <div class="col-12">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
+                <i class="bi bi-layout-sidebar me-1" style="color:#6B21A8;"></i>Navigation Modules
+              </div>
+              <div class="role-perm-grid" id="addRoleNavPerms">
+                <label class="role-perm-item"><input type="checkbox" onclick="displayVAEPD()" value="dashboard" checked> <i class="bi bi-grid-fill"></i> Dashboard</label>
+                <label class="role-perm-item"><input type="checkbox" value="mj_registry"> <i class="bi bi-person-lines-fill"></i> MJ Registry</label>
+                <label class="role-perm-item"><input type="checkbox" value="mj_profile"> <i class="bi bi-person-badge"></i> MJ Profile</label>
+                <label class="role-perm-item"><input type="checkbox" value="post_job"> <i class="bi bi-send-fill"></i> Post Job</label>
+                <label class="role-perm-item"><input type="checkbox" value="reports"> <i class="bi bi-bar-chart-fill"></i> Reports</label>
+                <label class="role-perm-item" id="addNavSettings"><input type="checkbox" value="settings" class="nav-settings-toggle" data-target="addRoleTabPerms"> <i class="bi bi-gear-fill"></i> Settings</label>
+              </div>
+            </div>
+            <!-- Settings Tabs -->
+            <!-- <div class="col-6">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
+                <i class="bi bi-tabs me-1" style="color:#6B21A8;"></i>Settings Tabs
+                <span style="font-size:10px;font-weight:400;color:var(--ink4);margin-left:4px;">Requires Settings access</span>
+              </div>
+              <div class="role-perm-grid role-perm-tabs-group" id="addRoleTabPerms" style="opacity:.35;pointer-events:none;">
+                <label class="role-perm-item"><input type="checkbox" value="tab_users"> <i class="bi bi-people"></i> Users</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_roles"> <i class="bi bi-shield-check"></i> Roles</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_rules"> <i class="bi bi-sliders"></i> Business Rules</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_facilities"> <i class="bi bi-building"></i> Facilities</label>
+              </div>
+            </div> -->
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
+        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
+        <button type="button" class="btn btn-sm" id="btnAddRoleSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
+          <i class="bi bi-shield-plus me-1"></i>Create Role
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Edit Role ══════════════════════════════════════════════ -->
+<div class="modal fade" id="modalEditRole" tabindex="-1" aria-labelledby="modalEditRoleLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
+        <div>
+          <h5 class="modal-title fw-semibold mb-0" id="modalEditRoleLabel" style="font-size:15px;color:var(--ink);">Edit Role</h5>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Update permissions for this role</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <input type="hidden" id="editRoleKey">
+        <!-- System role notice -->
+        <div id="editRoleSystemNotice" class="d-none" style="background:#FDF3E3;border:1px solid #F0D9A0;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#7A5010;">
+          <i class="bi bi-lock-fill me-1"></i><strong>System role</strong> — the name cannot be changed but permissions can be updated.
+        </div>
+        <form id="formEditRole" novalidate>
+          <div class="row g-3 mb-3">
+            <div class="col-7">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Role Name <span class="text-danger">*</span></label>
+              <input type="text" id="editRoleName" class="form-control form-control-sm" required>
+              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+            </div>
+            <div class="col-5">
+              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Badge Colour</label>
+              <div class="d-flex gap-2 mt-1" id="editRoleSwatches">
+                <span class="role-swatch" data-bg="#F5F0FF" data-clr="#6B21A8" style="background:#6B21A8;" title="Purple"></span>
+                <span class="role-swatch" data-bg="#E8F7F2" data-clr="#13795B" style="background:#13795B;" title="Teal"></span>
+                <span class="role-swatch" data-bg="#EBF3FD" data-clr="#1A5FA8" style="background:#1A5FA8;" title="Blue"></span>
+                <span class="role-swatch" data-bg="#E6F4F4" data-clr="#1e5f5f" style="background:#1e5f5f;" title="Dark Teal"></span>
+                <span class="role-swatch" data-bg="#FDF3E3" data-clr="#C07A1A" style="background:#C07A1A;" title="Amber"></span>
+                <span class="role-swatch" data-bg="#FDF0F0" data-clr="#B03030" style="background:#B03030;" title="Red"></span>
+                <span class="role-swatch" data-bg="#F0F0F0" data-clr="#666" style="background:#666;" title="Grey"></span>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Description</label>
+            <textarea id="editRoleDesc" class="form-control form-control-sm" rows="2"></textarea>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-6">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
+                <i class="bi bi-layout-sidebar me-1" style="color:#6B21A8;"></i>Navigation Modules
+              </div>
+              <div class="role-perm-grid" id="editRoleNavPerms">
+                <label class="role-perm-item"><input type="checkbox" value="dashboard"> <i class="bi bi-grid-fill"></i> Dashboard</label>
+                <label class="role-perm-item"><input type="checkbox" value="mj_registry"> <i class="bi bi-person-lines-fill"></i> MJ Registry</label>
+                <label class="role-perm-item"><input type="checkbox" value="mj_profile"> <i class="bi bi-person-badge"></i> MJ Profile</label>
+                <label class="role-perm-item"><input type="checkbox" value="post_job"> <i class="bi bi-send-fill"></i> Post Job</label>
+                <label class="role-perm-item"><input type="checkbox" value="reports"> <i class="bi bi-bar-chart-fill"></i> Reports</label>
+                <label class="role-perm-item"><input type="checkbox" value="settings" class="nav-settings-toggle" data-target="editRoleTabPerms"> <i class="bi bi-gear-fill"></i> Settings</label>
+              </div>
+            </div>
+            <div class="col-6">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
+                <i class="bi bi-tabs me-1" style="color:#6B21A8;"></i>Settings Tabs
+                <span style="font-size:10px;font-weight:400;color:var(--ink4);margin-left:4px;">Requires Settings access</span>
+              </div>
+              <div class="role-perm-grid role-perm-tabs-group" id="editRoleTabPerms" style="opacity:.35;pointer-events:none;">
+                <label class="role-perm-item"><input type="checkbox" value="tab_users"> <i class="bi bi-people"></i> Users</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_roles"> <i class="bi bi-shield-check"></i> Roles</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_rules"> <i class="bi bi-sliders"></i> Business Rules</label>
+                <label class="role-perm-item"><input type="checkbox" value="tab_facilities"> <i class="bi bi-building"></i> Facilities</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;justify-content:space-between;">
+        <button type="button" id="btnDeleteRole" class="btn btn-sm btn-light border text-danger" style="font-size:13px;">
+          <i class="bi bi-trash me-1"></i>Delete Role
+        </button>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
+          <button type="button" class="btn btn-sm" id="btnEditRoleSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
+            <i class="bi bi-check2 me-1"></i>Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ══ Role permission grid ══════════════════════════════════════════ */
+.role-perm-grid { display:flex;flex-direction:column;gap:6px; }
+.role-perm-item {
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--ink2);cursor:pointer;
+  padding:7px 10px;border-radius:7px;border:1px solid #EDE8F6;
+  transition:background .15s;
+}
+.role-perm-item:hover { background:#F9F6FF; }
+.role-perm-item input[type=checkbox] { accent-color:#6B21A8;width:15px;height:15px;cursor:pointer;flex-shrink:0; }
+.role-perm-item i { color:#6B21A8;font-size:13px;width:16px;text-align:center; }
+/* Swatch picker */
+.role-swatch {
+  width:22px;height:22px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .15s,border-color .15s;
+  flex-shrink:0;
+}
+.role-swatch:hover { transform:scale(1.2); }
+.role-swatch.selected { border-color:var(--ink);transform:scale(1.15); }
+/* Module access pills in table */
+.role-acc-pill {
+  display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:20px;
+  background:rgba(var(--pacc-r,107),var(--pacc-g,33),var(--pacc-b,168),.1);
+  color:var(--pacc,#6B21A8);
+  white-space:nowrap;
+}
+.acc-pill-dashboard { background:#F5F0FF;color:#6B21A8; }
+.acc-pill-mj_registry { background:#EBF3FD;color:#1A5FA8; }
+.acc-pill-mj_profile  { background:#E8F7F2;color:#13795B; }
+.acc-pill-post_job    { background:#E6F4F4;color:#1e5f5f; }
+.acc-pill-reports     { background:#FDF3E3;color:#C07A1A; }
+.acc-pill-settings    { background:#FDF0F0;color:#B03030; }
+</style>
+
+<script>
+/* ══ ROLES DATA ═══════════════════════════════════════════════════ */
+var NAV_MODULES = [
+  { key:'dashboard',   label:'Dashboard',   icon:'bi-grid-fill' },
+  { key:'mj_registry', label:'MJ Registry', icon:'bi-person-lines-fill' },
+  { key:'mj_profile',  label:'MJ Profile',  icon:'bi-person-badge' },
+  { key:'post_job',    label:'Post Job',     icon:'bi-send-fill' },
+  { key:'reports',     label:'Reports',      icon:'bi-bar-chart-fill' },
+  { key:'settings',    label:'Settings',     icon:'bi-gear-fill' }
+];
+var SETTINGS_TABS = [
+  { key:'tab_users',      label:'Users' },
+  { key:'tab_roles',      label:'Roles' },
+  { key:'tab_rules',      label:'Business Rules' },
+  { key:'tab_facilities', label:'Facilities' }
+];
+var ROLES_DATA = [
+  { key:'admin',   label:'Admin',       desc:'Full access to all modules and settings. Can manage users, roles, and system configuration.',
+    avBg:'#F5F0FF', avClr:'#6B21A8', 
+    nav:['dashboard','mj_registry','mj_profile','post_job','reports','settings'],
+    tabs:['tab_users','tab_roles','tab_rules','tab_facilities'] },
+  { key:'aac',     label:'AAC Staff',   desc:'Can view and manage MJ registry, profiles, job publishing and operational reports.',
+    avBg:'#E8F7F2', avClr:'#13795B', 
+    nav:['dashboard','mj_registry','mj_profile','post_job','reports'], tabs:[] },
+  { key:'nurse',   label:'SCC Nurse',   desc:'Can publish chaperone jobs and view operational reports for their facility.',
+    avBg:'#EBF3FD', avClr:'#1A5FA8', 
+    nav:['dashboard','post_job','reports'], tabs:[] },
+  { key:'ae',      label:'SCC AE',      desc:'Can publish jobs, view job listings and reports for their facility.',
+    avBg:'#E6F4F4', avClr:'#1e5f5f',
+    nav:['dashboard','post_job','reports'], tabs:[] },
+  { key:'finance', label:'Finance',     desc:'Can access payment reports, AP listing export and configure fee and GL code tables.',
+    avBg:'#FDF3E3', avClr:'#C07A1A', 
+    nav:['dashboard','reports','settings'], tabs:['tab_rules'] },
+  { key:'hr',      label:'HR',          desc:'Can access MJ timesheets and payment processing reports for payroll.',
+    avBg:'#FDF0F0', avClr:'#B03030', 
+    nav:['dashboard','reports'], tabs:[] }
+];
+
+/* ══ USER COUNT PER ROLE ══════════════════════════════════════════ */
+function userCountForRole(key) {
+  return USERS_DATA.filter(function(u){ return u.role === key; }).length;
+}
+
+/* ══ RENDER ROLES TABLE ═══════════════════════════════════════════ */
+function renderRolesTable() {
+  var pillLabels = { dashboard:'Dashboard', mj_registry:'MJ Registry', mj_profile:'MJ Profile', post_job:'Post Job', reports:'Reports', settings:'Settings' };
+  var rows = ROLES_DATA.map(function(r) {
+    var pills = r.nav.map(function(k) {
+      return '<span class="acc-pill-' + k + '" style="display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin:1px 2px 1px 0;white-space:nowrap;">' + pillLabels[k] + '</span>';
+    }).join('');
+    var systemBadge = r.system ? '<span style="font-size:9px;font-weight:600;color:var(--ink4);background:#F0F0F0;padding:1px 6px;border-radius:20px;margin-left:6px;vertical-align:middle;">SYSTEM</span>' : '';
+    var uCount = userCountForRole(r.key);
+    return '<tr>' +
+      '<td><div class="d-flex align-items-center gap-2">' +
+        '<span class="role-badge r-' + r.key + '" style="font-size:12px;padding:3px 10px;">' + r.label + '</span>' + systemBadge +
+      '</div></td>' +
+      '<td style="font-size:12px;color:var(--ink3);max-width:260px;">' + r.desc + '</td>' +
+      '<td style="text-align:center;font-size:13px;font-weight:600;color:var(--ink2);">' + uCount + '</td>' +
+      '<td style="max-width:280px;">' + pills + '</td>' +
+      '<td><button class="btn btn-sm btn-light border" style="font-size:11px;" onclick="openEditRole(\'' + r.key + '\')">' +
+        '<i class="bi bi-pencil"></i></button></td>' +
+    '</tr>';
+  });
+  $('#tbl-roles tbody').html(rows.join(''));
+}
+
+$(document).ready(function () { renderRolesTable(); });
+
+/* ══ SWATCH PICKER ════════════════════════════════════════════════ */
+function initSwatches(containerId) {
+  document.getElementById(containerId).addEventListener('click', function(e) {
+    var sw = e.target.closest('.role-swatch');
+    if (!sw) return;
+    this.querySelectorAll('.role-swatch').forEach(function(s){ s.classList.remove('selected'); });
+    sw.classList.add('selected');
+  });
+}
+initSwatches('addRoleSwatches');
+initSwatches('editRoleSwatches');
+
+/* ══ SETTINGS TOGGLE (enable/disable tabs section) ════════════════ */
+document.addEventListener('change', function(e) {
+  if (!e.target.classList.contains('nav-settings-toggle')) return;
+  var targetId = e.target.getAttribute('data-target');
+  var group = document.getElementById(targetId);
+  if (!group) return;
+  if (e.target.checked) {
+    group.style.opacity = '1';
+    group.style.pointerEvents = 'auto';
+  } else {
+    group.style.opacity = '.35';
+    group.style.pointerEvents = 'none';
+    group.querySelectorAll('input[type=checkbox]').forEach(function(cb){ cb.checked = false; });
+  }
+});
+
+/* ══ ADD ROLE ═════════════════════════════════════════════════════ */
+document.getElementById('btnAddRoleSave').addEventListener('click', function() {
+  var form = document.getElementById('formAddRole');
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  var name = document.getElementById('addRoleName').value.trim();
+  var desc = document.getElementById('addRoleDesc').value.trim();
+  var selSwatch = document.querySelector('#addRoleSwatches .role-swatch.selected') ||
+                  document.querySelector('#addRoleSwatches .role-swatch');
+  var avBg  = selSwatch ? selSwatch.getAttribute('data-bg')  : '#F0F0F0';
+  var avClr = selSwatch ? selSwatch.getAttribute('data-clr') : '#666';
+
+  var nav = [];
+  document.querySelectorAll('#addRoleNavPerms input:checked').forEach(function(cb){ nav.push(cb.value); });
+  var tabs = [];
+  document.querySelectorAll('#addRoleTabPerms input:checked').forEach(function(cb){ tabs.push(cb.value); });
+
+  var key = name.toLowerCase().replace(/[^a-z0-9]+/g,'_');
+  /* ensure unique key */
+  var existing = ROLES_DATA.find(function(r){ return r.key === key; });
+  if (existing) key = key + '_' + Date.now();
+
+  ROLES_DATA.push({ key:key, label:name, desc:desc, avBg:avBg, avClr:avClr, system:false, nav:nav, tabs:tabs });
+
+  /* inject role-badge CSS for new role */
+  injectRoleBadgeStyle(key, avBg, avClr);
+
+  renderRolesTable();
+  form.classList.remove('was-validated');
+  form.reset();
+  document.querySelector('#addRoleSwatches .role-swatch').classList.add('selected');
+  document.getElementById('addRoleTabPerms').style.opacity = '.35';
+  document.getElementById('addRoleTabPerms').style.pointerEvents = 'none';
+  bootstrap.Modal.getInstance(document.getElementById('modalAddRole')).hide();
+});
+
+document.getElementById('modalAddRole').addEventListener('hidden.bs.modal', function() {
+  var form = document.getElementById('formAddRole');
+  form.classList.remove('was-validated');
+  form.reset();
+  document.querySelectorAll('#addRoleSwatches .role-swatch').forEach(function(s){ s.classList.remove('selected'); });
+  document.querySelector('#addRoleSwatches .role-swatch').classList.add('selected');
+  document.getElementById('addRoleTabPerms').style.opacity = '.35';
+  document.getElementById('addRoleTabPerms').style.pointerEvents = 'none';
+});
+
+/* ══ OPEN EDIT ROLE ═══════════════════════════════════════════════ */
+function openEditRole(key) {
+  var role = ROLES_DATA.find(function(r){ return r.key === key; });
+  if (!role) return;
+
+  document.getElementById('editRoleKey').value = key;
+  document.getElementById('editRoleName').value = role.label;
+  document.getElementById('editRoleName').readOnly = role.system;
+  document.getElementById('editRoleDesc').value = role.desc || '';
+  document.getElementById('editRoleSystemNotice').classList.toggle('d-none', !role.system);
+  document.getElementById('btnDeleteRole').disabled = role.system;
+  document.getElementById('btnDeleteRole').title = role.system ? 'System roles cannot be deleted' : '';
+
+  /* swatches */
+  document.querySelectorAll('#editRoleSwatches .role-swatch').forEach(function(s) {
+    s.classList.toggle('selected', s.getAttribute('data-clr') === role.avClr);
+  });
+
+  /* nav checkboxes */
+  document.querySelectorAll('#editRoleNavPerms input[type=checkbox]').forEach(function(cb) {
+    cb.checked = role.nav.indexOf(cb.value) > -1;
+  });
+
+  /* settings tabs toggle */
+  var hasSettings = role.nav.indexOf('settings') > -1;
+  var tabGroup = document.getElementById('editRoleTabPerms');
+  tabGroup.style.opacity = hasSettings ? '1' : '.35';
+  tabGroup.style.pointerEvents = hasSettings ? 'auto' : 'none';
+  document.querySelectorAll('#editRoleTabPerms input[type=checkbox]').forEach(function(cb) {
+    cb.checked = role.tabs.indexOf(cb.value) > -1;
+  });
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditRole')).show();
+}
+
+/* ══ SAVE EDIT ROLE ═══════════════════════════════════════════════ */
+document.getElementById('btnEditRoleSave').addEventListener('click', function() {
+  var form = document.getElementById('formEditRole');
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  var key  = document.getElementById('editRoleKey').value;
+  var role = ROLES_DATA.find(function(r){ return r.key === key; });
+  if (!role) return;
+
+  if (!role.system) role.label = document.getElementById('editRoleName').value.trim();
+  role.desc = document.getElementById('editRoleDesc').value.trim();
+
+  var selSwatch = document.querySelector('#editRoleSwatches .role-swatch.selected');
+  if (selSwatch) {
+    role.avBg  = selSwatch.getAttribute('data-bg');
+    role.avClr = selSwatch.getAttribute('data-clr');
+    injectRoleBadgeStyle(key, role.avBg, role.avClr);
+  }
+
+  role.nav = [];
+  document.querySelectorAll('#editRoleNavPerms input:checked').forEach(function(cb){ role.nav.push(cb.value); });
+  role.tabs = [];
+  document.querySelectorAll('#editRoleTabPerms input:checked').forEach(function(cb){ role.tabs.push(cb.value); });
+
+  renderRolesTable();
+  form.classList.remove('was-validated');
+  bootstrap.Modal.getInstance(document.getElementById('modalEditRole')).hide();
+});
+
+/* ══ DELETE ROLE ══════════════════════════════════════════════════ */
+document.getElementById('btnDeleteRole').addEventListener('click', function() {
+  var key  = document.getElementById('editRoleKey').value;
+  var role = ROLES_DATA.find(function(r){ return r.key === key; });
+  if (!role || role.system) return;
+  if (!confirm('Delete the "' + role.label + '" role? Users assigned this role will need to be reassigned.')) return;
+  ROLES_DATA = ROLES_DATA.filter(function(r){ return r.key !== key; });
+  renderRolesTable();
+  bootstrap.Modal.getInstance(document.getElementById('modalEditRole')).hide();
+});
+
+document.getElementById('modalEditRole').addEventListener('hidden.bs.modal', function() {
+  document.getElementById('formEditRole').classList.remove('was-validated');
+});
+
+/* ══ INJECT BADGE STYLE FOR CUSTOM ROLES ══════════════════════════ */
+function injectRoleBadgeStyle(key, bg, clr) {
+  var id = 'badge-style-' + key;
+  var existing = document.getElementById(id);
+  if (existing) existing.remove();
+  var style = document.createElement('style');
+  style.id = id;
+  style.textContent = '.r-' + key + '{background:' + bg + ';color:' + clr + ';}';
+  document.head.appendChild(style);
+}
+
+function displayVAEPD(){
+  
+}
+</script>
+
 </body>
 </html>
