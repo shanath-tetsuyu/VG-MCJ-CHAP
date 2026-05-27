@@ -354,3 +354,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 .users-dt-foot .paginate_button:hover:not(.disabled) { background: #F5F0FF !important; color: #6B21A8 !important; border-color: #C4B5FD !important; }
 .users-dt-foot .paginate_button.current, .users-dt-foot .paginate_button.current:hover { background: #6B21A8 !important; color: #fff !important; border-color: #6B21A8 !important; }
 .users-dt-foot .paginate_button.disabled { opacity: .4; cursor: default; }
+
+.choices__inner {
+  border-radius: 6px;
+  min-height: 34px;
+  font-size: 13px;
+}
+
+.choices__list--multiple .choices__item {
+  background: #0d6efd;
+  border: none;
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 12px;
+}

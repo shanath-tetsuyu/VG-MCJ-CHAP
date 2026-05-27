@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <!-- V2 Sidebar CSS -->
   <link rel="stylesheet" href="../portal/settings.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 </head>
 <body>
 
@@ -294,7 +295,7 @@
                 <input id="facilities-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search organisation/facility...">
               </div>
               <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddFacility">
-                <i class="bi bi-plus-lg me-1"></i>Add Organisation/Facility
+                <i class="bi bi-plus-lg me-1"></i>Add Facility
               </button>
             </div>
 
@@ -325,38 +326,18 @@
 
 /* ══ Users DataTable ═══════════════════════════════════════════════ */
 const USERS_DATA = [
-  { initials:'JD', avBg:'#F5F0FF', avClr:'#6B21A8',
-    name:'John David',       email:'john.david@awwa.org.sg',
-    role:'admin',   roleLabel:'Admin',
-    facility:'All Facilities', active:true,  lastActive:'Today, 09:14' },
   { initials:'SL', avBg:'#E8F7F2', avClr:'#13795B',
     name:'Sarah Lim',        email:'sarah.lim@awwa.org.sg',
-    role:'aac',     roleLabel:'AAC Staff',
+    role:'aac',     roleLabel:'VG AAC Staff',
     facility:'AAC Toa Payoh', active:true,  lastActive:'Today, 08:52' },
   { initials:'PN', avBg:'#EBF3FD', avClr:'#1A5FA8',
     name:'Priya Nair',       email:'priya.nair@awwa.org.sg',
-    role:'nurse',   roleLabel:'SCC Nurse',
+    role:'nurse',   roleLabel:'VG SCC Nurse',
     facility:'SCC Buona Vista', active:true, lastActive:'Yesterday, 16:30' },
   { initials:'MT', avBg:'#E6F4F4', avClr:'#1e5f5f',
     name:'Michael Tan',      email:'michael.tan@awwa.org.sg',
-    role:'ae',      roleLabel:'SCC AE',
-    facility:'SCC Clementi', active:true,  lastActive:'26 May, 11:05' },
-  { initials:'CW', avBg:'#FDF3E3', avClr:'#C07A1A',
-    name:'Cindy Wong',       email:'cindy.wong@awwa.org.sg',
-    role:'finance', roleLabel:'Finance',
-    facility:'AAC Toa Payoh', active:true,  lastActive:'25 May, 14:22' },
-  { initials:'RY', avBg:'#FDF0F0', avClr:'#B03030',
-    name:'Raymond Yeo',      email:'raymond.yeo@awwa.org.sg',
-    role:'hr',      roleLabel:'HR',
-    facility:'AAC Toa Payoh', active:true,  lastActive:'24 May, 09:00' },
-  { initials:'FH', avBg:'#F0F0F0', avClr:'#AAA',
-    name:'Fatimah Hassan',   email:'fatimah.hassan@awwa.org.sg',
-    role:'aac',     roleLabel:'AAC Staff',
-    facility:'AAC Jurong',   active:false, lastActive:'12 May, 17:48' },
-  { initials:'KO', avBg:'#EBF3FD', avClr:'#1A5FA8',
-    name:'Kevin Ong',        email:'kevin.ong@awwa.org.sg',
-    role:'nurse',   roleLabel:'SCC Nurse',
-    facility:'SCC Jurong',   active:true,  lastActive:'Today, 07:30' }
+    role:'ae',      roleLabel:'AWWA SCC Staff',
+    facility:'SCC Clementi', active:true,  lastActive:'26 May, 11:05' }
 ];
 
 function renderUsers() {
@@ -467,12 +448,11 @@ document.addEventListener('click', function (e) {
   </script>
 <!-- ══ MODAL: Add User ═══════════════════════════════════════════════ -->
 <div class="modal fade" id="modalAddUser" tabindex="-1" aria-labelledby="modalAddUserLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width:520px;">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content" style="border-radius:12px;border:none;">
       <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
         <div>
           <h5 class="modal-title fw-semibold mb-0" id="modalAddUserLabel" style="font-size:15px;color:var(--ink);">Add User</h5>
-          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Grant a staff member access to the CARES portal</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -494,11 +474,22 @@ document.addEventListener('click', function (e) {
           </div>
 
           <!-- Email -->
-          <div class="mb-3">
-            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Work Email <span class="text-danger">*</span></label>
-            <input type="email" id="addUserEmail" class="form-control form-control-sm" placeholder="e.g. sarah.lim@awwa.org.sg" required>
-            <div class="invalid-feedback" style="font-size:11px;">Enter a valid email address.</div>
-          </div>
+           <div class="row">
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Email <span class="text-danger">*</span></label>
+                  <input type="email" id="addUserEmail" class="form-control form-control-sm" placeholder="e.g. sarah.lim@awwa.org.sg" required>
+                  <div class="invalid-feedback" style="font-size:11px;">Enter a valid email address.</div>
+                </div>
+              </div>  
+              <div class="col-6">
+                <div class="mb-3">
+                  <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Organisation <span class="text-danger">*</span></label>
+                  <input type="text" id="addUserOrganisation" class="form-control form-control-sm" placeholder="e.g. AWWA" readonly value="AWWA Ltd">
+                </div>
+              </div>  
+           </div>
+
 
           <!-- Role & Facility -->
           <div class="row g-3 mb-3">
@@ -517,14 +508,11 @@ document.addEventListener('click', function (e) {
             </div>
             <div class="col-6">
               <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facility</label>
-              <select id="addUserFacility" class="form-select form-select-sm">
-                <option value="All Facilities">All Facilities</option>
-                <option value="AAC Toa Payoh">AAC Toa Payoh</option>
-                <option value="AAC Jurong">AAC Jurong</option>
-                <option value="SCC Buona Vista">SCC Buona Vista</option>
-                <option value="SCC Clementi">SCC Clementi</option>
-                <option value="SCC Jurong">SCC Jurong</option>
-              </select>
+                <select id="mySelect" multiple class="form-select form-select-sm">
+                  <option value="view">Clementi</option>
+                  <option value="add">Hougang</option>
+                  <option value="edit">Bedok</option>
+                </select>
             </div>
           </div>
 
@@ -551,28 +539,19 @@ document.addEventListener('click', function (e) {
   </div>
 </div>
 
-<!-- ══ MODAL: Add Organisation / Facility ════════════════════════════ -->
+<!-- ══ MODAL: Add Facility ════════════════════════════ -->
 <div class="modal fade" id="modalAddFacility" tabindex="-1" aria-labelledby="modalAddFacilityLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width:540px;">
     <div class="modal-content" style="border-radius:12px;border:none;">
       <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
         <div>
-          <h5 class="modal-title fw-semibold mb-0" id="modalAddFacilityLabel" style="font-size:15px;color:var(--ink);">Add Organisation / Facility</h5>
+          <h5 class="modal-title fw-semibold mb-0" id="modalAddFacilityLabel" style="font-size:15px;color:var(--ink);">Add Facility</h5>
           <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Register a new AAC or SCC centre in the system</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" style="padding:20px 24px;">
         <form id="formAddFacility" novalidate>
-
-          <!-- Organisation & Type -->
-          <div class="row g-3 mb-3">
-            <div class="col-8">
-              <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Organisation Name <span class="text-danger">*</span></label>
-              <input type="text" id="addFacOrg" class="form-control form-control-sm" placeholder="e.g. AWWA Ltd" required>
-              <div class="invalid-feedback" style="font-size:11px;">Required.</div>
-            </div>
-          </div>
 
           <!-- Facility Name -->
           <div class="row g-3 mb-3">
@@ -631,6 +610,7 @@ document.addEventListener('click', function (e) {
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
 /* ══ ROLE LABEL MAP ════════════════════════════════════════════════ */
 var ROLE_LABELS = { admin:'Admin', aac:'AAC Staff', nurse:'SCC Nurse', ae:'SCC AE', finance:'Finance', hr:'HR' };
@@ -824,27 +804,180 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
                 <i class="bi bi-layout-sidebar me-1" style="color:#6B21A8;"></i>Navigation Modules
               </div>
               <div class="role-perm-grid" id="addRoleNavPerms">
-                <label class="role-perm-item"><input type="checkbox" onclick="displayVAEPD()" value="dashboard" checked> <i class="bi bi-grid-fill"></i> Dashboard</label>
-                <label class="role-perm-item"><input type="checkbox" value="mj_registry"> <i class="bi bi-person-lines-fill"></i> MJ Registry</label>
-                <label class="role-perm-item"><input type="checkbox" value="mj_profile"> <i class="bi bi-person-badge"></i> MJ Profile</label>
-                <label class="role-perm-item"><input type="checkbox" value="post_job"> <i class="bi bi-send-fill"></i> Post Job</label>
-                <label class="role-perm-item"><input type="checkbox" value="reports"> <i class="bi bi-bar-chart-fill"></i> Reports</label>
-                <label class="role-perm-item" id="addNavSettings"><input type="checkbox" value="settings" class="nav-settings-toggle" data-target="addRoleTabPerms"> <i class="bi bi-gear-fill"></i> Settings</label>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="dashboard" data-module value="dashboard"> <i class="bi bi-grid-fill"></i> 
+                        Dashboard
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="dashboardAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="dashboard">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard">
+                        Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="mj_registry" data-module value="mj_registry"> <i class="bi bi-person-lines-fill"></i>
+                        MJ Registry
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="mj_registryAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="mj_registry_view">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_add">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_edit">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_delete">
+                        Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="mj_profile" data-module value="mj_profile"> <i class="bi bi-person-badge"></i>
+                        MJ Profile
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="mj_profileAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="mj_profile_view">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_add">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_edit">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_delete">
+                        Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="post_job" data-module value="post_job"> <i class="bi bi-send-fill"></i>
+                        Post Job
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="post_jobAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="post_job_view">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_add">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_edit">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_delete">
+                        Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="reports" data-module value="reports"> <i class="bi bi-bar-chart-fill"></i>
+                        Reports
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="reportsAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="reports_view">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_add">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_edit">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_delete">
+                        Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item" id="addNavSettings">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="settings" data-module value="settings" class="nav-settings-toggle" data-target="addRoleTabPerms"> <i class="bi bi-gear-fill"></i>
+                        Settings
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="settingsAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="settings_view">
+                        View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_add">
+                        Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_edit">
+                        Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_delete">
+                        Delete
+                      </label>
+                    </div>
+
+                    <!-- Settings Tabs -->
+                     <div class="row">
+                      <div class="col-6">
+                        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
+                          <i class="bi bi-tabs me-1" style="color:#6B21A8;"></i>Settings Tabs
+                          <span style="font-size:10px;font-weight:400;color:var(--ink4);margin-left:4px;">Requires Settings access</span>
+                        </div>
+                        <div class="role-perm-grid role-perm-tabs-group" id="addRoleTabPerms" style="opacity:.35;pointer-events:none;">
+                          <label class="role-perm-item"><input type="checkbox" value="tab_users"> <i class="bi bi-people"></i> Users</label>
+                          <label class="role-perm-item"><input type="checkbox" value="tab_roles"> <i class="bi bi-shield-check"></i> Roles</label>
+                          <label class="role-perm-item"><input type="checkbox" value="tab_rules"> <i class="bi bi-sliders"></i> Business Rules</label>
+                          <label class="role-perm-item"><input type="checkbox" value="tab_facilities"> <i class="bi bi-building"></i> Facilities</label>
+                        </div>
+                      </div>
+                    </div>
+                </div>
               </div>
             </div>
-            <!-- Settings Tabs -->
-            <!-- <div class="col-6">
-              <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #F0EBF8;">
-                <i class="bi bi-tabs me-1" style="color:#6B21A8;"></i>Settings Tabs
-                <span style="font-size:10px;font-weight:400;color:var(--ink4);margin-left:4px;">Requires Settings access</span>
-              </div>
-              <div class="role-perm-grid role-perm-tabs-group" id="addRoleTabPerms" style="opacity:.35;pointer-events:none;">
-                <label class="role-perm-item"><input type="checkbox" value="tab_users"> <i class="bi bi-people"></i> Users</label>
-                <label class="role-perm-item"><input type="checkbox" value="tab_roles"> <i class="bi bi-shield-check"></i> Roles</label>
-                <label class="role-perm-item"><input type="checkbox" value="tab_rules"> <i class="bi bi-sliders"></i> Business Rules</label>
-                <label class="role-perm-item"><input type="checkbox" value="tab_facilities"> <i class="bi bi-building"></i> Facilities</label>
-              </div>
-            </div> -->
           </div>
         </form>
       </div>
@@ -906,12 +1039,138 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
                 <i class="bi bi-layout-sidebar me-1" style="color:#6B21A8;"></i>Navigation Modules
               </div>
               <div class="role-perm-grid" id="editRoleNavPerms">
-                <label class="role-perm-item"><input type="checkbox" value="dashboard"> <i class="bi bi-grid-fill"></i> Dashboard</label>
-                <label class="role-perm-item"><input type="checkbox" value="mj_registry"> <i class="bi bi-person-lines-fill"></i> MJ Registry</label>
-                <label class="role-perm-item"><input type="checkbox" value="mj_profile"> <i class="bi bi-person-badge"></i> MJ Profile</label>
-                <label class="role-perm-item"><input type="checkbox" value="post_job"> <i class="bi bi-send-fill"></i> Post Job</label>
-                <label class="role-perm-item"><input type="checkbox" value="reports"> <i class="bi bi-bar-chart-fill"></i> Reports</label>
-                <label class="role-perm-item"><input type="checkbox" value="settings" class="nav-settings-toggle" data-target="editRoleTabPerms"> <i class="bi bi-gear-fill"></i> Settings</label>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_dashboard" data-module value="dashboard"> <i class="bi bi-grid-fill"></i>
+                        Dashboard
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_dashboardAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="dashboard_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="dashboard_delete">Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_mj_registry" data-module value="mj_registry"> <i class="bi bi-person-lines-fill"></i>
+                        MJ Registry
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_mj_registryAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="mj_registry_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_registry_delete">Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_mj_profile" data-module value="mj_profile"> <i class="bi bi-person-badge"></i>
+                        MJ Profile
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_mj_profileAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="mj_profile_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="mj_profile_delete">Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_post_job" data-module value="post_job"> <i class="bi bi-send-fill"></i>
+                        Post Job
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_post_jobAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="post_job_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="post_job_delete">Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_reports" data-module value="reports"> <i class="bi bi-bar-chart-fill"></i>
+                        Reports
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_reportsAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="reports_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="reports_delete">Delete
+                      </label>
+                    </div>
+                </div>
+                <div class="row flex-column role-perm-item">
+                    <div class="row justify-content-center">
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" onclick="displayVAEPD(this.id)" id="edit_settings" data-module value="settings" class="nav-settings-toggle" data-target="editRoleTabPerms"> <i class="bi bi-gear-fill"></i>
+                        Settings
+                      </label>
+                    </div>
+                    <div class="flex-row justify-content-start gap-2" id="edit_settingsAccess" style="display:none;">
+                      <label class="d-flex align-items-center gap-1" style="margin-left:5%">
+                        <input type="checkbox" value="settings_view">View
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_add">Add
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_edit">Edit
+                      </label>
+                      <label class="d-flex align-items-center gap-1">
+                        <input type="checkbox" value="settings_delete">Delete
+                      </label>
+                    </div>
+                </div>
               </div>
             </div>
             <div class="col-6">
@@ -1090,7 +1349,7 @@ document.getElementById('btnAddRoleSave').addEventListener('click', function() {
   var avClr = selSwatch ? selSwatch.getAttribute('data-clr') : '#666';
 
   var nav = [];
-  document.querySelectorAll('#addRoleNavPerms input:checked').forEach(function(cb){ nav.push(cb.value); });
+  document.querySelectorAll('#addRoleNavPerms input[data-module]:checked').forEach(function(cb){ nav.push(cb.value); });
   var tabs = [];
   document.querySelectorAll('#addRoleTabPerms input:checked').forEach(function(cb){ tabs.push(cb.value); });
 
@@ -1142,8 +1401,20 @@ function openEditRole(key) {
   });
 
   /* nav checkboxes */
-  document.querySelectorAll('#editRoleNavPerms input[type=checkbox]').forEach(function(cb) {
-    cb.checked = role.nav.indexOf(cb.value) > -1;
+  var editModuleIds = {
+    dashboard: 'edit_dashboard', mj_registry: 'edit_mj_registry',
+    mj_profile: 'edit_mj_profile', post_job: 'edit_post_job',
+    reports: 'edit_reports', settings: 'edit_settings'
+  };
+  Object.keys(editModuleIds).forEach(function(modKey) {
+    var cbId  = editModuleIds[modKey];
+    var cb    = document.getElementById(cbId);
+    if (!cb) return;
+    var checked = role.nav.indexOf(modKey) > -1;
+    cb.checked = checked;
+    /* show/hide VAEPD sub-row immediately */
+    var accessDiv = document.getElementById(cbId + 'Access');
+    if (accessDiv) accessDiv.style.display = checked ? 'flex' : 'none';
   });
 
   /* settings tabs toggle */
@@ -1179,7 +1450,7 @@ document.getElementById('btnEditRoleSave').addEventListener('click', function() 
   }
 
   role.nav = [];
-  document.querySelectorAll('#editRoleNavPerms input:checked').forEach(function(cb){ role.nav.push(cb.value); });
+  document.querySelectorAll('#editRoleNavPerms input[data-module]:checked').forEach(function(cb){ role.nav.push(cb.value); });
   role.tabs = [];
   document.querySelectorAll('#editRoleTabPerms input:checked').forEach(function(cb){ role.tabs.push(cb.value); });
 
@@ -1214,9 +1485,26 @@ function injectRoleBadgeStyle(key, bg, clr) {
   document.head.appendChild(style);
 }
 
-function displayVAEPD(){
-  
+function displayVAEPD(id) {
+  var accessDiv = '#' + id + 'Access';
+  if ($('#' + id).prop('checked')) {
+    $(accessDiv)
+      .stop(true, true)
+      .css('display', 'flex')
+      .hide()
+      .slideDown(200);
+  } else {
+    $(accessDiv)
+      .stop(true, true)
+      .slideUp(200);
+  }
 }
+
+new Choices('#mySelect', {
+  removeItemButton: true,
+  placeholderValue: 'Select facility',
+  searchEnabled: true
+});
 </script>
 
 </body>
