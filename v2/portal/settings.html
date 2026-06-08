@@ -327,16 +327,16 @@
 /* ══ Users DataTable ═══════════════════════════════════════════════ */
 const USERS_DATA = [
   { initials:'SL', avBg:'#E8F7F2', avClr:'#13795B',
-    name:'Sarah Lim',        email:'sarah.lim@awwa.org.sg',
+    name:'Sarah Lim',        email:'sarah.lim@vanguard.org.sg',
     role:'aac',     roleLabel:'VG AAC Staff',
     facility:'AAC Toa Payoh', active:true,  lastActive:'Today, 08:52' },
   { initials:'PN', avBg:'#EBF3FD', avClr:'#1A5FA8',
-    name:'Priya Nair',       email:'priya.nair@awwa.org.sg',
+    name:'Priya Nair',       email:'priya.nair@vanguard.org.sg',
     role:'nurse',   roleLabel:'VG SCC Nurse',
     facility:'SCC Buona Vista', active:true, lastActive:'Yesterday, 16:30' },
   { initials:'MT', avBg:'#E6F4F4', avClr:'#1e5f5f',
-    name:'Michael Tan',      email:'michael.tan@awwa.org.sg',
-    role:'ae',      roleLabel:'AWWA SCC Staff',
+    name:'Michael Tan',      email:'michael.tan@vanguard.org.sg',
+    role:'ae',      roleLabel:'vanguard SCC Staff',
     facility:'SCC Clementi', active:true,  lastActive:'26 May, 11:05' }
 ];
 
@@ -478,14 +478,14 @@ document.addEventListener('click', function (e) {
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Email <span class="text-danger">*</span></label>
-                  <input type="email" id="addUserEmail" class="form-control form-control-sm" placeholder="e.g. sarah.lim@awwa.org.sg" required>
+                  <input type="email" id="addUserEmail" class="form-control form-control-sm" placeholder="e.g. sarah.lim@vanguard.org.sg" required>
                   <div class="invalid-feedback" style="font-size:11px;">Enter a valid email address.</div>
                 </div>
               </div>  
               <div class="col-6">
                 <div class="mb-3">
                   <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Organisation <span class="text-danger">*</span></label>
-                  <input type="text" id="addUserOrganisation" class="form-control form-control-sm" placeholder="e.g. AWWA" readonly value="AWWA Ltd">
+                  <input type="text" id="addUserOrganisation" class="form-control form-control-sm" placeholder="e.g. vanguard" readonly value="vanguard Ltd">
                 </div>
               </div>  
            </div>
@@ -687,11 +687,11 @@ document.getElementById('modalAddUser').addEventListener('hidden.bs.modal', func
 
 /* ══ FACILITIES DATA ══════════════════════════════════════════════ */
 var FACILITIES_DATA = [
-  { org:'AWWA Ltd', name:'AAC Toa Payoh', active:true },
-  { org:'AWWA Ltd', name:'AAC Jurong',    active:true },
-  { org:'AWWA Ltd', name:'SCC Buona Vista', active:true },
-  { org:'AWWA Ltd', name:'SCC Clementi',  active:true },
-  { org:'AWWA Ltd', name:'SCC Jurong',    active:true }
+  { org:'vanguard Ltd', name:'AAC Toa Payoh', active:true },
+  { org:'vanguard Ltd', name:'AAC Jurong',    active:true },
+  { org:'vanguard Ltd', name:'SCC Buona Vista', active:true },
+  { org:'vanguard Ltd', name:'SCC Clementi',  active:true },
+  { org:'vanguard Ltd', name:'SCC Jurong',    active:true }
 ];
 
 function renderFacilitiesTable() {
