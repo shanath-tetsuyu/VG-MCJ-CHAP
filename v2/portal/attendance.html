@@ -105,37 +105,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 .role-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:20px;font-size:10px;font-weight:600;background:var(--gl);color:var(--g);margin:1px}
 .role-chip-none{font-size:11px;color:var(--ink4);font-style:italic}
 
-/* ── DataTable overrides ── */
-.dataTables_wrapper{font-family:'DM Sans',sans-serif}
-.dataTables_length,.dataTables_filter{display:none}
-.dataTables_info{font-size:11px;color:var(--ink4);padding:8px 2px}
-.dt-pg-wrap{display:flex;justify-content:space-between;align-items:center}
-.dt-pg-wrap .dataTables_info{display:none}
-.dt-pg-wrap .dataTables_paginate{display:flex;gap:4px;padding:8px 0;justify-content:flex-end}
-.dataTables_paginate .paginate_button{padding:4px 10px;border:1px solid var(--bdr)!important;border-radius:6px;font-size:12px;cursor:pointer;background:var(--s)!important;color:var(--ink2)!important;transition:background .12s}
-.dataTables_paginate .paginate_button:hover{background:var(--bg)!important;color:var(--ink)!important}
-.dataTables_paginate .paginate_button.current{background:var(--g)!important;color:#fff!important;border-color:var(--g)!important}
-.dataTables_paginate .paginate_button.disabled{opacity:.4;cursor:default}
-.dt-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:4px}
-#dt-pag .dataTables_paginate{display:flex;gap:4px;padding:4px 0}
-#dt-pag .paginate_button{padding:4px 10px;border:1px solid var(--bdr)!important;border-radius:6px;font-size:12px;cursor:pointer;background:var(--s)!important;color:var(--ink2)!important;transition:background .12s}
-#dt-pag .paginate_button:hover{background:var(--bg)!important;color:var(--ink)!important}
-#dt-pag .paginate_button.current{background:var(--g)!important;color:#fff!important;border-color:var(--g)!important}
-#dt-pag .paginate_button.disabled{opacity:.4;cursor:default}
-#mjTable{width:100%!important;border-collapse:collapse}
-#mjTable thead th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:2px solid var(--bdr);background:var(--s);white-space:nowrap;cursor:pointer;user-select:none}
-#mjTable thead th.sorting::after{content:' ↕';color:var(--bdr);font-size:9px}
-#mjTable thead th.sorting_asc::after{content:' ↑';color:var(--gm);font-size:9px}
-#mjTable thead th.sorting_desc::after{content:' ↓';color:var(--gm);font-size:9px}
-#mjTable thead th.no-sort::after{content:''}
-#mjTable tbody tr{border-bottom:1px solid var(--bdr2);transition:background .1s}
-#mjTable tbody tr:hover{background:#FAFBFC}
-#mjTable tbody td{font-size:12px;padding:10px 12px;color:var(--ink2);vertical-align:middle}
-.mj-id-cell{font-family:monospace;font-size:11px;color:var(--ink4);font-weight:600}
-.mj-name-cell{font-weight:500;font-size:12px;color:var(--ink)}
-.mj-meta{font-size:10px;color:var(--ink4);margin-top:1px}
-.btn-view{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--s);color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-view:hover{background:var(--g);color:#fff;border-color:var(--g)}
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;font-weight:600;color:var(--ink4);text-align:left;padding:6px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.03em}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.st{display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-g{background:var(--gm)} .d-a{background:#EF9F27} .d-n{background:#DDD}
 
 /* ── Right panel ── */
 .rp{padding:14px 15px}
@@ -261,7 +238,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 ════════════════════════════════════════════════════════════════════ -->
 <div class="main">
   <div class="topbar"><button id="sidebarToggle" class="btn btn-sm me-2" type="button" style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8"><i class="bi bi-list fs-5"></i></button>
-    <div class="topbar-title">MJ Registry</div>
+    <div class="topbar-title">Attendance</div>
     <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
     <span style="font-size:12px;color:var(--ink3)">AAC — Volunteer Group SCC</span>
     <span style="margin-left:auto;font-size:12px;color:var(--ink4)">18 May 2026</span>
@@ -271,116 +248,86 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 
     <!-- ── LEFT SCROLL ── -->
     <div class="left-scroll">
-
-      <!-- KPI Row -->
-      <div class="kpi-row">
-        <div class="kpi-box k-act">
-          <div class="kpi-n">12</div>
-          <div class="kpi-l">Active MJs (assignable)</div>
-          <div class="kpi-sub">↑ 1 from last month</div>
-        </div>
-        <div class="kpi-box k-trn">
-          <div class="kpi-n">4</div>
-          <div class="kpi-l">In training or screening</div>
-          <div class="kpi-sub">3 training · 1 screening</div>
-        </div>
-        <div class="kpi-box k-sus">
-          <div class="kpi-n">1</div>
-          <div class="kpi-l">Suspended (temporary)</div>
-          <div class="kpi-sub">⚠ Review needed</div>
-        </div>
-        <div class="kpi-box k-blk">
-          <div class="kpi-n">1</div>
-          <div class="kpi-l">Blacklisted — no assignments</div>
-          <div class="kpi-sub">Staff action required</div>
-        </div>
-        <div class="kpi-box k-eng">
-          <div class="kpi-n">9</div>
-          <div class="kpi-l">Engaged this month (≥ 1 job)</div>
-          <div class="kpi-sub">May 2026</div>
-        </div>
-      </div>
-
       <!-- MJ Registry Table -->
       <div class="card">
         <div class="card-head">
           <div class="card-icon ci-g">👥</div>
-          <div class="card-label">MJ Roster</div>
-          <button class="br-btn" onclick="togglePop('pop-mj',this)" style="margin-left:auto">i</button>
-          <button class="q-btn" onclick="togglePop('popq-mj',this)">?</button>
-
-          <!-- Info popover -->
-          <div class="pop pop-info right" id="pop-mj" style="top:30px">
-            <div class="pop-title">Business rules — MJ Registry (§4)</div>
-            <div class="pr"><div class="pd pd-g"></div><div><strong>Eligibility gate:</strong> OJT = Completed is required before an MJ can receive job notifications or be assigned for a role. Training alone is insufficient.</div></div>
-            <div class="pr"><div class="pd pd-g"></div><div><strong>Status lifecycle:</strong> Screening → Training → Active ↔ Suspended. Active → Withdrawn or Terminated (terminal). Active / Suspended → Blacklisted ↔ Active.</div></div>
-            <div class="pr"><div class="pd pd-a"></div><div><strong>Auto-blacklist:</strong> 3 no-shows without valid reason → system sets flag. Staff must manually confirm blacklist. No new tasks until removed.</div></div>
-            <div class="pr"><div class="pd pd-a"></div><div><strong>C4Me access:</strong> Auto-revoke recommended on Suspended, Terminated, Blacklisted. Staff prompted to confirm. Re-grant manually on reactivation.</div></div>
-            <div class="pr"><div class="pd pd-r"></div><div><strong>Withdrawn / Terminated:</strong> Offline acknowledgement from MJ required before status change. Staff must record confirmation.</div></div>
-          </div>
-
-          <!-- Questions popover -->
-          <div class="pop pop-q right" id="popq-mj" style="top:30px">
-            <div class="pop-title">Open questions — MJ Registry (§4)</div>
-            <div class="pr"><div class="pd pd-q"></div><div><strong>[H4 — High]</strong> Training role list incomplete. 4 roles confirmed, 5+ additional roles not yet listed. OJT data model and eligibility engine cannot be finalised. Escalate to Maisarah.</div></div>
-            <div class="pr"><div class="pd pd-q"></div><div><strong>[M7 — Medium]</strong> Is C4Me access auto-revoked on Suspended / Terminated / Blacklisted, or does staff do it manually? A blacklisted MJ with live access is a data risk.</div></div>
-            <div class="pr"><div class="pd pd-q"></div><div><strong>[M10 — Medium]</strong> Withdrawn/Terminated require offline MJ acknowledgement. No system field exists to record or audit this — risk if disputed.</div></div>
-            <div class="pr"><div class="pd pd-q"></div><div><strong>[M4 — Medium]</strong> Service boundary: exact postal code match vs postal district (first 2 digits)? Two different matching semantics — must resolve before eligibility engine is built.</div></div>
-            <div class="note">Owner: AAC / Maisarah · Target: URG sign-off 8 Jun 2026</div>
-          </div>
+          <div class="card-label">Attendance</div>
         </div>
 
         <!-- Filter bar -->
         <div class="filter-bar">
-          <label>Status</label>
-          <select id="fStatus" onchange="applyFilters()">
-            <option value="">All</option>
-            <option>Active</option>
-            <option>Training</option>
-            <option>Screening</option>
-            <option>Suspended</option>
-            <option>Blacklisted</option>
-            <option>Withdrawn</option>
-            <option>Terminated</option>
-          </select>
-          <label>MJ Type</label>
-          <select id="fType" onchange="applyFilters()">
-            <option value="">All</option>
-            <option>Pure MJ</option>
-            <option>MJ + Senior</option>
-            <option>MJ + Volunteer</option>
-            <option>MJ + Vol + Senior</option>
-          </select>
-          <label>Eligible for</label>
-          <select id="fRole" onchange="applyFilters()">
-            <option value="">Any role</option>
-            <option>Chaperone</option>
-            <option>Befriending</option>
-            <option>Home Assessment</option>
-            <option>Centre Assistant</option>
-          </select>
-          <input type="text" id="fSearch" placeholder="Search name, ID, district…" oninput="applyFilters()" style="width:190px">
+          <label>MicroJobber</label>
+          <input type="text" id="fSearch" placeholder="Search name" oninput="applyFilters()" style="width:190px">
+          <label>From</label>
+          <input type="date" id="attFrom" onchange="filterAttendance()">
+          <label>To</label>
+          <input type="date" id="attTo" onchange="filterAttendance()">
           <button class="btn-clear" onclick="clearFilters()">Clear</button>
-          <button class="btn-add-mj" style="margin-left:auto" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Register MJ</button>
+          <button class="btn-add-mj" style="margin-left: auto;">Export to Excel</button>
         </div>
 
         <div style="overflow-x:auto">
-          <table id="mjTable">
+            <table class="tbl" id="attTbl">
             <thead>
-              <tr>
-                <th>MJ ID</th>
+                <tr>
                 <th>Name</th>
-                <th class="no-sort">MJ Type</th>
-                <th class="no-sort">Status</th>
-                <th class="no-sort">OJT-Eligible Roles</th>
-                <th>District</th>
-                <th>No-shows</th>
-                <th>Last active</th>
-                <th class="no-sort">Actions</th>
-              </tr>
+                <th>Date</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Duration</th>
+                <th>Location</th>
+                <th>Job ID</th>
+                </tr>
             </thead>
-            <tbody></tbody>
-          </table>
+            <tbody>
+                <tr data-date="2026-05-03" data-jobid="mj-2026-037">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Tan Siew Ling</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">3 May 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">14:02</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">16:10</span></td>
+                <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
+                <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
+                </tr>
+                <tr data-date="2026-04-22" data-jobid="mj-2026-029">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Tan Siew Ling</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">10:05</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:08</span></td>
+                <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
+                <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
+                </tr>
+                <tr data-date="2026-04-02" data-jobid="mj-2026-018">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Lim Wei Jie</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:58</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">10:55</span></td>
+                <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
+                <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
+                </tr>
+                <tr data-date="2026-03-10" data-jobid="mj-2026-009">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Goh Lee Min</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">13:01</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">15:05</span></td>
+                <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
+                <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
+                </tr>
+                <tr data-date="2026-02-14" data-jobid="mj-2026-004">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Chia Rui En</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:55</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:10</span></td>
+                <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
+                <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
+                </tr>
+            </tbody>
+            </table>
         </div>
 
         <div class="dt-bottom">
@@ -388,317 +335,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
           <div id="dt-pag"></div>
         </div>
 
-        <div style="font-size:11px;color:var(--ink4);margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)">
-          ⚠ [H4] Training role list incomplete — eligible role counts reflect 4 confirmed roles only. Schema is extensible; additional roles to be added when list is received from Maisarah.
-        </div>
       </div>
 
     </div><!-- /left-scroll -->
 
-    <!-- ── RIGHT PANEL ── -->
-    <div class="right-panel">
-      <div class="rp">
-
-        <div class="rp-title" style="margin-top:4px">🚨 Approaching auto-blacklist</div>
-        <div class="flag-item">
-          <div class="flag-name">Grace Chua Siew Ling <span style="font-weight:400;font-size:10px">(MJ-0005)</span></div>
-          <div class="flag-meta">2 no-shows recorded · 1 more triggers auto-flag<br>Last: 12 May 2026 — Befriending</div>
-        </div>
-        <div class="flag-item">
-          <div class="flag-name">Ng Bee Hoon <span style="font-weight:400;font-size:10px">(MJ-0011)</span></div>
-          <div class="flag-meta" style="color:#B03030">3 no-shows — auto-flag active ⚠<br>Pending staff review &amp; blacklist confirmation</div>
-        </div>
-        <div class="flag-item">
-          <div class="flag-name">Gopalan s/o Rajan <span style="font-weight:400;font-size:10px">(MJ-0019)</span></div>
-          <div class="flag-meta">2 no-shows recorded · 1 more triggers auto-flag<br>Last: 15 May 2026 — Centre Assistant</div>
-        </div>
-
-        <div class="rp-title">⚙️ Business rules</div>
-        <div class="rule-card">
-          <div class="rc-icon">🎯</div>
-          <div>
-            <div class="rc-type rt-b">Eligibility</div>
-            <div class="rc-title">OJT = Completed (role gate)</div>
-            <div class="rc-text">System blocks assignment and shows error if MJ's OJT is not Completed for the target service role. Training Completed alone is not sufficient.</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">🔄</div>
-          <div>
-            <div class="rc-type rt-b">Status lifecycle</div>
-            <div class="rc-title">Screening → Training → Active</div>
-            <div class="rc-text">Active ↔ Suspended. Active → Withdrawn / Terminated (terminal). Active or Suspended → Blacklisted ↔ Active. Terminated and Withdrawn cannot be reinstated.</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">🚫</div>
-          <div>
-            <div class="rc-type rt-o">Auto-flag</div>
-            <div class="rc-title">3 no-shows = auto-blacklist flag</div>
-            <div class="rc-text">System sets flag at 3 no-shows. Staff must explicitly confirm blacklist. No new task assignments until flag is removed.</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">📱</div>
-          <div>
-            <div class="rc-type rt-o">C4Me access</div>
-            <div class="rc-title">Revoke on status change</div>
-            <div class="rc-text">Recommended: auto-revoke C4Me MJ access on Suspended, Terminated, Blacklisted. Staff prompted to confirm. Re-grant manually on reactivation to Active. [M7 — pending confirmation]</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">✍️</div>
-          <div>
-            <div class="rc-type rt-o">Offline ack required</div>
-            <div class="rc-title">Withdrawn &amp; Terminated exits</div>
-            <div class="rc-text">MJ offline acknowledgement required before status change takes effect. Staff must confirm in CARES. Creates audit trail for labour dispute scenarios. [M10]</div>
-          </div>
-        </div>
-
-        <div class="rp-title">❓ Open questions</div>
-        <div class="rule-card">
-          <div class="rc-icon">❓</div>
-          <div>
-            <div class="rc-type rt-q">[H4] High</div>
-            <div class="rc-title">Training role list incomplete</div>
-            <div class="rc-text">4 roles confirmed. 5+ additional roles unsubmitted. Full list needed before training schema and eligibility engine can be finalised. Owner: Maisarah.</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">❓</div>
-          <div>
-            <div class="rc-type rt-q">[M4] Medium</div>
-            <div class="rc-title">Service boundary definition</div>
-            <div class="rc-text">Postal code (exact match) vs postal district (first 2 digits) — two different matching semantics. Cannot build eligibility engine until resolved. Target: URG #3.</div>
-          </div>
-        </div>
-        <div class="rule-card">
-          <div class="rc-icon">❓</div>
-          <div>
-            <div class="rc-type rt-q">[M9] Medium</div>
-            <div class="rc-title">Interest field as matching criterion</div>
-            <div class="rc-text">MJ profile captures "Interests" from code table. Unconfirmed whether used for Phase 1 matching or profile-capture only. Recommend profile-only for Phase 1.</div>
-          </div>
-        </div>
-
-      </div>
-    </div><!-- /right-panel -->
-
   </div><!-- /layout -->
 </div><!-- /main -->
-
-<!-- Register a MJ -->
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header" style="background:var(--gl);border-bottom:1px solid var(--gb)">
-        <div class="d-flex align-items-center gap-2">
-          <div class="card-icon ci-g" style="font-size:15px">📋</div>
-          <div>
-            <h5 class="modal-title mb-0" id="exampleModalLabel" style="font-size:14px;font-weight:700;color:var(--g)">Register Microjobber</h5>
-          </div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <div class="modal-body" style="padding:20px 24px">
-
-        <!-- Intro banner -->
-        <!-- <div class="banner bn-g" style="margin-bottom:18px">
-          <span>ℹ️</span>
-          <span>Thank you for your interest in joining Vanguard Healthcare as a Micro-jobber. All applications will be screened prior to confirmation. If shortlisted, we will be in touch.</span>
-        </div> -->
-
-        <!-- ── PART 1: BASIC INFORMATION ── -->
-        <div class="sect-title" style="margin-top:0">Part 1 — Basic Information</div>
-        <div class="m-info-grid-2" style="margin-bottom:12px">
-          <div>
-            <label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Full Name <span style="color:var(--rm)">*</span></label>
-            <input type="text" class="form-control form-control-sm" placeholder="e.g. Ahmad Razif bin Ismail" style="font-size:13px;border-color:var(--bdr);border-radius:8px">
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Contact Number <span style="color:var(--rm)">*</span></label>
-            <input type="tel" class="form-control form-control-sm" placeholder="e.g. 9123 4567" style="font-size:13px;border-color:var(--bdr);border-radius:8px">
-          </div>
-        </div>
-
-        <div style="margin-bottom:18px">
-          <label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:8px">Spoken Languages <span style="font-weight:400;text-transform:none;letter-spacing:0">(tick all that apply)</span></label>
-          <div class="d-flex flex-wrap gap-3">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="lang-en">
-              <label class="form-check-label" for="lang-en" style="font-size:13px">English</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="lang-zh">
-              <label class="form-check-label" for="lang-zh" style="font-size:13px">Mandarin</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="lang-ms">
-              <label class="form-check-label" for="lang-ms" style="font-size:13px">Malay</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="lang-ta">
-              <label class="form-check-label" for="lang-ta" style="font-size:13px">Tamil</label>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── PART 2: PREFERRED WORK LOCATION ── -->
-        <div class="sect-title">Part 2 — Preferred Work Location</div>
-        <div style="font-size:11px;color:var(--ink4);margin-bottom:8px">You may select more than one location.</div>
-        <div class="d-flex flex-column gap-2" style="margin-bottom:18px">
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="loc-aac-wl">
-            <label class="form-check-label" for="loc-aac-wl" style="font-size:13px;font-weight:500">Vanguard Active Ageing Centre — Woodlands</label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="loc-aac-sj">
-            <label class="form-check-label" for="loc-aac-sj" style="font-size:13px;font-weight:500">Vanguard Active Ageing Centre — Senja</label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="loc-scc-wl">
-            <label class="form-check-label" for="loc-scc-wl" style="font-size:13px;font-weight:500">Vanguard Senior Care Centre — Woodlands</label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="loc-scc-sj">
-            <label class="form-check-label" for="loc-scc-sj" style="font-size:13px;font-weight:500">Vanguard Senior Care Centre — Senja</label>
-          </div>
-        </div>
-
-        <!-- ── PART 3: AREAS OF INTEREST ── -->
-        <div class="sect-title">Part 3 — Areas of Interest for Micro-Jobs</div>
-        <div style="font-size:11px;color:var(--ink4);margin-bottom:8px">You may tick more than one.</div>
-        <div class="d-flex flex-column gap-2" style="margin-bottom:18px">
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-chap">
-            <label class="form-check-label" for="role-chap" style="font-size:13px">
-              <span style="font-weight:600">Chaperone Associate</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Accompany seniors (wheelchair-bound) for appointments</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-safe">
-            <label class="form-check-label" for="role-safe" style="font-size:13px">
-              <span style="font-weight:600">Safe Steps Associate</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Conduct screening and home assessments for seniors with fall risks</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-ca">
-            <label class="form-check-label" for="role-ca" style="font-size:13px">
-              <span style="font-weight:600">Centre Assistant (AAC)</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Assist AAC with daily operations on-site</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-el">
-            <label class="form-check-label" for="role-el" style="font-size:13px">
-              <span style="font-weight:600">Engagement Lead (AAC)</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Planning, leading and facilitating group activities at AAC</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-bef">
-            <label class="form-check-label" for="role-bef" style="font-size:13px">
-              <span style="font-weight:600">Care Befriender (AAC)</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Visiting seniors at home to check on their well-being while conducting screening</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-ps">
-            <label class="form-check-label" for="role-ps" style="font-size:13px">
-              <span style="font-weight:600">Pantry Support (SCC)</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Dishwashing and keeping the pantry and shared spaces clean and tidy</span>
-            </label>
-          </div>
-          <div class="form-check" style="background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px 9px 36px">
-            <input class="form-check-input" type="checkbox" id="role-wf">
-            <label class="form-check-label" for="role-wf" style="font-size:13px">
-              <span style="font-weight:600">Wellness Facilitator (SCC)</span>
-              <span style="color:var(--ink4);font-size:11px;display:block;margin-top:1px">Planning, leading and facilitating group activities at SCC</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- ── PART 4: AVAILABILITY ── -->
-        <div class="sect-title">Part 4 — Availability to Work</div>
-        <div style="font-size:11px;color:var(--ink4);margin-bottom:8px">Tick based on commitment level. You may tick more than one.</div>
-
-        <div style="margin-bottom:12px">
-          <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Days Available</label>
-          <div class="d-flex flex-wrap gap-2">
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-mon">
-              <label class="form-check-label" for="day-mon" style="font-size:12px;font-weight:600">Monday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-tue">
-              <label class="form-check-label" for="day-tue" style="font-size:12px;font-weight:600">Tuesday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-wed">
-              <label class="form-check-label" for="day-wed" style="font-size:12px;font-weight:600">Wednesday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-thu">
-              <label class="form-check-label" for="day-thu" style="font-size:12px;font-weight:600">Thursday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-fri">
-              <label class="form-check-label" for="day-fri" style="font-size:12px;font-weight:600">Friday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-sat">
-              <label class="form-check-label" for="day-sat" style="font-size:12px;font-weight:600">Saturday</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" id="day-sun">
-              <label class="form-check-label" for="day-sun" style="font-size:12px;font-weight:600">Sunday</label>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:18px">
-          <label style="font-size:11px;font-weight:700;color:var(--ink3);display:block;margin-bottom:6px">Time of Day</label>
-          <div class="d-flex flex-wrap gap-3 align-items-center">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="time-am">
-              <label class="form-check-label" for="time-am" style="font-size:13px">Morning <span style="color:var(--ink4);font-size:11px">(7am – 12noon)</span></label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="time-pm">
-              <label class="form-check-label" for="time-pm" style="font-size:13px">Afternoon <span style="color:var(--ink4);font-size:11px">(1pm – 6pm)</span></label>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <div class="form-check mb-0">
-                <input class="form-check-input" type="checkbox" id="time-other" onchange="document.getElementById('time-other-input').disabled=!this.checked;if(this.checked)document.getElementById('time-other-input').focus()">
-                <label class="form-check-label" for="time-other" style="font-size:13px">Other:</label>
-              </div>
-              <input type="text" id="time-other-input" disabled placeholder="e.g. 2pm – 4pm" class="form-control form-control-sm" style="font-size:12px;width:160px;border-radius:7px;border-color:var(--bdr)">
-            </div>
-          </div>
-          <div style="font-size:10px;color:var(--ink4);margin-top:6px">* Each microjob requires a minimum engagement period of one hour.</div>
-        </div>
-
-        <!-- ── ACKNOWLEDGEMENT ── -->
-        <div class="ack-box" style="display:block;margin-top:4px;background:var(--al);border:1px solid var(--ab)">
-          <label style="font-size:12px;color:var(--am);display:flex;gap:8px;align-items:flex-start;cursor:pointer;line-height:1.6">
-            <input type="checkbox" id="ack-check" style="margin-top:3px;flex-shrink:0;accent-color:var(--am)">
-            <span>I understand that this is an <strong>indication of interest only</strong>, and that my application will be subject to screening before any job appointment is confirmed.</span>
-          </label>
-        </div>
-
-      </div><!-- /modal-body -->
-
-      <div class="modal-footer" style="justify-content:space-between">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" style="font-size:12px">Cancel</button>
-        <button type="button" class="btn btn-sm" style="background:var(--g);color:#fff;font-size:12px;font-weight:600;border:none;padding:6px 18px;border-radius:8px">Submit Indication of Interest</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      MJ QUICK-VIEW MODAL
