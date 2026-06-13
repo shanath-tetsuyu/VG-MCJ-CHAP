@@ -71,12 +71,12 @@
       <div class="kpi-row">
         <div class="kpi-box k-pub">
           <div class="kpi-n">8</div>
-          <div class="kpi-l">Published — awaiting MJ takeup</div>
+          <div class="kpi-l">Open — awaiting MJ takeup</div>
           <div class="kpi-sub">↑ 2 from last week</div>
         </div>
         <div class="kpi-box k-tak">
           <div class="kpi-n">5</div>
-          <div class="kpi-l">Taken by MJ (active)</div>
+          <div class="kpi-l">Available MJs</div>
           <div class="kpi-sub">This month</div>
         </div>
         <div class="kpi-box k-risk">
@@ -97,9 +97,8 @@
       </div>
 
       <!-- Training Status -->
-      <div class="card">
+      <div class="card" style="display: none;">
         <div class="card-head">
-          <div class="card-icon ci-p">🎓</div>
           <div class="card-label">Training &amp; OJT Status</div>
           <button class="br-btn" onclick="togglePop('pop-training',this)" style="margin-left:auto">i</button>
           <button class="q-btn" onclick="togglePop('popq-training',this)">?</button>
@@ -132,7 +131,7 @@
             </thead>
             <tbody>
               <tr>
-                <td><span class="tr-role">🤝 Chaperone</span></td>
+                <td><span class="tr-role">Chaperone</span></td>
                 <td><span class="pill-stat ps-pend">3</span></td>
                 <td><span class="pill-stat ps-sched">2</span></td>
                 <td><span class="pill-stat ps-prog">1</span></td>
@@ -141,7 +140,7 @@
                 <td><span class="eligible-chip">✓ 15</span></td>
               </tr>
               <tr>
-                <td><span class="tr-role">💬 Befriending</span></td>
+                <td><span class="tr-role">Befriending</span></td>
                 <td><span class="pill-stat ps-pend">5</span></td>
                 <td><span class="pill-stat ps-sched">3</span></td>
                 <td><span class="pill-stat ps-prog">2</span></td>
@@ -150,7 +149,7 @@
                 <td><span class="eligible-chip">✓ 10</span></td>
               </tr>
               <tr>
-                <td><span class="tr-role">🏠 Home Assessment</span></td>
+                <td><span class="tr-role">Home Assessment</span></td>
                 <td><span class="pill-stat ps-pend">8</span></td>
                 <td><span class="pill-stat ps-sched">4</span></td>
                 <td><span class="pill-stat ps-prog">0</span></td>
@@ -159,7 +158,7 @@
                 <td><span class="eligible-chip" style="background:var(--al);color:var(--am)">⚠ 5</span></td>
               </tr>
               <tr>
-                <td><span class="tr-role">🏛 Centre Assistant</span></td>
+                <td><span class="tr-role">Centre Assistant</span></td>
                 <td><span class="pill-stat ps-pend">2</span></td>
                 <td><span class="pill-stat ps-sched">1</span></td>
                 <td><span class="pill-stat ps-prog">1</span></td>
@@ -176,14 +175,13 @@
       <!-- Job Listing & Assignment -->
       <div class="card">
         <div class="card-head">
-          <div class="card-icon ci-b">📋</div>
           <div class="card-label">Job Listing &amp; Assignment</div>
           <button class="br-btn" onclick="togglePop('pop-jobs',this)" style="margin-left:auto">i</button>
           <button class="q-btn" onclick="togglePop('popq-jobs',this)">?</button>
           <div class="pop pop-info right" id="pop-jobs" style="top:30px">
             <div class="pop-title">Business rules — Publishing &amp; Matching (§5.2–5.3)</div>
             <div class="pr"><div class="pd pd-g"></div><div><strong>Lead time:</strong> ≥ 3 business days minimum. &lt; 3 BD = system blocks publication. Public holidays excluded from BD count.</div></div>
-            <div class="pr"><div class="pd pd-g"></div><div><strong>Urgent flag:</strong> Published 3–5 BD before job date = "Urgent" badge shown on C4Me listing.</div></div>
+            <div class="pr"><div class="pd pd-g"></div><div><strong>Urgent flag:</strong> Open 3–5 BD before job date = "Urgent" badge shown on C4Me listing.</div></div>
             <div class="pr"><div class="pd pd-g"></div><div><strong>Matching (all criteria must be met):</strong> OJT = Completed, language, gender, service boundary, required skills.</div></div>
             <div class="pr"><div class="pd pd-g"></div><div><strong>Slots:</strong> Chaperone/Befriending = 1 confirmed + 4 waitlist. Home Assessment = 2 confirmed + 4 waitlist.</div></div>
             <div class="pr"><div class="pd pd-a"></div><div><strong>No-taker alert:</strong> 2 BD before — SCC Nurse, AE, and all AAC Staff notified. Client informed of risk.</div></div>
@@ -225,10 +223,11 @@
           <select id="fStatus" onchange="applyFilters()">
             <option value="">All</option>
             <option>In Progress</option>
-            <option>Published</option>
+            <option>Open</option>
             <option>Taken</option>
             <option>Waitlisted</option>
             <option>At Risk</option>
+            <option>Re-opened</option>
             <option>Completed</option>
             <option>Confirmed</option>
             <option>Cancelled</option>
@@ -279,7 +278,7 @@
     <!-- RIGHT PANEL -->
     <div class="right-panel">
       <div class="rp">
-        <div class="rp-title" style="margin-top:4px">⚠️ At-risk jobs</div>
+        <div class="rp-title" style="margin-top:4px"> At-risk jobs</div>
         <div class="risk-item">
           <div class="risk-dot"></div>
           <div class="risk-body">
@@ -296,7 +295,7 @@
             <div>0 takers · Auto-cancel: Thu 21 May</div>
           </div>
         </div>
-        <div class="rp-title">⚙️ Business rules</div>
+        <div class="rp-title"> Business rules</div>
         <div class="rule-card">
           <div class="rc-icon">🎯</div>
           <div class="rc-body">
@@ -397,8 +396,30 @@
       <button class="btn-primary" onclick="closeModal()">Done</button>
       <button class="btn-ghost" id="btn-complete">Mark Completed</button>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn-danger" id="btn-cancel-job">Cancel Job</button>
+        <button class="btn-danger" id="btn-cancel-job" onclick="openCancelJobModal()">Cancel Job</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Job Modal -->
+<div id="cancelJobModal" class="modal-overlay" style="display:none" onclick="handleCancelJobOverlayClick(event)">
+  <div class="modal-box" style="width:440px;max-height:unset" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="card-icon" style="background:var(--rl);font-size:16px">&#x2715;</div>
+      <div class="modal-head-title">Cancel Job</div>
+      <button class="modal-close" onclick="closeCancelJobModal()">&#x2715; Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="banner bn-r" style="margin-bottom:16px">&#x26A0;&#xFE0F; &nbsp;Cancelling this job will notify the assigned MJ and any waitlisted MJs. This action cannot be undone.</div>
+      <div class="form-group">
+        <label class="form-label">Reason for Cancellation</label>
+        <textarea id="cancelJobReason" class="form-inp" rows="4" placeholder="Enter reason for cancellation…" style="resize:vertical;width:100%"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" onclick="submitCancelJob()">Submit</button>
+      <button class="btn-ghost" onclick="closeCancelJobModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -444,26 +465,27 @@ const JOB_DATA = [
   {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',    status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',       status:'Taken',     mj:'Ahmad Razif',     wl:2, urgency:'Standard' },
   {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',   date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',     status:'Completed', mj:'Lily Tan',        wl:0, urgency:'Standard' },
-  {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Published',  mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Open',  mj:null,              wl:4, urgency:'Standard' },
   {id:'MJ-2026-005',type:'Centre Assistant',facility:'SCC — Bishan',    date:'23 May 2026',sd:'2026-05-23',time:'13:00–17:00',client:'—',                status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed', mj:'Fatimah bte Ali', wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Published',  mj:null,              wl:1, urgency:'Standard' },
+  {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',  mj:null,              wl:1, urgency:'Standard' },
   {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',     mj:'Susan Lim',       wl:0, urgency:'Standard' },
   {id:'MJ-2026-009',type:'Centre Assistant',facility:'VG — Clementi',   date:'24 May 2026',sd:'2026-05-24',time:'08:00–17:00',client:'—',                status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Published',  mj:null,              wl:3, urgency:'Urgent'  },
-  {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Published',  mj:null,              wl:2, urgency:'Standard' },
-  {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Published',  mj:null,              wl:3, urgency:'Standard' },
+  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Open',  mj:null,              wl:3, urgency:'Urgent'  },
+  {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',  mj:null,              wl:3, urgency:'Standard' },
   {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed', mj:'Ravi Kumar',      wl:0, urgency:'Standard' },
-  {id:'MJ-2026-014',type:'Centre Assistant',facility:'SCC — Queenstown',date:'29 May 2026',sd:'2026-05-29',time:'09:00–18:00',client:'—',                status:'Published',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-014',type:'Centre Assistant',facility:'SCC — Queenstown',date:'29 May 2026',sd:'2026-05-29',time:'09:00–18:00',client:'—',                status:'Open',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',    date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',      status:'Cancelled', mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',     mj:'Grace Chua',      wl:0, urgency:'Standard' },
   {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Published',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-019',type:'Centre Assistant',facility:'SCC — Toa Payoh', date:'01 Jun 2026',sd:'2026-06-01',time:'08:00–13:00',client:'—',                status:'Published',  mj:null,              wl:3, urgency:'Standard' },
-  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Published',  mj:null,              wl:2, urgency:'Standard' },
-  {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Published',  mj:null,              wl:1, urgency:'Standard' },
-  {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Published',  mj:null,              wl:0, urgency:'Standard' },
-  {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress',  mj:'Nigel Tan, Lawrence Tan',     wl:0, urgency:'Standard' }
+  {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',  mj:null,              wl:4, urgency:'Standard' },
+  {id:'MJ-2026-019',type:'Centre Assistant',facility:'SCC — Toa Payoh', date:'01 Jun 2026',sd:'2026-06-01',time:'08:00–13:00',client:'—',                status:'Open',  mj:null,              wl:3, urgency:'Standard' },
+  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Open',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',  mj:null,              wl:1, urgency:'Standard' },
+  {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',  mj:null,              wl:0, urgency:'Standard' },
+  {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress',  mj:'Nigel Tan, Lawrence Tan',     wl:0, urgency:'Standard' },
+  {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown',date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',     status:'Re-opened', mj:null,              wl:2, urgency:'Standard', cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
 ];
 
 const WAITLIST_DATA = {
@@ -480,16 +502,18 @@ const WAITLIST_DATA = {
   'MJ-2026-019':[{n:'Lily Ng',t:'17 May 08:00'},{n:'Chen Wei Ling',t:'17 May 10:00'},{n:'Mohd Farid',t:'18 May 07:30'}],
   'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
   'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
+  'MJ-2026-024':[{n:'Ramesh Kumar',t:'20 May 10:15'},{n:'Joanna Lim',t:'20 May 11:02'}],
 };
 
 const TYPE_ICON = {'Chaperone':'🤝','Befriending':'💬','Home Assessment':'🏠','Centre Assistant':'🏛'};
 const STATUS_HTML = {
-  'Published': '<span class="badge b-pub">● Published</span>',
+  'Open':      '<span class="badge b-pub">● Open</span>',
   'Taken':     '<span class="badge b-tak">✓ Taken</span>',
   'Completed': '<span class="badge b-com">✔ Completed</span>',
   'Cancelled': '<span class="badge b-can">✕ Cancelled</span>',
-  'Waitlisted':'<span class="badge b-wl">⏳ Waitlisted</span>',
+  'Waitlisted':'<span class="badge b-wl">Waitlisted</span>',
   'At Risk':   '<span class="badge b-risk">⚠ At Risk</span>',
+  'Re-opened': '<span class="badge b-reopen">↺ Re-opened</span>',
 };
 
 /* ══ DataTable ═════════════════════════════════════════════════════ */
@@ -498,7 +522,7 @@ var currentJobId = null;
 $(document).ready(function () {
   const rows = JOB_DATA.map(j => [
     '<span class="job-id-cell">' + j.id + '</span>',
-    '<span class="type-cell">' + TYPE_ICON[j.type] + ' ' + j.type + '</span>',
+    '<span class="type-cell">' + ' ' + j.type + '</span>',
     j.facility,
     '<span data-sort="' + j.sd + '">' + j.date + '</span>',
     j.time,
@@ -598,6 +622,7 @@ function openModal(jobId) {
   var isHA = j.type === 'Home Assessment';
   var isBef = j.type === 'Befriending';
   var slots = isHA ? 2 : 1;
+  var isReopen = j.status === 'Re-opened';
   var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
   var displayNoShow = j.status === 'Completed' || j.status === 'In Progress'|| j.status === 'Cancelled';
 
@@ -620,6 +645,7 @@ function openModal(jobId) {
     '</div>';
 
   var slotHtml = '<div class="sect-title">Confirmed slot' + (slots > 1 ? 's' : '') + ' (' + slots + ' required)</div>';
+
   for (var i = 0; i < slots; i++) {
     var hasMJ = i === 0 && j.mj;
     slotHtml += '<div class="slot-row" id="slot-' + i + '">' +
@@ -631,8 +657,17 @@ function openModal(jobId) {
       else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
     }
 
-    if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>';
+    if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>' +
+      '<a href="./proto2_v3_mj_profile.html" style="margin-left:6px"><button class="btn-ghost" style="font-size:11px;padding:4px 10px">View Attendance</button></a>';
     slotHtml += '</div>';
+  }
+
+  if (isReopen){
+    slotHtml += '<div class="sect-title">Cancelled By</div>' +
+      '<div style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--rm);background:var(--rl);border-radius:var(--r);padding:10px 12px;border:1px solid var(--rb)">' +
+      '<div style="flex:1"><strong>' + j.cancelledBy + '</strong> &nbsp;·&nbsp; ' + j.cancelledAt + '</div>' +
+      '<a href="./proto2_v3_mj_profile.html" style="font-size:11px;font-weight:600;color:var(--rm);text-decoration:none;white-space:nowrap;border:1px solid var(--rb);padding:3px 10px;border-radius:20px;background:var(--s)">View profile →</a>' +
+      '</div>';
   }
 
   var wlHtml = '';
@@ -699,6 +734,28 @@ function assignManually(jobId, idx) {
     row.querySelector('.slot-num').className = 'slot-num sn-filled';
     row.querySelector('.slot-num').textContent = '✓';
   }
+}
+
+/* ══ Cancel Job ═════════════════════════════════════════════════════ */
+function openCancelJobModal() {
+  document.getElementById('assignModal').style.display = 'none';
+  document.getElementById('cancelJobReason').value = '';
+  document.getElementById('cancelJobModal').style.display = 'flex';
+}
+
+function closeCancelJobModal() {
+  document.getElementById('cancelJobModal').style.display = 'none';
+  if (currentJobId) openModal(currentJobId);
+}
+
+function submitCancelJob() {
+  var reason = document.getElementById('cancelJobReason').value.trim();
+  if (!reason) { alert('Please enter a reason for cancellation.'); return; }
+  document.getElementById('cancelJobModal').style.display = 'none';
+}
+
+function handleCancelJobOverlayClick(e) {
+  if (e.target.id === 'cancelJobModal') closeCancelJobModal();
 }
 
 /* ══ No Show ════════════════════════════════════════════════════════ */
