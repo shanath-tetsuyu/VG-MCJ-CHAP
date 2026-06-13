@@ -251,7 +251,6 @@
           <table id="jobTable">
             <thead>
               <tr>
-                <th>Job ID</th>
                 <th>Type</th>
                 <th>Facility</th>
                 <th>Date</th>
@@ -521,7 +520,6 @@ let dt;
 var currentJobId = null;
 $(document).ready(function () {
   const rows = JOB_DATA.map(j => [
-    '<span class="job-id-cell">' + j.id + '</span>',
     '<span class="type-cell">' + ' ' + j.type + '</span>',
     j.facility,
     '<span data-sort="' + j.sd + '">' + j.date + '</span>',
@@ -537,7 +535,7 @@ $(document).ready(function () {
   dt = $('#jobTable').DataTable({
     data: rows,
     columns: [
-      {title:'Job ID'},{title:'Type'},{title:'Facility'},{title:'Date'},
+      {title:'Type'},{title:'Facility'},{title:'Date'},
       {title:'Time slot',orderable:false},{title:'Client'},
       {title:'Status',orderable:false},{title:'MJ assigned'},
       {title:'Waitlist',className:'dt-center',orderable:false},
@@ -626,7 +624,7 @@ function openModal(jobId) {
   var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
   var displayNoShow = j.status === 'Completed' || j.status === 'In Progress'|| j.status === 'Cancelled';
 
-  document.getElementById('modal-title').textContent = j.id + ' — ' + j.type + ' · ' + j.facility;
+  document.getElementById('modal-title').textContent = j.type + ' · ' + j.facility;
 
   var banner = '';
   if (j.status === 'At Risk')
