@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CARES — Job Listing</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/job_listing.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+
+    <div class="d-flex" id="wrapper" style="height:100vh;overflow:hidden;">
+
+      <!-- Sidebar -->
+      <nav id="sidebar" class="sidebar d-flex flex-column">
+        <div class="sidebar-profile p-3 text-center">
+          <div class="sidebar-avatar mx-auto mb-2">
+            <i class="bi bi-person-fill fs-3 text-white"></i>
+          </div>
+          <div class="sidebar-username text-white fw-semibold small">Cares Admin TETSUYU</div>
+          <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+            Enterprise Administrators
+            <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+          </div>
+        </div>
+        <ul class="nav flex-column sidebar-nav mt-1">
+          <li class="nav-item">
+            <a class="nav-link sidebar-link active" href="./index.html">
+              <i class="bi bi-grid-fill me-2"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item" style="opacity:0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#prospectsMenu" aria-expanded="false">
+              <i class="bi bi-person-circle me-2"></i>Prospects
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="prospectsMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">New Prospect</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Prospect List</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#microjobberMenu" aria-expanded="false">
+              <i class="bi bi-person-circle me-2"></i>Microjobber
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="microjobberMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./job_listing.html">Job Listing</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./publish.html">Post Job</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" onclick="openPortal()">Link To Portal</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item" style="opacity:0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>Pre-Admission
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="preAdmissionMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Applications</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Assessments</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item" style="opacity:0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#clientMenu" aria-expanded="false">
+              <i class="bi bi-person-badge me-2"></i>Client
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="clientMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client List</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Profile</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Page Content -->
+      <div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden;">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-light bg-white topbar px-3 border-bottom shadow-sm" style="flex-shrink:0;">
+          <button id="sidebarToggle" class="btn btn-sm btn-success me-3" type="button">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <span class="navbar-brand fw-bold text-dark fs-5 me-2">
+            <span class="brand-dot"></span>Vanguard
+          </span>
+          <small class="text-muted me-auto">Session logout in <span id="sessionTimer">17520</span> seconds</small>
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="text-muted small">Welcome to CARES</span>
+            <div class="input-group input-group-sm" style="width:220px;">
+              <span class="input-group-text border-0 bg-light text-muted" style="font-size:0.75rem;">Client Search</span>
+              <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Type 3+ characters to search..." id="clientSearchInput">
+            </div>
+            <select class="form-select form-select-sm" style="width:220px;">
+              <option selected>Vanguard Senior Community Home</option>
+              <option>Vanguard Day Activity Centre</option>
+              <option>Vanguard Transitional Home</option>
+            </select>
+            <button class="btn btn-sm btn-light position-relative border">
+              <i class="bi bi-bell-fill text-muted"></i>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.6rem;">10</span>
+            </button>
+            <button class="btn btn-sm btn-light border text-muted">
+              <i class="bi bi-box-arrow-right me-1"></i> Log out
+            </button>
+          </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main" style="overflow-y:auto;overflow-x:hidden;">
+
+          <!-- Page Header -->
+          <div class="tm-page-header">
+            <h2 class="tm-title">Tasks</h2>
+            <div class="tm-breadcrumb">
+              <i class="bi bi-house-fill" style="color:#5B9EDB;font-size:11px;"></i>
+              <a href="./index.html" class="tm-bc-link"> Home</a>
+              <span class="tm-bc-sep">/</span>
+              <span>Tasks</span>
+            </div>
+          </div>
+
+          <!-- Filter Card -->
+          <div class="tm-filter-card">
+
+            <!-- Row 1: Status selector + legend -->
+            <div class="tm-fc-row1">
+              <select class="tm-status-sel" id="tmStatusFilter" onchange="renderTaskList()">
+                <option value="">Task All Status</option>
+                <option value="Published">Published</option>
+                <option value="Taken">Taken</option>
+                <option value="In Progress">In Progress</option>
+                <option value="At Risk">At Risk</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Waitlisted">Waitlisted</option>
+              </select>
+              <div class="tm-legend">
+                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#FF9800;"></span> Pending</span>
+                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#2196F3;"></span> Active</span>
+                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#4CAF50;"></span> Completed</span>
+                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#F44336;"></span> Not Completed</span>
+                <span class="tm-leg-item"><span class="tm-leg-star">★</span> Event</span>
+              </div>
+            </div>
+
+            <!-- Filter grid: two columns -->
+            <div class="tm-fc-grid">
+
+              <!-- Left column -->
+              <div class="tm-fc-col">
+                <div class="tm-fc-field">
+                  <label class="tm-fc-lbl" style="min-width:52px;">Users:</label>
+                  <input type="text" class="tm-fc-inp" placeholder="Choose a User...">
+                </div>
+                <div class="tm-fc-field tm-fc-field-top">
+                  <div class="tm-fc-lbl-block">
+                    User Groups in<br>Resource To<br>Display:<br>
+                    <i class="bi bi-info-circle-fill tm-info-icon"></i>
+                  </div>
+                  <input type="text" class="tm-fc-inp" placeholder="Choose a User Group..." style="align-self:flex-end;">
+                </div>
+                <div class="tm-fc-field tm-fc-field-top">
+                  <label class="tm-fc-lbl" style="min-width:80px;padding-top:18px;">Action<br>Type:</label>
+                  <div style="flex:1;">
+                    <div class="tm-ua-note">**(UA - User Added)</div>
+                    <input type="text" class="tm-fc-inp" style="width:100%;" placeholder="Choose a Action Type...">
+                  </div>
+                </div>
+                <div class="tm-fc-field tm-fc-field-top">
+                  <div class="tm-fc-lbl-block" style="min-width:80px;">Recurrence<br>End Date:</div>
+                  <div style="display:flex;align-items:center;gap:8px;align-self:flex-end;">
+                    <input type="date" class="tm-fc-inp" style="width:130px;">
+                    <button class="tm-search-btn" onclick="renderTaskList()">Search</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right column -->
+              <div class="tm-fc-col">
+                <div class="tm-fc-field">
+                  <label class="tm-fc-lbl" style="min-width:52px;">Client:</label>
+                  <input type="text" class="tm-fc-inp" placeholder="Choose a Client(s)...">
+                </div>
+                <div class="tm-fc-field tm-fc-field-top">
+                  <div class="tm-fc-lbl-block">
+                    Users to<br>exclude in<br>Resources<br>View: <i class="bi bi-info-circle-fill tm-info-icon"></i>
+                  </div>
+                  <input type="text" class="tm-fc-inp" placeholder="Exclude a User..." style="align-self:flex-end;">
+                </div>
+                <div class="tm-fc-field">
+                  <label class="tm-fc-lbl" style="min-width:55px;">Facility</label>
+                  <input type="text" class="tm-fc-inp" placeholder="Choose a Facility...">
+                </div>
+                <div class="tm-timeslot-box">
+                  <div class="tm-ts-title">Display Time Slot:</div>
+                  <div class="tm-ts-track-wrap">
+                    <div class="tm-ts-thumb"></div>
+                    <div class="tm-ts-bar"></div>
+                    <div class="tm-ts-thumb"></div>
+                  </div>
+                  <div class="tm-ts-label">Selected Time Range: 00:00:00 - 24:00:00</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Action Toolbar -->
+          <div class="tm-toolbar">
+            <div class="tm-tb-left">
+              <button class="tm-tb-nav">&#8249;</button>
+              <button class="tm-tb-nav">&#8250;</button>
+              <button class="tm-tb-btn">today</button>
+              <button class="tm-tb-btn">New Task</button>
+              <button class="tm-tb-btn">New</button>
+              <button class="tm-tb-btn">Export Tasks to Excel</button>
+              <button class="tm-tb-btn">Export PDF</button>
+            </div>
+            <div class="tm-tb-date" id="tmDateRange">Jun 22 – 28, 2026</div>
+            <div class="tm-tb-views">
+              <button class="tm-view-btn">month</button>
+              <button class="tm-view-btn">week</button>
+              <button class="tm-view-btn">day</button>
+              <button class="tm-view-btn">3-Day</button>
+              <button class="tm-view-btn tm-view-active">list</button>
+              <button class="tm-view-btn">R-Day</button>
+              <button class="tm-view-btn">R-Week</button>
+              <button class="tm-view-btn">R-Month</button>
+            </div>
+          </div>
+
+          <!-- Task List -->
+          <div class="tm-list-area" id="tmListArea">
+            <!-- populated by renderTaskList() -->
+          </div>
+
+        </div>
+        <!-- End Main Content -->
+
+        <button class="btn need-help-btn position-fixed" style="bottom:20px;right:20px;border-radius:50px;z-index:999;background:#1e7a6e;color:#fff;font-size:0.8rem;padding:8px 16px;">
+          <i class="bi bi-question-circle me-1"></i> Need Help?
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Assign / Manage Modal -->
+    <div id="assignModal" class="modal-overlay" style="display:none;" onclick="handleOverlayClick(event)">
+      <div class="modal-box">
+        <div class="modal-head">
+          <div class="modal-head-title" id="modal-title"></div>
+          <button class="modal-close" onclick="closeModal()">✕ Close</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer">
+          <button class="btn-primary" id="btn-complete" onclick="closeModal()">Mark as Complete</button>
+          <button class="btn-danger" id="btn-cancel-job" onclick="closeModal()">Cancel Job</button>
+          <button class="btn-ghost" style="margin-left:auto;" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No-Show Modal -->
+    <div id="noShowModal" class="modal-overlay" style="display:none;" onclick="handleNoShowOverlayClick(event)">
+      <div class="modal-box" style="max-width:440px;">
+        <div class="modal-head">
+          <div class="modal-head-title">Record No-Show</div>
+          <button class="modal-close" onclick="cancelNoShow()">✕ Close</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Reason for no-show</label>
+            <select id="noShowReason" class="form-sel" onchange="handleNoShowReasonChange()">
+              <option value="">— Select reason —</option>
+              <option value="client_cancelled">Client cancelled on the day</option>
+              <option value="client_no_answer">Client did not answer door / calls</option>
+              <option value="mj_no_show">MJ did not show up</option>
+              <option value="medical">Medical emergency</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+          <div class="form-group" id="noShowOthersWrap" style="display:none;">
+            <label class="form-label">Please specify</label>
+            <input type="text" id="noShowOthersText" class="form-inp" placeholder="Describe the reason…">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary" onclick="submitNoShow()">Submit</button>
+          <button class="btn-ghost" onclick="cancelNoShow()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      document.getElementById('sidebarToggle').addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-collapsed');
+      });
+      document.querySelectorAll('.sidebar-collapsible').forEach(toggle => {
+        const targetId = toggle.getAttribute('data-bs-target');
+        const collapseEl = document.querySelector(targetId);
+        if (!collapseEl) return;
+        collapseEl.addEventListener('show.bs.collapse', () => {
+          const icon = toggle.querySelector('.collapse-icon');
+          if (icon) icon.style.transform = 'rotate(-90deg)';
+          toggle.classList.add('active');
+        });
+        collapseEl.addEventListener('hide.bs.collapse', () => {
+          const icon = toggle.querySelector('.collapse-icon');
+          if (icon) icon.style.transform = 'rotate(0deg)';
+          toggle.classList.remove('active');
+        });
+      });
+      let seconds = 17520;
+      const timerEl = document.getElementById('sessionTimer');
+      const countdown = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds;
+        if (seconds <= 0) { clearInterval(countdown); timerEl.textContent = '0'; }
+      }, 1000);
+      document.getElementById('clientSearchInput').addEventListener('input', function () {
+        if (this.value.length >= 3) console.log('Searching for:', this.value);
+      });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+/* ══ Data ══════════════════════════════════════════════════════════ */
+const JOB_DATA = [
+  {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'At Risk',    mj:null,                       wl:0, urgency:'Urgent'  }
+];
+
+const WAITLIST_DATA = {
+  'MJ-2026-002':[{n:'Ramesh Kumar',t:'17 May 08:12'},{n:'Joanna Lim',t:'17 May 09:44'}],
+  'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
+  'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
+  'MJ-2026-009':[{n:'Tan Siew Lian',t:'16 May 08:30'},{n:'Abdul Halim',t:'16 May 09:15'},{n:'Mei Ling Chua',t:'16 May 12:00'},{n:'Raj Gopal',t:'17 May 07:45'}],
+  'MJ-2026-010':[{n:'Wong Kah Meng',t:'16 May 10:00'},{n:'Lim Soo Bee',t:'16 May 13:30'},{n:'Ng Ah Cheh',t:'17 May 08:00'}],
+  'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
+  'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
+  'MJ-2026-014':[{n:'Sarah Tan',t:'18 May 07:45'},{n:'Vijay Kumar',t:'18 May 09:30'}],
+  'MJ-2026-017':[{n:'Grace Ho',t:'15 May 16:00'},{n:'Fatimah bte Salleh',t:'16 May 08:20'},{n:'Ravi Shankar',t:'16 May 11:45'},{n:'Yeo Bee Kheng',t:'17 May 07:30'}],
+  'MJ-2026-018':[{n:'Abdul Rahman',t:'17 May 15:00'},{n:'Lee Ah Kow Jr',t:'17 May 16:30'},{n:'Tan Sock Kiang',t:'18 May 08:00'},{n:'Gopalan s/o Rajan',t:'18 May 09:00'}],
+  'MJ-2026-019':[{n:'Lily Ng',t:'17 May 08:00'},{n:'Chen Wei Ling',t:'17 May 10:00'},{n:'Mohd Farid',t:'18 May 07:30'}],
+  'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
+  'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
+};
+
+const STATUS_HTML = {
+  'Published':   '<span class="badge b-pub">● Published</span>',
+  'Taken':       '<span class="badge b-tak">✓ Taken</span>',
+  'Completed':   '<span class="badge b-com">✔ Completed</span>',
+  'Cancelled':   '<span class="badge b-can">✕ Cancelled</span>',
+  'Waitlisted':  '<span class="badge b-wl">⏳ Waitlisted</span>',
+  'At Risk':     '<span class="badge b-risk">⚠ At Risk</span>',
+  'In Progress': '<span class="badge b-tak">▶ In Progress</span>',
+};
+
+/* ══ Helpers ════════════════════════════════════════════════════════ */
+function fmt12(t) {
+  var p = t.trim().split(':');
+  var h = parseInt(p[0]), m = p[1] || '00';
+  var ap = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + ':' + m + ap;
+}
+function fmtSlot(slot) {
+  var p = slot.split('–');
+  return p.length < 2 ? slot : fmt12(p[0]) + ' - ' + fmt12(p[1]);
+}
+function fmtDateFull(ds) {
+  var d = new Date(ds + 'T00:00:00');
+  var mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return mo[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+function statusDotColor(s) {
+  var m = {'Published':'#2196F3','Taken':'#4CAF50','In Progress':'#2196F3','At Risk':'#FF5722','Completed':'#4CAF50','Cancelled':'#F44336','Waitlisted':'#FF9800'};
+  return m[s] || '#9E9E9E';
+}
+
+/* ══ Render task list ═══════════════════════════════════════════════ */
+var currentJobId = null;
+
+function renderTaskList() {
+  var statusFilter = document.getElementById('tmStatusFilter') ? document.getElementById('tmStatusFilter').value : '';
+
+  var filtered = JOB_DATA.filter(function(j) {
+    if (statusFilter && j.status !== statusFilter) return false;
+    return true;
+  });
+
+  var grouped = {};
+  filtered.forEach(function(j) {
+    if (!grouped[j.sd]) grouped[j.sd] = [];
+    grouped[j.sd].push(j);
+  });
+
+  var dates = Object.keys(grouped).sort();
+  var html = '';
+
+  if (!dates.length) {
+    html = '<div style="padding:30px 20px;color:#888;font-size:13px;">No tasks found.</div>';
+  }
+
+  dates.forEach(function(dk) {
+    var jobs = grouped[dk].slice().sort(function(a,b){ return a.time.localeCompare(b.time); });
+    html += '<div class="tm-date-group">';
+    html += '<div class="tm-date-header">' + fmtDateFull(dk) + '</div>';
+    jobs.forEach(function(j) {
+      var dot = statusDotColor(j.status);
+      var slot = fmtSlot(j.time);
+      var title = j.type + (j.client && j.client !== '—' ? ' - ' + j.client : '');
+      var mjLine = j.mj ? '<div class="tm-task-sub"><span class="tm-loc-label">Assigned MJ:</span><span class="tm-loc-val">' + j.mj + '</span></div>' : '';
+      html += '<div class="tm-task-row">';
+      html += '<div class="tm-task-time">' + slot + '</div>';
+      html += '<div class="tm-task-dot" style="background:' + dot + ';"></div>';
+      html += '<div class="tm-task-detail">';
+      html += '<div class="tm-task-name">' + title + '</div>';
+      html += '<div class="tm-task-sub"><span class="tm-loc-label">Location:</span><span class="tm-loc-val">' + j.facility + '</span></div>';
+      html += mjLine;
+      html += (STATUS_HTML[j.status] || j.status);
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+
+  document.getElementById('tmListArea').innerHTML = html;
+}
+
+/* ══ Modal ══════════════════════════════════════════════════════════ */
+function openModal(jobId) {
+  currentJobId = jobId;
+  var j = JOB_DATA.find(function(x){return x.id === jobId;});
+  if (!j) return;
+  var wl = WAITLIST_DATA[jobId] || [];
+  var isHA = j.type === 'Home Assessment';
+  var isBef = j.type === 'Befriending';
+  var slots = isHA ? 2 : 1;
+  var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
+  var displayNoShow = j.status === 'Completed' || j.status === 'In Progress' || j.status === 'Cancelled';
+
+  document.getElementById('modal-title').textContent = j.id + ' — ' + j.type + ' · ' + j.facility;
+
+  var banner = '';
+  if (j.status === 'At Risk')
+    banner = '<div class="banner bn-r">⚠️ <div><strong>At Risk:</strong> No confirmed MJ. Auto-cancel triggers 1 BD before job date.</div></div>';
+  else if (j.status === 'Cancelled')
+    banner = '<div class="banner bn-r">✕ <div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
+  else if (j.status === 'Completed')
+    banner = '<div class="banner bn-g">✓ <div><strong>Completed:</strong> Job was successfully completed. Records are locked.</div></div>';
+  else if (isHA)
+    banner = '<div class="banner bn-a">ℹ️ <div><strong>Home Assessment:</strong> Minimum 2 confirmed MJs required.</div></div>';
+
+  var grid = '<div class="m-info-grid">' +
+    '<div class="m-info-box"><div class="m-info-label">Date &amp; time</div><div class="m-info-val">' + j.date + ', ' + j.time + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Client</div><div class="m-info-val">' + j.client + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Urgency</div><div class="m-info-val">' + (j.urgency === 'Urgent' ? '🔶 Urgent' : 'Standard') + '</div></div>' +
+    '</div>';
+
+  var slotHtml = '<div class="sect-title">Confirmed slot' + (slots > 1 ? 's' : '') + ' (' + slots + ' required)</div>';
+  for (var i = 0; i < slots; i++) {
+    var hasMJ = i === 0 && j.mj;
+    slotHtml += '<div class="slot-row" id="slot-' + i + '">' +
+      '<div class="slot-num ' + (hasMJ ? 'sn-filled' : 'sn-empty') + '">' + (hasMJ ? '✓' : (i + 1)) + '</div>' +
+      '<div style="flex:1"><div class="slot-name"' + (hasMJ ? '' : ' style="color:var(--ink4);font-style:italic"') + '>' + (hasMJ ? j.mj : 'Empty — awaiting MJ') + '</div>' +
+      '<div class="slot-meta">' + (hasMJ ? 'Confirmed · Grabbed 16 May 09:30' : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')) + '</div></div>';
+    if (!locked) {
+      if (hasMJ) slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
+      else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
+    }
+    if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>';
+    slotHtml += '</div>';
+  }
+
+  var wlHtml = '';
+  if (!isBef) {
+    wlHtml = '<div class="sect-title">Waitlist (' + wl.length + ' / 4)</div>';
+    if (!wl.length) {
+      wlHtml += '<div style="font-size:12px;color:var(--ink4);padding:8px 0">No MJs on waitlist yet.</div>';
+    } else {
+      wl.forEach(function(w, idx) {
+        wlHtml += '<div class="wl-row" id="wl-' + idx + '">' +
+          '<div class="wl-pos">' + (idx + 1) + '</div>' +
+          '<div class="wl-name">' + w.n + '</div>' +
+          '<div class="wl-time">' + w.t + '</div>';
+        if (!locked) wlHtml += '<button class="wl-btn wl-confirm" onclick="confirmWL(this,\'' + jobId + '\',' + idx + ')">Confirm</button>' +
+          '<button class="wl-btn wl-remove" onclick="removeWL(this,' + idx + ')">Remove</button>';
+        wlHtml += '</div>';
+      });
+    }
+  } else {
+    wlHtml = '<div class="sect-title">Assignment</div>' +
+      '<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr)">' +
+      'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.' +
+      (!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(\'' + jobId + '\',0)">+ Assign MJ manually</button>' : '') + '</div>';
+  }
+
+  document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
+  document.getElementById('btn-complete').disabled = locked;
+  document.getElementById('btn-cancel-job').disabled = locked;
+  document.getElementById('assignModal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('assignModal').style.display = 'none'; }
+function handleOverlayClick(e) { if (e.target.id === 'assignModal') closeModal(); }
+
+function confirmWL(btn, jobId, idx) {
+  var row = btn.closest('.wl-row');
+  row.style.background = 'var(--gl)'; row.style.borderColor = 'var(--gb)';
+  btn.textContent = '✓ Confirmed'; btn.disabled = true;
+  btn.style.background = 'var(--gm)'; btn.style.color = '#fff';
+}
+function removeWL(btn, idx) {
+  var row = btn.closest('.wl-row');
+  row.style.opacity = '.45';
+  row.querySelectorAll('button').forEach(function(b){b.disabled = true;});
+  btn.textContent = 'Removed';
+}
+function removeSlot(btn, jobId, idx) {
+  var row = document.getElementById('slot-' + idx);
+  row.querySelector('.slot-name').textContent = 'Empty — slot re-opened';
+  row.querySelector('.slot-name').style.cssText = 'color:var(--ink4);font-style:italic';
+  row.querySelector('.slot-meta').textContent = 'Open for grab · Slot re-opened';
+  row.querySelector('.slot-num').className = 'slot-num sn-empty';
+  row.querySelector('.slot-num').textContent = String(idx + 1);
+  btn.textContent = 'Removed'; btn.disabled = true;
+}
+function assignManually(jobId, idx) {
+  var name = prompt('Enter MJ name to assign manually:');
+  if (!name || !name.trim()) return;
+  var row = document.getElementById('slot-' + idx);
+  if (row) {
+    row.querySelector('.slot-name').textContent = name.trim();
+    row.querySelector('.slot-name').style.cssText = '';
+    row.querySelector('.slot-meta').textContent = 'Manually assigned · Just now';
+    row.querySelector('.slot-num').className = 'slot-num sn-filled';
+    row.querySelector('.slot-num').textContent = '✓';
+  }
+}
+
+/* ══ No Show ════════════════════════════════════════════════════════ */
+function openNoShowModal() {
+  document.getElementById('assignModal').style.display = 'none';
+  document.getElementById('noShowReason').value = '';
+  document.getElementById('noShowOthersWrap').style.display = 'none';
+  document.getElementById('noShowOthersText').value = '';
+  document.getElementById('noShowModal').style.display = 'flex';
+}
+function handleNoShowReasonChange() {
+  var val = document.getElementById('noShowReason').value;
+  document.getElementById('noShowOthersWrap').style.display = val === 'others' ? 'block' : 'none';
+}
+function submitNoShow() {
+  var reason = document.getElementById('noShowReason').value;
+  if (!reason) { alert('Please select a no-show reason.'); return; }
+  if (reason === 'others' && !document.getElementById('noShowOthersText').value.trim()) {
+    alert('Please specify the reason.'); return;
+  }
+  document.getElementById('noShowModal').style.display = 'none';
+  if (currentJobId) openModal(currentJobId);
+}
+function cancelNoShow() {
+  document.getElementById('noShowModal').style.display = 'none';
+  if (currentJobId) openModal(currentJobId);
+}
+function handleNoShowOverlayClick(e) {
+  if (e.target.id === 'noShowModal') cancelNoShow();
+}
+
+/* ══ Portal ═════════════════════════════════════════════════════════ */
+function openPortal() {
+  if (confirm('Heading over to MJ Chap Portal')) {
+    window.open('./portal/index.html', '_blank').focus();
+  }
+}
+
+/* ══ Init ═══════════════════════════════════════════════════════════ */
+$(document).ready(function() {
+  renderTaskList();
+});
+    </script>
+  </body>
+</html>
