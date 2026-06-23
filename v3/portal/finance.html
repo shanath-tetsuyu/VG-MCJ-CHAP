@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARES — MJ Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="../portal/index.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#13795B;--gm:#1D9E75;--gl:#E8F7F2;--gb:#9FE1CB;
+  --am:#C07A1A;--al:#FDF3E3;--ab:#F0C060;
+  --rm:#B03030;--rl:#FDF0F0;--rb:#F0AAAA;
+  --bm:#1A5FA8;--bl:#EBF3FD;--bb:#90BFED;
+  --pm:#6B21A8;--pl:#F5F0FF;--pb:#C4B5FD;
+  --ink:#1C1C1E;--ink2:#444;--ink3:#777;--ink4:#AAA;
+  --s:#fff;--bg:#F5F6F8;--bdr:#E4E4E4;--bdr2:#F0F0F0;
+  --r:10px;--rl2:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);display:block !important;}
+#wrapper{display:flex;height:100vh;}
+#sidebar{background-color:#6B21A8 !important;flex-shrink:0;}
+#page-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── Shell ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:6px;flex-shrink:0;}
+.topbar-title{font-size:14px;font-weight:600;}
+.layout{flex:1;display:flex;overflow:hidden;}
+.left-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.right-panel{width:298px;border-left:1px solid var(--bdr);background:var(--s);overflow-y:auto;flex-shrink:0;}
+
+/* ── Cards ── */
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px;}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;position:relative;}
+.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ci-g{background:var(--gl)}.ci-b{background:var(--bl)}.ci-a{background:var(--al)}.ci-p{background:var(--pl)}
+.card-label{font-size:12px;font-weight:600;color:var(--ink2);flex:1;}
+
+/* ── KPI Row ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.kpi-box{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:14px 16px;}
+.kpi-n{font-size:28px;font-weight:700;line-height:1;letter-spacing:-0.5px;}
+.kpi-l{font-size:11px;color:var(--ink4);margin-top:4px;line-height:1.35;}
+.kpi-sub{font-size:10px;font-weight:600;margin-top:8px;padding:2px 7px;border-radius:20px;display:inline-block;}
+.k-total .kpi-n{color:var(--pm)}.k-total .kpi-sub{background:var(--pl);color:var(--pm);}
+.k-hrs .kpi-n{color:var(--bm)}.k-hrs .kpi-sub{background:var(--bl);color:var(--bm);}
+.k-jobs .kpi-n{color:var(--g)}.k-jobs .kpi-sub{background:var(--gl);color:var(--g);}
+.k-mj .kpi-n{color:var(--ink)}.k-mj .kpi-sub{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr);}
+.k-pend .kpi-n{color:var(--am)}.k-pend .kpi-sub{background:var(--al);color:var(--am);}
+
+/* ── Tabs ── */
+.fin-tabs{display:flex;gap:0;border-bottom:1px solid var(--bdr);margin-bottom:0;background:var(--s);border-radius:var(--rl2) var(--rl2) 0 0;padding:0 18px;}
+.fin-tab{font-size:12px;font-weight:600;color:var(--ink4);padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.fin-tab.active{color:var(--pm);border-bottom-color:var(--pm);}
+.fin-tab:hover:not(.active){color:var(--ink2);}
+.tab-pane-fin{display:none;}
+.tab-pane-fin.active{display:block;}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.filter-bar label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.filter-bar select,.filter-bar input[type=text],.filter-bar input[type=month]{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;transition:border-color .15s;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--pm);background:var(--s);}
+.btn-clear{font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 11px;border:1px solid var(--bdr);border-radius:7px;background:var(--s);color:var(--ink3);cursor:pointer;}
+.btn-clear:hover{background:var(--bg);}
+.btn-export{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border:none;border-radius:8px;background:var(--g);color:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.btn-export:hover{background:#0A5C46;}
+.btn-submit-ap{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border:none;border-radius:8px;background:var(--pm);color:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.btn-submit-ap:hover{background:#4c1676;}
+
+/* ── Table ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:7px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.03em;white-space:nowrap;}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle;}
+.tbl tr:last-child td{border:none;}
+.tbl tbody tr{cursor:pointer;transition:background .1s;}
+.tbl tbody tr:hover td{background:var(--pl);}
+.tbl tfoot td{font-size:11px;font-weight:700;color:var(--ink2);padding:10px 10px;border-top:2px solid var(--bdr);background:var(--bg);}
+
+/* ── Badges & Pills ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-chap{background:var(--bl);color:var(--bm);}
+.b-befr{background:var(--gl);color:var(--g);}
+.b-home{background:var(--al);color:var(--am);}
+.b-cent{background:var(--pl);color:var(--pm);}
+.b-draft{background:#E8E8ED;color:#555;}
+.b-submitted{background:var(--bl);color:var(--bm);}
+.b-processed{background:var(--gl);color:var(--g);}
+.b-amended{background:var(--al);color:var(--am);}
+
+/* ── Amount cell ── */
+.amount-cell{font-size:13px;font-weight:600;color:var(--g);text-align:right;}
+.amount-neg{color:var(--am);}
+.hours-cell{font-size:12px;text-align:center;}
+.rounded-up{color:var(--am);font-weight:600;}
+.rate-cell{font-size:12px;color:var(--ink3);text-align:right;}
+
+/* ── Popovers ── */
+.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1;}
+.br-btn:hover,.br-btn.active{background:var(--bm);color:#fff;}
+.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1;}
+.q-btn:hover,.q-btn.active{background:var(--rm);color:#fff;}
+.pop{display:none;position:absolute;z-index:400;width:290px;border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:12px;line-height:1.6;top:calc(100% + 6px);left:0;}
+.pop.right{left:auto;right:0;}.pop.on{display:block;}
+.pop-info{background:var(--ink);color:#fff;}
+.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.pop-info .pop-title::before{content:'⚙';font-size:12px;}
+.pop-info .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;}
+.pop-info .pr:last-child{margin-bottom:0;}
+.pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.pd-g{background:var(--gm)}.pd-a{background:#F0C060}.pd-r{background:#F0AAAA}.pd-q{background:#F0AAAA}
+.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,.3);}
+.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.pop-q .pop-title::before{content:'?';font-size:12px;color:var(--rb);}
+.pop-q .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;color:#FFD0D0;}
+.pop-q .pr:last-child{margin-bottom:0;}
+.pop-q .note{font-size:10px;color:rgba(255,200,200,.45);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,.15);}
+
+/* ── Right Panel ── */
+.rp{padding:14px 15px;}
+.rp-title{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;margin-top:14px;}
+.rp-title:first-child{margin-top:4px;}
+.rate-card{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 12px;margin-bottom:6px;}
+.rate-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.rate-name{font-size:11px;font-weight:600;color:var(--ink2);}
+.rate-val{font-size:14px;font-weight:700;color:var(--g);}
+.rate-detail{font-size:10px;color:var(--ink4);line-height:1.4;}
+.period-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:var(--pl);color:var(--pm);margin-bottom:8px;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr2);font-size:12px;}
+.summary-row:last-child{border-bottom:none;}
+.summary-label{color:var(--ink3);}
+.summary-val{font-weight:600;color:var(--ink);}
+.summary-val.highlight{color:var(--pm);}
+.legend-row{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:11px;color:var(--ink3);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:500;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:var(--s);border-radius:var(--rl2);width:700px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
+.modal-head-title{font-size:14px;font-weight:600;flex:1;}
+.modal-close{background:none;border:1px solid var(--bdr);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:var(--ink3);font-family:'DM Sans',sans-serif;}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--bdr);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.m-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.m-info-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.m-info-box{background:var(--bg);border-radius:var(--r);padding:10px 12px;}
+.m-info-label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.m-info-val{font-size:13px;font-weight:500;color:var(--ink);}
+.m-info-val.highlight{color:var(--pm);font-weight:700;}
+.sect-title{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;margin-top:16px;}
+.sect-title:first-child{margin-top:0;}
+.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5;margin-bottom:12px;}
+.bn-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb);}
+.bn-a{background:var(--al);color:var(--am);border:1px solid var(--ab);}
+.bn-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb);}
+.bn-p{background:var(--pl);color:var(--pm);border:1px solid var(--pb);}
+.btn-primary{background:var(--g);color:#fff;border:none;border-radius:var(--r);padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-primary:hover{background:#0A5C46;}
+.btn-purple{background:var(--pm);color:#fff;border:none;border-radius:var(--r);padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-purple:hover{background:#4c1676;}
+.btn-ghost{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:8px 14px;font-size:13px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* ── Rounding indicator ── */
+.round-explain{font-size:10px;color:var(--am);background:var(--al);border-radius:4px;padding:1px 5px;margin-left:4px;font-weight:600;}
+
+/* ── Amendment tag ── */
+.amend-tag{font-size:10px;background:var(--al);color:var(--am);border-radius:4px;padding:1px 5px;font-weight:600;margin-left:4px;}
+
+/* ── History table ── */
+.hist-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:6px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:.03em;}
+.hist-tbl td{padding:9px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle;}
+.hist-tbl tr:last-child td{border:none;}
+
+/* ── No data ── */
+.no-data{text-align:center;padding:40px 20px;color:var(--ink4);font-size:13px;}
+</style>
+
+</head>
+<body>
+
+<div class="d-flex" id="wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════════════════ -->
+<nav id="sidebar" class="sidebar d-flex flex-column">
+  <div class="sidebar-profile p-3 text-center">
+    <div class="sidebar-avatar mx-auto mb-2">
+      <i class="bi bi-person-fill fs-3 text-white"></i>
+    </div>
+    <div class="sidebar-username text-white fw-semibold small">John David</div>
+    <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+      Admin
+      <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+    </div>
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-1">
+    <li class="nav-item">
+      <a class="nav-link sidebar-link" href="./index.html">
+        <i class="bi bi-grid-fill me-2"></i>Dashboard
+      </a>
+    </li>
+    <ul class="nav flex-column sidebar">
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./attendance.html">Attendance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./settings.html">Settings</a></li>
+    </ul>
+  </ul>
+</nav>
+
+
+<div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <div class="topbar">
+    <button id="sidebarToggle" class="btn btn-sm me-2" type="button"
+      style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8">
+      <i class="bi bi-list fs-5"></i>
+    </button>
+    <div class="topbar-title">Finance — MJ Payment</div>
+    <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
+    <span style="font-size:12px;color:var(--ink3)">AAC — Volunteer Group SCC</span>
+    <span style="margin-left:auto;font-size:12px;color:var(--ink4)">11 Jun 2026</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- ══ LEFT SCROLL ══════════════════════════════════════════════ -->
+    <div class="left-scroll">
+
+      <!-- AP Listing Card -->
+      <div class="card" style="padding:0;">
+
+        <!-- Tabs -->
+        <div class="fin-tabs">
+          <div class="fin-tab active" onclick="switchTab('ap')" id="tab-ap">
+            <i class="bi bi-receipt"></i> AP Listing
+          </div>
+        </div>
+
+        <!-- ── TAB: AP Listing ── -->
+        <div class="tab-pane-fin active" id="pane-ap" style="padding:18px;">
+
+          <div class="card-head" style="margin-bottom:10px;">
+            <div class="card-icon ci-p"><i class="bi bi-cash-stack" style="font-size:13px;"></i></div>
+            <div class="card-label">Accounts Payable Listing</div>
+          </div>
+
+          <!-- Period + filters -->
+          <div class="filter-bar">
+            <label>Month</label>
+            <input type="month" id="fMonth" onchange="applyFilters()"> <!-- default to current month in JS -->
+            <label>Service</label>
+            <select id="fService" onchange="applyFilters()">
+              <option value="all">All services</option>
+              <option value="Chaperone">Chaperone</option>
+              <option value="Befriending">Befriending</option>
+              <option value="Home Assessment">Home Assessment</option>
+              <option value="Center Assistant">Center Assistant</option>
+            </select>
+            <label>MJ Name</label>
+            <input type="text" id="fName" placeholder="Search name…" oninput="applyFilters()" style="width:160px;">
+            <label>Status</label>
+            <select id="fStatus" onchange="applyFilters()">
+              <option value="all">All</option>
+              <option value="Draft">Draft</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Processed">Processed</option>
+              <option value="Amended">Amended</option>
+            </select>
+            <button class="btn-clear" onclick="clearFilters()">Clear</button>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn-export" onclick="exportAP()">
+                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- AP Table -->
+          <div style="overflow-x:auto;">
+            <table class="tbl" id="apTbl">
+              <thead>
+                <tr>
+                  <th>MJ Name</th>
+                  <th>Job ID</th>
+                  <th>Service</th>
+                  <th>Facility</th>
+                  <th>Date</th>
+                  <th style="text-align:center;">Sched. hrs</th>
+                  <th style="text-align:center;">Actual hrs</th>
+                  <th style="text-align:center;">Bill. hrs</th>
+                  <th style="text-align:right;">Rate / hr</th>
+                  <th style="text-align:right;">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="apBody">
+                <!-- populated by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="no-data-msg" class="no-data" style="display:none;">
+            <i class="bi bi-inbox" style="font-size:32px;opacity:.3;display:block;margin-bottom:8px;"></i>
+            No records match the selected filters.
+          </div>
+
+        </div><!-- /pane-ap -->
+
+      </div><!-- /card -->
+
+    </div><!-- /left-scroll -->
+
+  </div><!-- /layout -->
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     JOB DETAIL MODAL
+════════════════════════════════════════════════════════════════════ -->
+<div id="jobModal" class="modal-overlay" style="display:none" onclick="handleOverlayClick(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="card-icon ci-p" style="font-size:16px;"><i class="bi bi-cash-stack"></i></div>
+      <div class="modal-head-title" id="modal-title">Payment Breakdown</div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="modal-approve-btn" style="display:none" onclick="approveAmendment()">
+        ✓ Approve Amendment
+      </button>
+      <button class="btn-ghost" style="margin-left:auto;" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* ══ Rates ══════════════════════════════════════════════════════════ */
+const RATES = {
+  'Chaperone': 12,
+  'Befriending': 10,
+  'Home Assessment': 14,
+  'Center Assistant': 11
+};
+
+/* ══ Rounding logic (URS §1.2) ════════════════════════════════════
+   Minimum 1 hour for first hour.
+   After first hour: every ≥ 30 min rounds up to next full hour.
+   Implementation: ceil(hours) if decimal >= 0.5, else floor(hours),
+   with floor never going below 1.
+════════════════════════════════════════════════════════════════════ */
+function calcBillableHours(actualMinutes) {
+  if (actualMinutes <= 0) return 1; // minimum 1 hr (e.g., no-show)
+  const hours = actualMinutes / 60;
+  const wholeHours = Math.floor(hours);
+  const remainder = hours - wholeHours;
+  let billable;
+  if (wholeHours === 0) {
+    billable = 1; // first hour minimum
+  } else if (remainder >= 0.5) {
+    billable = wholeHours + 1; // round up
+  } else {
+    billable = wholeHours; // stay
+  }
+  return Math.max(1, billable);
+}
+
+function calcAmount(billableHrs, service) {
+  return (billableHrs * RATES[service]).toFixed(2);
+}
+
+function fmtDuration(mins) {
+  if (mins <= 0) return '—';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+/* ══ Mock AP data ════════════════════════════════════════════════════
+   actualMins: check-in / check-out based (MJ payment basis)
+   schedMins:  scheduled time (SCC billing basis, shown for reference)
+   isAmended:  actual > scheduled by a material amount
+════════════════════════════════════════════════════════════════════ */
+const AP_DATA = [
+  // Chaperone
+  {id:'MJ-2026-048', name:'Ahmad Razif bin Ismail', mjId:'MJ-0001', service:'Chaperone', facility:'Queenstown SCC', date:'30 May 2026', schedMins:120, actualMins:128, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-047', name:'Ravi Kumar s/o Gopal',  mjId:'MJ-0004', service:'Chaperone', facility:'Queenstown SCC', date:'29 June 2026', schedMins:60, actualMins:58, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-046', name:'Lily Tan Ah Mooi',       mjId:'MJ-0006', service:'Chaperone', facility:'Bedok SCC',     date:'28 June 2026', schedMins:120, actualMins:155, isNoShow:false, isAmended:true, status:'Amended', notes:'Appointment ran over 35 min. Client required additional escort to pharmacy.'},
+  {id:'MJ-2026-045', name:'Ahmad Razif bin Ismail', mjId:'MJ-0001', service:'Chaperone', facility:'Queenstown SCC', date:'27 June 2026', schedMins:60, actualMins:0, isNoShow:true, isAmended:false, status:'Draft', notes:'Client no-show. MJ arrived at location. Paid min 1 hr per AAC policy.'},
+  {id:'MJ-2026-044', name:'Fatimah bte Ali',        mjId:'MJ-0002', service:'Chaperone', facility:'Tampines SCC',   date:'26 June 2026', schedMins:120, actualMins:122, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-043', name:'Susan Lim Bee Lian',     mjId:'MJ-0003', service:'Chaperone', facility:'Clementi SCC',   date:'25 June 2026', schedMins:60, actualMins:63, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-042', name:'Ravi Kumar s/o Gopal',   mjId:'MJ-0004', service:'Chaperone', facility:'Bishan SCC',     date:'23 June 2026', schedMins:180, actualMins:185, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-041', name:'Ng Bee Hoon',             mjId:'MJ-0011', service:'Chaperone', facility:'Tampines SCC',   date:'22 June 2026', schedMins:60, actualMins:92, isNoShow:false, isAmended:true, status:'Amended', notes:'Actual time exceeded scheduled by 32 min. Requires amendment approval.'},
+  {id:'MJ-2026-040', name:'Chan Wai Leng',           mjId:'MJ-0008', service:'Chaperone', facility:'Queenstown SCC', date:'21 June 2026', schedMins:120, actualMins:119, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-039', name:'Abdul Halim bin Rahman',  mjId:'MJ-0010', service:'Chaperone', facility:'Bedok SCC',      date:'20 June 2026', schedMins:60, actualMins:61, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-038', name:'Lily Tan Ah Mooi',        mjId:'MJ-0006', service:'Chaperone', facility:'Clementi SCC',   date:'19 June 2026', schedMins:60, actualMins:62, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-037', name:'Ahmad Razif bin Ismail',  mjId:'MJ-0001', service:'Chaperone', facility:'Queenstown SCC', date:'18 June 2026', schedMins:120, actualMins:128, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-036', name:'Fatimah bte Ali',         mjId:'MJ-0002', service:'Chaperone', facility:'Tampines SCC',   date:'17 June 2026', schedMins:60, actualMins:65, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-035', name:'Grace Chua Siew Ling',    mjId:'MJ-0005', service:'Chaperone', facility:'Bishan SCC',     date:'16 June 2026', schedMins:120, actualMins:116, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  // Befriending
+  {id:'MJ-2026-034', name:'Susan Lim Bee Lian',      mjId:'MJ-0003', service:'Befriending', facility:'Queenstown AAC', date:'29 June 2026', schedMins:60, actualMins:63, isNoShow:false, isAmended:false, status:'Draft', notes:'Pool of 3 clients completed within 1 hr.'},
+  {id:'MJ-2026-033', name:'Ravi Kumar s/o Gopal',    mjId:'MJ-0004', service:'Befriending', facility:'Queenstown AAC', date:'28 June 2026', schedMins:60, actualMins:58, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-032', name:'Lily Tan Ah Mooi',        mjId:'MJ-0006', service:'Befriending', facility:'Bedok AAC',      date:'27 June 2026', schedMins:60, actualMins:91, isNoShow:false, isAmended:true, status:'Amended', notes:'MJ spent additional time with client. 31 min over. Requires amendment approval.'},
+  {id:'MJ-2026-031', name:'Abdul Halim bin Rahman',  mjId:'MJ-0010', service:'Befriending', facility:'Tampines AAC',   date:'26 June 2026', schedMins:60, actualMins:55, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-030', name:'Grace Chua Siew Ling',    mjId:'MJ-0005', service:'Befriending', facility:'Clementi AAC',   date:'25 June 2026', schedMins:60, actualMins:60, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-029', name:'Susan Lim Bee Lian',      mjId:'MJ-0003', service:'Befriending', facility:'Queenstown AAC', date:'22 June 2026', schedMins:60, actualMins:68, isNoShow:false, isAmended:false, status:'Processed', notes:''},
+  {id:'MJ-2026-028', name:'Ravi Kumar s/o Gopal',    mjId:'MJ-0004', service:'Befriending', facility:'Queenstown AAC', date:'21 June 2026', schedMins:60, actualMins:59, isNoShow:false, isAmended:false, status:'Processed', notes:''},
+  {id:'MJ-2026-027', name:'Ahmad Razif bin Ismail',  mjId:'MJ-0001', service:'Befriending', facility:'Bedok AAC',      date:'20 June 2026', schedMins:60, actualMins:62, isNoShow:false, isAmended:false, status:'Processed', notes:''},
+  {id:'MJ-2026-026', name:'Fatimah bte Ali',         mjId:'MJ-0002', service:'Befriending', facility:'Tampines AAC',   date:'19 June 2026', schedMins:60, actualMins:57, isNoShow:false, isAmended:false, status:'Processed', notes:''},
+  {id:'MJ-2026-025', name:'Ng Bee Hoon',             mjId:'MJ-0011', service:'Befriending', facility:'Bishan AAC',     date:'18 June 2026', schedMins:60, actualMins:61, isNoShow:false, isAmended:false, status:'Processed', notes:''},
+  // Home Assessment
+  {id:'MJ-2026-024', name:'Ravi Kumar s/o Gopal',    mjId:'MJ-0004', service:'Home Assessment', facility:'Queenstown AAC', date:'27 June 2026', schedMins:60, actualMins:65, isNoShow:false, isAmended:false, status:'Draft', notes:'Paired with MJ-0010 Abdul Halim. Both billed separately.'},
+  {id:'MJ-2026-024B',name:'Abdul Halim bin Rahman',  mjId:'MJ-0010', service:'Home Assessment', facility:'Queenstown AAC', date:'27 June 2026', schedMins:60, actualMins:65, isNoShow:false, isAmended:false, status:'Draft', notes:'Paired with MJ-0004 Ravi Kumar. Both billed separately.'},
+  {id:'MJ-2026-023', name:'Lily Tan Ah Mooi',        mjId:'MJ-0006', service:'Home Assessment', facility:'Tampines AAC',   date:'24 June 2026', schedMins:60, actualMins:58, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-023B',name:'Ravi Kumar s/o Gopal',    mjId:'MJ-0004', service:'Home Assessment', facility:'Tampines AAC',   date:'24 May 2026', schedMins:60, actualMins:58, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-022', name:'Ahmad Razif bin Ismail',  mjId:'MJ-0001', service:'Home Assessment', facility:'Bedok AAC',      date:'21 May 2026', schedMins:60, actualMins:62, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-022B',name:'Susan Lim Bee Lian',      mjId:'MJ-0003', service:'Home Assessment', facility:'Bedok AAC',      date:'21 May 2026', schedMins:60, actualMins:62, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  // Center Assistant
+  {id:'MJ-2026-021', name:'Ravi Kumar s/o Gopal',    mjId:'MJ-0004', service:'Center Assistant', facility:'Queenstown AAC', date:'30 May 2026', schedMins:240, actualMins:238, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-020', name:'Lily Tan Ah Mooi',        mjId:'MJ-0006', service:'Center Assistant', facility:'Bedok AAC',      date:'28 May 2026', schedMins:120, actualMins:119, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-019', name:'Susan Lim Bee Lian',      mjId:'MJ-0003', service:'Center Assistant', facility:'Tampines AAC',   date:'26 May 2026', schedMins:120, actualMins:122, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+  {id:'MJ-2026-018', name:'Lim Wei Jie',             mjId:'MJ-0012', service:'Center Assistant', facility:'Clementi AAC',   date:'23 May 2026', schedMins:60, actualMins:57, isNoShow:false, isAmended:false, status:'Draft', notes:''},
+];
+
+let currentData = [...AP_DATA];
+let activeFilters = { month: '2026-05', service: 'all', name: '', status: 'all' };
+let currentRow = null;
+
+/* ══ Month filter helper ═════════════════════════════════════════════
+   fMonth value format: "YYYY-MM" (e.g. "2026-05")
+════════════════════════════════════════════════════════════════════ */
+function rowMatchesMonth(row, month) {
+  if (!month) return true;
+  const d = new Date(row.date);
+  const rowMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  return rowMonth === month;
+}
+
+/* ══ Render table ════════════════════════════════════════════════════ */
+function renderTable(data) {
+  const tbody = document.getElementById('apBody');
+  tbody.innerHTML = '';
+  let total = 0;
+
+  if (data.length === 0) {
+    document.getElementById('no-data-msg').style.display = 'block';
+    document.getElementById('tbl-total').textContent = '$0.00';
+    return;
+  }
+  document.getElementById('no-data-msg').style.display = 'none';
+
+  data.forEach((row, idx) => {
+    const actualMins = row.isNoShow ? 60 : row.actualMins; // no-show = min 1 hr
+    const billable = calcBillableHours(actualMins);
+    const schedBillable = calcBillableHours(row.schedMins);
+    const amount = parseFloat(calcAmount(billable, row.service));
+    total += amount;
+
+    const isRoundedUp = (actualMins > 0) && (billable > Math.floor(actualMins / 60));
+    const hasDiscrepancy = row.isAmended;
+
+    const svcBadge = {
+      'Chaperone': `<span class="badge b-chap">Chaperone</span>`,
+      'Befriending': `<span class="badge b-befr">Befriending</span>`,
+      'Home Assessment': `<span class="badge b-home">Home Assess.</span>`,
+      'Center Assistant': `<span class="badge b-cent">Center Asst.</span>`
+    }[row.service] || row.service;
+
+    const statusBadge = {
+      'Draft': `<span class="badge b-draft">Draft</span>`,
+      'Submitted': `<span class="badge b-submitted">Submitted</span>`,
+      'Processed': `<span class="badge b-processed">✓ Processed</span>`,
+      'Amended': `<span class="badge b-amended">⚠ Amended</span>`
+    }[row.status] || `<span class="badge b-draft">${row.status}</span>`;
+
+    const actualDisplay = row.isNoShow
+      ? `<span style="font-size:11px;color:var(--g);font-weight:600;">No-show<br><span class="round-explain">min 1 hr</span></span>`
+      : `<span class="hours-cell">${fmtDuration(row.actualMins)}${isRoundedUp ? '<br><span class="round-explain">↑ rounded</span>' : ''}</span>`;
+
+    const amendTag = hasDiscrepancy
+      ? `<span class="amend-tag">⚠ needs sign-off</span>` : '';
+
+    const tr = document.createElement('tr');
+    tr.dataset.idx = idx;
+    tr.style.background = hasDiscrepancy ? 'rgba(192,122,26,0.05)' : '';
+    tr.innerHTML = `
+      <td>
+        <div style="font-size:12px;font-weight:500;">${row.name}</div>
+        <div style="font-size:10px;color:var(--ink4);">${row.mjId}</div>
+      </td>
+      <td style="font-family:monospace;font-size:11px;font-weight:600;color:var(--bm);">${row.id}</td>
+      <td>${svcBadge}</td>
+      <td style="font-size:11px;color:var(--ink3);">${row.facility}</td>
+      <td style="font-size:11px;color:var(--ink3);white-space:nowrap;">${row.date}</td>
+      <td class="hours-cell">${fmtDuration(row.schedMins)}</td>
+      <td>${actualDisplay}</td>
+      <td class="hours-cell ${billable > schedBillable ? 'rounded-up' : ''}">${billable} hr${billable !== 1 ? 's' : ''}</td>
+      <td class="rate-cell">$${RATES[row.service].toFixed(2)}</td>
+      <td class="amount-cell">$${amount.toFixed(2)}${amendTag}</td>
+      <td>${statusBadge}</td>
+    `;
+    tr.addEventListener('click', () => openModal(row));
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('tbl-total').textContent = `$${total.toFixed(2)}`;
+}
+
+/* ══ Filters ════════════════════════════════════════════════════════ */
+function applyFilters() {
+  activeFilters.month   = document.getElementById('fMonth').value;
+  activeFilters.service = document.getElementById('fService').value;
+  activeFilters.name    = document.getElementById('fName').value.toLowerCase().trim();
+  activeFilters.status  = document.getElementById('fStatus').value;
+
+  const filtered = AP_DATA.filter(r => {
+    if (!rowMatchesMonth(r, activeFilters.month)) return false;
+    if (activeFilters.service !== 'all' && r.service !== activeFilters.service) return false;
+    if (activeFilters.name && !r.name.toLowerCase().includes(activeFilters.name)) return false;
+    if (activeFilters.status !== 'all' && r.status !== activeFilters.status) return false;
+    return true;
+  });
+
+  renderTable(filtered);
+}
+
+function clearFilters() {
+  document.getElementById('fMonth').value = '2026-05';
+  document.getElementById('fService').value = 'all';
+  document.getElementById('fName').value = '';
+  document.getElementById('fStatus').value = 'all';
+  applyFilters();
+}
+
+/* ══ Tab switching ═══════════════════════════════════════════════════ */
+function switchTab(tab) {
+  ['ap','rates','history'].forEach(t => {
+    document.getElementById(`pane-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+}
+
+/* ══ Popovers ═══════════════════════════════════════════════════════ */
+function togglePop(id, btn) {
+  const pop = document.getElementById(id);
+  const isOn = pop.classList.contains('on');
+  document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+  if (!isOn) { pop.classList.add('on'); btn.classList.add('active'); }
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.card-head')) {
+    document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+  }
+});
+
+/* ══ Modal ══════════════════════════════════════════════════════════ */
+function openModal(row) {
+  currentRow = row;
+  const actualMins = row.isNoShow ? 60 : row.actualMins;
+  const billable = calcBillableHours(actualMins);
+  const schedBillable = calcBillableHours(row.schedMins);
+  const amount = parseFloat(calcAmount(billable, row.service));
+  const isRoundedUp = (actualMins > 0) && (billable > Math.floor(actualMins / 60));
+
+  document.getElementById('modal-title').textContent = `Payment Breakdown — ${row.id}`;
+
+  const approveBtn = document.getElementById('modal-approve-btn');
+  approveBtn.style.display = row.isAmended ? 'block' : 'none';
+
+  let amendBanner = '';
+  if (row.isAmended) {
+    amendBanner = `<div class="banner bn-a"><span>⚠</span><span><strong>Amendment pending sign-off:</strong> Actual time exceeded scheduled time. Supervisor approval required before this record can be included in AP export.</span></div>`;
+  }
+  if (row.isNoShow) {
+    amendBanner = `<div class="banner bn-g"><span>ℹ</span><span><strong>Client no-show:</strong> MJ arrived at location. Per AAC policy, MJ is paid minimum 1 hour. SCC will charge client in full based on scheduled time.</span></div>`;
+  }
+
+  const timingNote = isRoundedUp
+    ? `<div class="banner bn-a" style="margin-top:8px;"><span>↑</span><span>Actual time (${fmtDuration(row.actualMins)}) had ≥ 30 min over a whole hour — rounded up to ${billable} hrs per rounding policy.</span></div>`
+    : '';
+
+  document.getElementById('modal-body').innerHTML = `
+    ${amendBanner}
+    <div class="sect-title">Job Details</div>
+    <div class="m-info-grid">
+      <div class="m-info-box"><div class="m-info-label">MJ Name</div><div class="m-info-val">${row.name}</div></div>
+      <div class="m-info-box"><div class="m-info-label">MJ ID</div><div class="m-info-val" style="font-family:monospace;">${row.mjId}</div></div>
+      <div class="m-info-box"><div class="m-info-label">Job ID</div><div class="m-info-val" style="font-family:monospace;color:var(--bm);">${row.id}</div></div>
+      <div class="m-info-box"><div class="m-info-label">Service Type</div><div class="m-info-val">${row.service}</div></div>
+      <div class="m-info-box"><div class="m-info-label">Facility</div><div class="m-info-val">${row.facility}</div></div>
+      <div class="m-info-box"><div class="m-info-label">Date</div><div class="m-info-val">${row.date}</div></div>
+    </div>
+
+    <div class="sect-title">Time Tracking</div>
+    <div class="m-info-grid">
+      <div class="m-info-box">
+        <div class="m-info-label">Scheduled Duration</div>
+        <div class="m-info-val">${fmtDuration(row.schedMins)}</div>
+        <div style="font-size:10px;color:var(--ink4);margin-top:3px;">Used for SCC client billing</div>
+      </div>
+      <div class="m-info-box">
+        <div class="m-info-label">Actual Duration (MJ)</div>
+        <div class="m-info-val" style="${row.isNoShow ? 'color:var(--g)' : ''}">
+          ${row.isNoShow ? 'No-show (client)' : fmtDuration(row.actualMins)}
+        </div>
+        <div style="font-size:10px;color:var(--ink4);margin-top:3px;">From check-in / check-out</div>
+      </div>
+      <div class="m-info-box">
+        <div class="m-info-label">Billable Hours (rounded)</div>
+        <div class="m-info-val highlight">${billable} hr${billable !== 1 ? 's' : ''}</div>
+        <div style="font-size:10px;color:var(--ink4);margin-top:3px;">Used for MJ payment</div>
+      </div>
+    </div>
+    ${timingNote}
+
+    <div class="sect-title">Payment Calculation</div>
+    <div style="background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;color:var(--ink3);">Billable hours</span>
+        <span style="font-size:13px;font-weight:600;">${billable} hr${billable !== 1 ? 's' : ''}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--bdr);">
+        <span style="font-size:12px;color:var(--ink3);">Rate (${row.service})</span>
+        <span style="font-size:13px;font-weight:600;">× $${RATES[row.service].toFixed(2)} / hr</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">Total payable to MJ</span>
+        <span style="font-size:18px;font-weight:700;color:var(--pm);">$${amount.toFixed(2)}</span>
+      </div>
+    </div>
+
+    ${row.notes ? `<div class="sect-title">Notes / Remarks</div><div style="font-size:12px;color:var(--ink3);background:var(--bg);border-radius:var(--r);padding:10px 12px;line-height:1.6;">${row.notes}</div>` : ''}
+
+    <div class="sect-title">Rounding Rule Applied</div>
+    <div style="font-size:12px;color:var(--ink3);line-height:1.6;">
+      ${row.isNoShow
+        ? 'Client no-show → <strong>minimum 1 hour</strong> always applies per AAC policy.'
+        : isRoundedUp
+          ? `Actual ${fmtDuration(row.actualMins)} → remainder ≥ 30 min → <strong>rounded up to ${billable} hrs</strong>.`
+          : `Actual ${fmtDuration(row.actualMins)} → remainder < 30 min (or exactly whole hours) → <strong>stays at ${billable} hr${billable !== 1 ? 's' : ''}</strong>.`
+      }
+    </div>
+  `;
+
+  document.getElementById('jobModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('jobModal').style.display = 'none';
+  currentRow = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('jobModal')) closeModal();
+}
+
+function approveAmendment() {
+  if (!currentRow) return;
+  currentRow.isAmended = false;
+  currentRow.status = 'Draft';
+  closeModal();
+  applyFilters();
+  // Update amendment count
+  const pendingAmends = AP_DATA.filter(r => r.isAmended).length;
+  document.getElementById('kpi-amend').textContent = pendingAmends;
+  if (pendingAmends === 0) {
+    document.getElementById('amend-banner').style.display = 'none';
+  }
+  alert('Amendment approved. Record updated to Draft and included in next AP export.');
+}
+
+/* ══ Export / Submit ════════════════════════════════════════════════ */
+function exportAP() {
+  const pending = AP_DATA.filter(r => r.isAmended && rowMatchesMonth(r, activeFilters.month));
+  if (pending.length > 0) {
+    alert(`⚠ ${pending.length} record(s) have pending amendments requiring sign-off.\n\nPlease approve all amendments before exporting the AP listing to HR/Finance.`);
+    return;
+  }
+  alert('✓ AP listing exported to Excel.\n\nFile: MJ_AP_May2026_FN2.xlsx\nTotal: $1,247.00 · 34 jobs · 12 MJ\n\nPlease forward to HR and Finance for payment processing.');
+}
+
+function submitToHR() {
+  const pending = AP_DATA.filter(r => r.isAmended && rowMatchesMonth(r, activeFilters.month));
+  if (pending.length > 0) {
+    alert(`⚠ Cannot submit — ${pending.length} amendment(s) still pending sign-off.\n\nResolve all flagged records first.`);
+    return;
+  }
+  if (confirm('Submit AP listing for May 2026 · Fortnightly 2 to HR/Finance?\n\nTotal: $1,247.00 · 34 jobs · 12 MJ\n\nThis action will lock the period for editing.')) {
+    alert('✓ AP listing submitted to HR/Finance.\n\nStatus updated to Submitted. Finance will mark as Processed upon payment completion.');
+  }
+}
+
+/* ══ Sidebar toggle ═════════════════════════════════════════════════ */
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  });
+}
+
+/* ══ Init ═══════════════════════════════════════════════════════════ */
+document.getElementById('fMonth').value = '2026-05';
+applyFilters();
+
+</script>
+</div><!-- /page-content -->
+</div><!-- /wrapper -->
+</body>
+</html>

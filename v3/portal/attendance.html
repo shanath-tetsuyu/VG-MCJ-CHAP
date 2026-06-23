@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARES — MJ Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#13795B;--gm:#1D9E75;--gl:#E8F7F2;--gb:#9FE1CB;
+  --am:#C07A1A;--al:#FDF3E3;--ab:#F0C060;
+  --rm:#B03030;--rl:#FDF0F0;--rb:#F0AAAA;
+  --bm:#1A5FA8;--bl:#EBF3FD;--bb:#90BFED;
+  --pm:#6B21A8;--pl:#F5F0FF;--pb:#C4B5FD;
+  --ink:#1C1C1E;--ink2:#444;--ink3:#777;--ink4:#AAA;
+  --s:#fff;--bg:#F5F6F8;--bdr:#E4E4E4;--bdr2:#F0F0F0;
+  --r:10px;--rl2:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
+
+/* ── Shell ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:6px;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:600}
+.layout{flex:1;display:flex;overflow:hidden}
+.left-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.right-panel{width:298px;border-left:1px solid var(--bdr);background:var(--s);overflow-y:auto;flex-shrink:0}
+
+/* ── Cards ── */
+.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;position:relative}
+.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ci-g{background:var(--gl)}.ci-b{background:var(--bl)}.ci-a{background:var(--al)}.ci-p{background:var(--pl)}
+.card-label{font-size:12px;font-weight:600;color:var(--ink2);flex:1}
+
+/* ── KPI row ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kpi-box{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:14px 16px}
+.kpi-n{font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.5px}
+.kpi-l{font-size:11px;color:var(--ink4);margin-top:4px;line-height:1.35}
+.kpi-sub{font-size:10px;font-weight:600;margin-top:8px;padding:2px 7px;border-radius:20px;display:inline-block}
+.k-act .kpi-n{color:var(--g)}.k-act .kpi-sub{background:var(--gl);color:var(--g)}
+.k-trn .kpi-n{color:var(--bm)}.k-trn .kpi-sub{background:var(--bl);color:var(--bm)}
+.k-sus .kpi-n{color:var(--am)}.k-sus .kpi-sub{background:var(--al);color:var(--am)}
+.k-blk .kpi-n{color:var(--rm)}.k-blk .kpi-sub{background:var(--rl);color:var(--rm)}
+.k-eng .kpi-n{color:var(--ink)}.k-eng .kpi-sub{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
+
+/* ── Popovers ── */
+.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1}
+.br-btn:hover,.br-btn.active{background:var(--bm);color:#fff}
+.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background .15s;font-family:'DM Sans',sans-serif;line-height:1}
+.q-btn:hover,.q-btn.active{background:var(--rm);color:#fff}
+.pop{display:none;position:absolute;z-index:400;width:290px;border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:12px;line-height:1.6;top:calc(100% + 6px);left:0}
+.pop.right{left:auto;right:0}.pop.on{display:block}
+.pop-info{background:var(--ink);color:#fff}
+.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pop-info .pop-title::before{content:'⚙';font-size:12px}
+.pop-info .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5}
+.pop-info .pr:last-child{margin-bottom:0}
+.pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.pd-g{background:var(--gm)}.pd-a{background:#F0C060}.pd-r{background:#F0AAAA}.pd-q{background:#F0AAAA}
+.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,.3)}
+.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pop-q .pop-title::before{content:'?';font-size:12px;color:var(--rb)}
+.pop-q .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;color:#FFD0D0}
+.pop-q .pr:last-child{margin-bottom:0}
+.pop-q .note{font-size:10px;color:rgba(255,200,200,.45);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,.15)}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.filter-bar select,.filter-bar input[type=text]{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;transition:border-color .15s}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--gm);background:var(--s)}
+.btn-clear{font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 11px;border:1px solid var(--bdr);border-radius:7px;background:var(--s);color:var(--ink3);cursor:pointer}
+.btn-clear:hover{background:var(--bg)}
+.btn-add-mj{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border:none;border-radius:8px;background:var(--g);color:#fff;cursor:pointer;white-space:nowrap}
+.btn-add-mj:hover{background:#0A5C46}
+
+/* ── Badges & Pills ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.b-active{background:var(--gl);color:var(--g)}
+.b-training{background:var(--bl);color:var(--bm)}
+.b-screening{background:#E8E8ED;color:#555}
+.b-suspended{background:var(--al);color:var(--am)}
+.b-blacklisted{background:var(--rl);color:var(--rm)}
+.b-withdrawn{background:#E8E8ED;color:#555}
+.b-terminated{background:#E8E8ED;color:#333}
+
+/* MJ Type pills */
+.type-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.tp-mj{background:var(--bl);color:var(--bm)}
+.tp-sr{background:var(--gl);color:var(--g)}
+.tp-vol{background:var(--pl);color:var(--pm)}
+.tp-svr{background:var(--al);color:var(--am)}
+
+/* No-show chips */
+.ns-zero{font-size:11px;color:var(--ink4)}
+.ns-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.ns-low{background:var(--al);color:var(--am)}
+.ns-high{background:var(--rl);color:var(--rm)}
+
+/* Role chips */
+.role-chip{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:20px;font-size:10px;font-weight:600;background:var(--gl);color:var(--g);margin:1px}
+.role-chip-none{font-size:11px;color:var(--ink4);font-style:italic}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-size:11px;font-weight:600;color:var(--ink4);text-align:left;padding:6px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.03em}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.st{display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-g{background:var(--gm)} .d-a{background:#EF9F27} .d-n{background:#DDD}
+
+/* ── Right panel ── */
+.rp{padding:14px 15px}
+.rp-title{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;margin-top:14px}
+.rp-title:first-child{margin-top:4px}
+.flag-item{background:var(--rl);border:1px solid var(--rb);border-radius:9px;padding:9px 11px;margin-bottom:6px}
+.flag-name{font-size:11px;font-weight:600;color:var(--rm);margin-bottom:2px}
+.flag-meta{font-size:10px;color:var(--rm);opacity:.8;line-height:1.4}
+.rule-card{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;display:flex;gap:8px;margin-bottom:6px}
+.rc-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.rc-title{font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:1px}
+.rc-text{font-size:11px;color:var(--ink4);line-height:1.4}
+.rc-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:2px}
+.rt-s{background:var(--bl);color:var(--bm)}.rt-b{background:var(--gl);color:var(--g)}
+.rt-o{background:var(--al);color:var(--am)}.rt-q{background:var(--rl);color:var(--rm)}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:500;display:flex;align-items:center;justify-content:center}
+.modal-box{background:var(--s);border-radius:var(--rl2);width:620px;max-width:94vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px}
+.modal-head-title{font-size:14px;font-weight:600;flex:1}
+.modal-close{background:none;border:1px solid var(--bdr);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:var(--ink3);font-family:'DM Sans',sans-serif}
+.modal-body{flex:1;overflow-y:auto;padding:18px 20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--bdr);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.m-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.m-info-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.m-info-box{background:var(--bg);border-radius:var(--r);padding:10px 12px}
+.m-info-label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.m-info-val{font-size:13px;font-weight:500;color:var(--ink)}
+.sect-title{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;margin-top:16px}
+.sect-title:first-child{margin-top:0}
+.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5;margin-bottom:12px}
+.bn-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb)}
+.bn-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
+.bn-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb)}
+.btn-primary{background:var(--g);color:#fff;border:none;border-radius:var(--r);padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-primary:hover{background:#0A5C46}
+.btn-danger{background:var(--rm);color:#fff;border:none;border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-ghost{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:8px 14px;font-size:13px;color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── OJT role table inside modal ── */
+.ojt-tbl{width:100%;border-collapse:collapse}
+.ojt-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;border-bottom:1px solid var(--bdr);text-align:left}
+.ojt-tbl td{font-size:12px;padding:8px 10px;border-bottom:1px solid var(--bdr2);color:var(--ink2);vertical-align:middle}
+.ojt-tbl tr:last-child td{border-bottom:none}
+.pill-stat{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.ps-na{background:#E8E8ED;color:#777}
+.ps-pend{background:var(--al);color:var(--am)}
+.ps-sched{background:var(--bl);color:var(--bm)}
+.ps-prog{background:var(--pl);color:var(--pm)}
+.ps-done{background:var(--gl);color:var(--g)}
+.elig-yes{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;background:var(--gl);color:var(--g)}
+.elig-no{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;background:#E8E8ED;color:#777}
+
+/* ── Status change modal ── */
+.status-select{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;width:100%;margin-top:8px}
+.status-select:focus{border-color:var(--gm);background:var(--s)}
+.ack-box{margin-top:12px;padding:12px;background:var(--al);border:1px solid var(--ab);border-radius:var(--r);display:none}
+.ack-box label{font-size:12px;color:var(--am);display:flex;gap:8px;align-items:flex-start;cursor:pointer;line-height:1.5}
+.ack-box input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--am)}
+
+/* ── Job history rows ── */
+.hist-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;margin-bottom:5px}
+.hist-type{font-size:10px;font-weight:600;flex-shrink:0;width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-date{font-size:11px;color:var(--ink4);flex:1}
+.hist-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.hb-comp{background:var(--gl);color:var(--g)}
+.hb-can{background:var(--rl);color:var(--rm)}
+.hb-ns{background:var(--al);color:var(--am)}
+</style>
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- V2 Sidebar CSS -->
+  <link rel="stylesheet" href="../portal/index.css">
+  <style>
+    body { display: block !important; }
+    #wrapper { display: flex; height: 100vh; }
+    #sidebar { background-color: #6B21A8 !important; flex-shrink: 0; }
+    #page-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════════════════════ -->
+<div class="d-flex" id="wrapper">
+
+<nav id="sidebar" class="sidebar d-flex flex-column">
+  <div class="sidebar-profile p-3 text-center">
+    <div class="sidebar-avatar mx-auto mb-2">
+      <i class="bi bi-person-fill fs-3 text-white"></i>
+    </div>
+    <div class="sidebar-username text-white fw-semibold small">John David</div>
+    <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+      Admin
+      <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+    </div>
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-1">
+    <li class="nav-item">
+      <a class="nav-link sidebar-link" href="./index.html">
+        <i class="bi bi-grid-fill me-2"></i>Dashboard
+      </a>
+    </li>
+    <ul class="nav flex-column sidebar">
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./attendance.html">Attendance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./settings.html">Settings</a></li>
+    </ul>
+  </ul>
+</nav>
+
+<div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar"><button id="sidebarToggle" class="btn btn-sm me-2" type="button" style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8"><i class="bi bi-list fs-5"></i></button>
+    <div class="topbar-title">Attendance</div>
+    <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
+    <span style="font-size:12px;color:var(--ink3)">AAC — Volunteer Group SCC</span>
+    <span style="margin-left:auto;font-size:12px;color:var(--ink4)">18 May 2026</span>
+  </div>
+
+  <div class="layout">
+
+    <!-- ── LEFT SCROLL ── -->
+    <div class="left-scroll">
+      <!-- MJ Registry Table -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ci-g"></div>
+          <div class="card-label">Attendance</div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <label>MicroJobber</label>
+          <input type="text" id="fSearch" placeholder="Search name" oninput="applyFilters()" style="width:190px">
+          <label>From</label>
+          <input type="date" id="attFrom" onchange="filterAttendance()">
+          <label>To</label>
+          <input type="date" id="attTo" onchange="filterAttendance()">
+          <button class="btn-clear" onclick="clearFilters()">Clear</button>
+          <button class="btn-add-mj" style="margin-left: auto;">Export to Excel</button>
+        </div>
+
+        <div style="overflow-x:auto">
+            <table class="tbl" id="attTbl">
+            <thead>
+                <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Duration</th>
+                <th>Location</th>
+                <th>Job ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-date="2026-05-03" data-jobid="mj-2026-037">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Tan Siew Ling</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">3 May 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">14:02</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">16:10</span></td>
+                <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
+                <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
+                </tr>
+                <tr data-date="2026-04-22" data-jobid="mj-2026-029">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Tan Siew Ling</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">10:05</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:08</span></td>
+                <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
+                <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
+                </tr>
+                <tr data-date="2026-04-02" data-jobid="mj-2026-018">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Lim Wei Jie</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:58</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">10:55</span></td>
+                <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
+                <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
+                </tr>
+                <tr data-date="2026-03-10" data-jobid="mj-2026-009">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Goh Lee Min</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">13:01</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">15:05</span></td>
+                <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
+                <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
+                </tr>
+                <tr data-date="2026-02-14" data-jobid="mj-2026-004">
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">Chia Rui En</td>
+                <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:55</span></td>
+                <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:10</span></td>
+                <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
+                <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
+                <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+
+        <div class="dt-bottom">
+          <div id="dt-info" class="dataTables_info"></div>
+          <div id="dt-pag"></div>
+        </div>
+
+      </div>
+
+    </div><!-- /left-scroll -->
+
+  </div><!-- /layout -->
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MJ QUICK-VIEW MODAL
+════════════════════════════════════════════════════════════════════ -->
+<div id="mjModal" class="modal-overlay" style="display:none" onclick="handleOverlayClick(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="card-icon ci-g" style="font-size:16px"></div>
+      <div class="modal-head-title" id="modal-title">MJ Profile</div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <a href="./proto2_v3_mj_profile.html"><button class="btn-primary">Open Full Profile →</button></a>
+      <button class="btn-ghost" id="btn-status" onclick="openStatusChange()">Change Status</button>
+      <button class="btn-ghost" style="margin-left:auto" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STATUS CHANGE MODAL
+════════════════════════════════════════════════════════════════════ -->
+<div id="statusModal" class="modal-overlay" style="display:none" onclick="handleStatusOverlayClick(event)">
+  <div class="modal-box" style="width:420px;max-height:420px" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="card-icon ci-a" style="font-size:16px"></div>
+      <div class="modal-head-title" id="status-modal-title">Change MJ Status</div>
+      <button class="modal-close" onclick="closeStatusModal()">✕ Close</button>
+    </div>
+    <div class="modal-body" id="status-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="confirmStatusChange()">Confirm Change</button>
+      <button class="btn-ghost" onclick="closeStatusModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════════ -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+
+/* ══ Mock data ══════════════════════════════════════════════════════ */
+const MJ_DATA = [
+  {
+    id:'MJ-0001', name:'Ahmad Razif bin Ismail', gender:'M',
+    type:'Pure MJ', status:'Active',
+    language:'English, Malay', district:'40',
+    ojt:{chaperone:'Completed', befriending:'Completed', homeAssessment:'In Progress', centreAssistant:'Pending'},
+    noshow:0, lastActive:'16 May 2026', joined:'Jan 2025',
+    jobs:{completed:18, cancelled:1, pending:1},
+    phone:'9xxx xxxx', email:'a.razif@email.com',
+    notes:'Reliable; preferred for Queenstown corridor. Speaks Malay fluently.'
+  },
+  {
+    id:'MJ-0002', name:'Fatimah bte Ali', gender:'F',
+    type:'MJ + Senior', status:'Active',
+    language:'Malay, English', district:'26',
+    ojt:{chaperone:'Completed', befriending:'Scheduled', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:1, lastActive:'15 May 2026', joined:'Mar 2025',
+    jobs:{completed:9, cancelled:1, pending:0},
+    phone:'8xxx xxxx', email:'fatimah.ali@email.com',
+    notes:'Senior MJ. Counts toward AAC Senior KPI.'
+  },
+  {
+    id:'MJ-0003', name:'Susan Lim Bee Lian', gender:'F',
+    type:'MJ + Volunteer', status:'Active',
+    language:'English, Mandarin', district:'12',
+    ojt:{chaperone:'In Progress', befriending:'Completed', homeAssessment:'Pending', centreAssistant:'Completed'},
+    noshow:0, lastActive:'14 May 2026', joined:'Feb 2025',
+    jobs:{completed:14, cancelled:0, pending:2},
+    phone:'9xxx xxxx', email:'susan.lim@email.com',
+    notes:'Volunteer MJ. Counts toward Volunteer KPI.'
+  },
+  {
+    id:'MJ-0004', name:'Ravi Kumar s/o Gopal', gender:'M',
+    type:'Pure MJ', status:'Active',
+    language:'English, Tamil', district:'11',
+    ojt:{chaperone:'Completed', befriending:'Completed', homeAssessment:'Completed', centreAssistant:'Completed'},
+    noshow:0, lastActive:'13 May 2026', joined:'Nov 2024',
+    jobs:{completed:31, cancelled:2, pending:1},
+    phone:'9xxx xxxx', email:'ravi.kumar@email.com',
+    notes:'Most experienced MJ. Eligible for all 4 service roles.'
+  },
+  {
+    id:'MJ-0005', name:'Grace Chua Siew Ling', gender:'F',
+    type:'MJ + Senior', status:'Active',
+    language:'English, Mandarin, Hokkien', district:'59',
+    ojt:{chaperone:'Pending', befriending:'Completed', homeAssessment:'NA', centreAssistant:'Scheduled'},
+    noshow:2, lastActive:'12 May 2026', joined:'Apr 2025',
+    jobs:{completed:6, cancelled:2, pending:0},
+    phone:'8xxx xxxx', email:'grace.chua@email.com',
+    notes:'⚠ 2 no-shows recorded. 1 more will trigger auto-blacklist flag.'
+  },
+  {
+    id:'MJ-0006', name:'Lily Tan Ah Mooi', gender:'F',
+    type:'MJ + Vol + Senior', status:'Active',
+    language:'English, Malay, Cantonese', district:'12',
+    ojt:{chaperone:'Completed', befriending:'In Progress', homeAssessment:'Pending', centreAssistant:'Completed'},
+    noshow:0, lastActive:'10 May 2026', joined:'Sep 2024',
+    jobs:{completed:22, cancelled:1, pending:0},
+    phone:'9xxx xxxx', email:'lily.tan@email.com',
+    notes:'Triple classification. Counts toward Senior and Volunteer KPIs.'
+  },
+  {
+    id:'MJ-0007', name:'Ramesh Kumar s/o Subramaniam', gender:'M',
+    type:'Pure MJ', status:'Training',
+    language:'English, Tamil', district:'55',
+    ojt:{chaperone:'Pending', befriending:'Pending', homeAssessment:'NA', centreAssistant:'Pending'},
+    noshow:0, lastActive:'—', joined:'May 2026',
+    jobs:{completed:0, cancelled:0, pending:0},
+    phone:'8xxx xxxx', email:'ramesh.k@email.com',
+    notes:'Newly onboarded. All roles pending OJT.'
+  },
+  {
+    id:'MJ-0008', name:'Chan Wai Leng', gender:'F',
+    type:'MJ + Senior', status:'Training',
+    language:'Mandarin, English', district:'30',
+    ojt:{chaperone:'Completed', befriending:'Scheduled', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:0, lastActive:'9 May 2026', joined:'Apr 2026',
+    jobs:{completed:1, cancelled:0, pending:0},
+    phone:'9xxx xxxx', email:'chan.wl@email.com',
+    notes:'Chaperone OJT completed. Eligible for Chaperone only.'
+  },
+  {
+    id:'MJ-0009', name:'Priya Nair d/o Krishnan', gender:'F',
+    type:'Pure MJ', status:'Suspended',
+    language:'English, Tamil', district:'31',
+    ojt:{chaperone:'Pending', befriending:'Completed', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:1, lastActive:'2 May 2026', joined:'Jun 2024',
+    jobs:{completed:7, cancelled:3, pending:0},
+    phone:'9xxx xxxx', email:'priya.nair@email.com',
+    notes:'Suspended 5 May 2026 by AAC staff. Pending review.'
+  },
+  {
+    id:'MJ-0010', name:'Abdul Halim bin Rahman', gender:'M',
+    type:'MJ + Volunteer', status:'Active',
+    language:'Malay, English', district:'15',
+    ojt:{chaperone:'In Progress', befriending:'Scheduled', homeAssessment:'Completed', centreAssistant:'In Progress'},
+    noshow:0, lastActive:'8 May 2026', joined:'Aug 2024',
+    jobs:{completed:11, cancelled:0, pending:1},
+    phone:'9xxx xxxx', email:'abdul.halim@email.com',
+    notes:'Volunteer MJ. Home Assessment eligible.'
+  },
+  {
+    id:'MJ-0011', name:'Ng Bee Hoon', gender:'F',
+    type:'MJ + Senior', status:'Active',
+    language:'Mandarin, Hokkien', district:'52',
+    ojt:{chaperone:'Completed', befriending:'Completed', homeAssessment:'NA', centreAssistant:'Scheduled'},
+    noshow:3, lastActive:'7 May 2026', joined:'Oct 2024',
+    jobs:{completed:13, cancelled:4, pending:0},
+    phone:'9xxx xxxx', email:'ng.beehoon@email.com',
+    notes:'🚨 Auto-blacklist flag active (3 no-shows). Pending staff review and blacklist confirmation.'
+  },
+  {
+    id:'MJ-0012', name:'David Teo Beng Kee', gender:'M',
+    type:'Pure MJ', status:'Blacklisted',
+    language:'English, Mandarin', district:'22',
+    ojt:{chaperone:'Completed', befriending:'NA', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:4, lastActive:'1 Apr 2026', joined:'Jan 2024',
+    jobs:{completed:8, cancelled:5, pending:0},
+    phone:'9xxx xxxx', email:'david.teo@email.com',
+    notes:'Blacklisted 10 Apr 2026 after 4 consecutive no-shows. C4Me access revoked. Staff must remove flag before reactivation.'
+  },
+  {
+    id:'MJ-0013', name:'Aminah bte Yusof', gender:'F',
+    type:'MJ + Vol + Senior', status:'Active',
+    language:'Malay, English', district:'68',
+    ojt:{chaperone:'Scheduled', befriending:'Completed', homeAssessment:'NA', centreAssistant:'Completed'},
+    noshow:0, lastActive:'18 May 2026', joined:'Jul 2024',
+    jobs:{completed:19, cancelled:1, pending:2},
+    phone:'8xxx xxxx', email:'aminah.yusof@email.com',
+    notes:'Triple classification. Highly engaged.'
+  },
+  {
+    id:'MJ-0014', name:'Wong Kah Meng', gender:'M',
+    type:'Pure MJ', status:'Screening',
+    language:'Mandarin, English', district:'47',
+    ojt:{chaperone:'NA', befriending:'NA', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:0, lastActive:'—', joined:'May 2026',
+    jobs:{completed:0, cancelled:0, pending:0},
+    phone:'8xxx xxxx', email:'wong.km@email.com',
+    notes:'Pre-screening in progress. Offline interview pending.'
+  },
+  {
+    id:'MJ-0015', name:'Siti Rohani bte Mahdi', gender:'F',
+    type:'MJ + Senior', status:'Active',
+    language:'Malay, English', district:'20',
+    ojt:{chaperone:'Completed', befriending:'Scheduled', homeAssessment:'Completed', centreAssistant:'NA'},
+    noshow:1, lastActive:'16 May 2026', joined:'Dec 2024',
+    jobs:{completed:16, cancelled:1, pending:1},
+    phone:'9xxx xxxx', email:'siti.rohani@email.com',
+    notes:'Eligible for Chaperone and Home Assessment.'
+  },
+  {
+    id:'MJ-0016', name:'Lim Soo Bee', gender:'F',
+    type:'Pure MJ', status:'Withdrawn',
+    language:'English, Hokkien', district:'31',
+    ojt:{chaperone:'NA', befriending:'Completed', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:0, lastActive:'15 Apr 2026', joined:'Mar 2024',
+    jobs:{completed:12, cancelled:1, pending:0},
+    phone:'—', email:'—',
+    notes:'Withdrawn 20 Apr 2026. Offline acknowledgement obtained. Terminal status — no reactivation.'
+  },
+  {
+    id:'MJ-0017', name:'Selvam s/o Raju', gender:'M',
+    type:'MJ + Volunteer', status:'Active',
+    language:'English, Tamil, Malay', district:'57',
+    ojt:{chaperone:'Completed', befriending:'Completed', homeAssessment:'Completed', centreAssistant:'In Progress'},
+    noshow:0, lastActive:'17 May 2026', joined:'Feb 2024',
+    jobs:{completed:28, cancelled:0, pending:2},
+    phone:'9xxx xxxx', email:'selvam.raju@email.com',
+    notes:'Eligible for 3 roles. Centre Assistant OJT in progress.'
+  },
+  {
+    id:'MJ-0018', name:'Sarah Tan Hui Xian', gender:'F',
+    type:'Pure MJ', status:'Training',
+    language:'English, Mandarin', district:'19',
+    ojt:{chaperone:'Scheduled', befriending:'Pending', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:0, lastActive:'—', joined:'Apr 2026',
+    jobs:{completed:0, cancelled:0, pending:0},
+    phone:'9xxx xxxx', email:'sarah.tan@email.com',
+    notes:'OJT scheduled for Chaperone in June.'
+  },
+  {
+    id:'MJ-0019', name:'Gopalan s/o Rajan', gender:'M',
+    type:'MJ + Senior', status:'Active',
+    language:'Tamil, English', district:'65',
+    ojt:{chaperone:'Scheduled', befriending:'NA', homeAssessment:'NA', centreAssistant:'Completed'},
+    noshow:2, lastActive:'15 May 2026', joined:'Nov 2024',
+    jobs:{completed:10, cancelled:2, pending:1},
+    phone:'9xxx xxxx', email:'gopalan.rajan@email.com',
+    notes:'⚠ 2 no-shows. 1 more triggers auto-flag. Centre Assistant eligible.'
+  },
+  {
+    id:'MJ-0020', name:'Lee Ah Kow', gender:'M',
+    type:'Pure MJ', status:'Terminated',
+    language:'Mandarin, English', district:'27',
+    ojt:{chaperone:'Completed', befriending:'Completed', homeAssessment:'NA', centreAssistant:'NA'},
+    noshow:1, lastActive:'10 Mar 2026', joined:'Aug 2023',
+    jobs:{completed:24, cancelled:3, pending:0},
+    phone:'—', email:'—',
+    notes:'Terminated 15 Mar 2026. Offline acknowledgement obtained. Terminal status — no reactivation.'
+  },
+];
+
+const HIST_DATA = {
+  'MJ-0001': [{type:'🤝 Chaperone', date:'16 May', s:'Completed'},{type:'💬 Befriending', date:'14 May', s:'Completed'},{type:'🤝 Chaperone', date:'10 May', s:'Completed'},{type:'💬 Befriending', date:'7 May', s:'No-show (client)'}],
+  'MJ-0002': [{type:'🤝 Chaperone', date:'15 May', s:'Completed'},{type:'🤝 Chaperone', date:'8 May', s:'Completed'},{type:'🤝 Chaperone', date:'1 May', s:'No-show (MJ)'}],
+  'MJ-0004': [{type:'🏠 Home Assess.', date:'13 May', s:'Completed'},{type:'🤝 Chaperone', date:'12 May', s:'Completed'},{type:'💬 Befriending', date:'10 May', s:'Completed'},{type:'🏠 Home Assess.', date:'7 May', s:'Completed'}],
+  'MJ-0005': [{type:'💬 Befriending', date:'12 May', s:'Completed'},{type:'💬 Befriending', date:'30 Apr', s:'No-show (MJ)'},{type:'💬 Befriending', date:'22 Apr', s:'No-show (MJ)'}],
+  'MJ-0011': [{type:'🤝 Chaperone', date:'7 May', s:'Completed'},{type:'💬 Befriending', date:'3 May', s:'No-show (MJ)'},{type:'🤝 Chaperone', date:'28 Apr', s:'No-show (MJ)'},{type:'💬 Befriending', date:'20 Apr', s:'No-show (MJ)'}],
+};
+
+/* ══ Build role chips ════════════════════════════════════════════ */
+const ROLE_LABELS = {chaperone:'Chaperone', befriending:'Befriending', homeAssessment:'Home Assess.', centreAssistant:'Ctr. Assist.'};
+
+function eligibleRoles(mj) {
+  var roles = [];
+  Object.keys(mj.ojt).forEach(function(k){ if(mj.ojt[k]==='Completed') roles.push(ROLE_LABELS[k]); });
+  return roles;
+}
+
+function rolesHtml(mj) {
+  var roles = eligibleRoles(mj);
+  if (!roles.length) return '<span class="role-chip-none">None yet</span>';
+  return roles.map(function(r){ return '<span class="role-chip">✓ '+r+'</span>'; }).join('');
+}
+
+function rolesText(mj) {
+  return eligibleRoles(mj).join(', ') || 'None';
+}
+
+/* ══ Type pill ═══════════════════════════════════════════════════ */
+const TYPE_CLASS = {'Pure MJ':'tp-mj','MJ + Senior':'tp-sr','MJ + Volunteer':'tp-vol','MJ + Vol + Senior':'tp-svr'};
+const TYPE_ICON  = {'Pure MJ':'💼','MJ + Senior':'🧓','MJ + Volunteer':'🤲','MJ + Vol + Senior':'🌟'};
+
+/* ══ Status badge ════════════════════════════════════════════════ */
+const STAT_HTML = {
+  'Active':     '<span class="badge b-active">● Active</span>',
+  'Training':   '<span class="badge b-training">◌ Training</span>',
+  'Screening':  '<span class="badge b-screening">◌ Screening</span>',
+  'Suspended':  '<span class="badge b-suspended">⏸ Suspended</span>',
+  'Blacklisted':'<span class="badge b-blacklisted">✕ Blacklisted</span>',
+  'Withdrawn':  '<span class="badge b-withdrawn">— Withdrawn</span>',
+  'Terminated': '<span class="badge b-terminated">— Terminated</span>',
+};
+
+/* ══ No-show display ══════════════════════════════════════════════ */
+function noshowHtml(n) {
+  if (n === 0) return '<span class="ns-zero">—</span>';
+  if (n >= 3)  return '<span class="ns-chip ns-high">🚨 ' + n + '</span>';
+  return '<span class="ns-chip ns-low">⚠ ' + n + '</span>';
+}
+
+/* ══ DataTable ════════════════════════════════════════════════════ */
+var dt;
+$(document).ready(function() {
+  var rows = MJ_DATA.map(function(m) {
+    var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + TYPE_ICON[m.type] + ' ' + m.type + '</span>';
+    return [
+      '<span class="mj-id-cell">' + m.id + '</span>',
+      '<div class="mj-name-cell">' + m.name + '</div><div class="mj-meta">' + m.language + ' · ' + m.gender + '</div>',
+      typePill,
+      STAT_HTML[m.status] || m.status,
+      rolesHtml(m),
+      'District ' + m.district,
+      noshowHtml(m.noshow),
+      m.lastActive,
+      '<button class="btn-view" onclick="openModal(\'' + m.id + '\')">View →</button>',
+    ];
+  });
+
+  dt = $('#mjTable').DataTable({
+    data: rows,
+    columns: [
+      {title:'MJ ID'},
+      {title:'Name'},
+      {title:'MJ Type', orderable:false},
+      {title:'Status',  orderable:false},
+      {title:'OJT-Eligible Roles', orderable:false},
+      {title:'District'},
+      {title:'No-shows'},
+      {title:'Last active'},
+      {title:'Actions', orderable:false},
+    ],
+    pageLength: 10,
+    order: [[0,'asc']],
+    dom: 't<"dt-pg-wrap"ip>',
+    language: {
+      info: 'Showing _START_–_END_ of _TOTAL_ MJs',
+      infoFiltered: '(filtered from _MAX_)',
+      paginate: {previous:'‹ Prev', next:'Next ›'},
+    },
+    drawCallback: function() {
+      var api = this.api(), pi = api.page.info();
+      var info = 'Showing ' + (pi.start+1) + '–' + pi.end + ' of ' + pi.recordsDisplay + ' MJs';
+      if (pi.recordsDisplay < pi.recordsTotal) info += ' (filtered from ' + pi.recordsTotal + ')';
+      document.getElementById('dt-info').textContent = info;
+      var pgSrc = document.querySelector('.dt-pg-wrap .dataTables_paginate');
+      var pgDst = document.getElementById('dt-pag');
+      if (pgSrc && pgDst) { pgDst.innerHTML = pgSrc.innerHTML; pgSrc.style.display='none'; }
+    },
+  });
+});
+
+/* ══ Custom filters ═══════════════════════════════════════════════ */
+$.fn.dataTable.ext.search.push(function(settings, data, idx) {
+  var m = MJ_DATA[idx]; if(!m) return true;
+  var fStat = document.getElementById('fStatus').value;
+  var fType = document.getElementById('fType').value;
+  var fRole = document.getElementById('fRole').value;
+  var fSrch = document.getElementById('fSearch').value.toLowerCase().trim();
+  if (fStat && m.status !== fStat) return false;
+  if (fType && m.type !== fType) return false;
+  if (fRole) {
+    var roleMap = {'Chaperone':'chaperone','Befriending':'befriending','Home Assessment':'homeAssessment','Centre Assistant':'centreAssistant'};
+    var key = roleMap[fRole];
+    if (!key || m.ojt[key] !== 'Completed') return false;
+  }
+  if (fSrch) {
+    var hay = (m.id + ' ' + m.name + ' ' + m.district + ' ' + m.language + ' ' + m.type).toLowerCase();
+    if (hay.indexOf(fSrch) === -1) return false;
+  }
+  return true;
+});
+
+function applyFilters() { if(dt) dt.draw(); }
+function clearFilters() {
+  ['fStatus','fType','fRole'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('fSearch').value = '';
+  if(dt) dt.draw();
+}
+
+/* ══ Popover ══════════════════════════════════════════════════════ */
+var activePop = null;
+function togglePop(id, btn) {
+  var pop = document.getElementById(id);
+  if (!pop) return;
+  if (activePop && activePop !== pop) {
+    activePop.classList.remove('on');
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+  }
+  var isOn = pop.classList.contains('on');
+  pop.classList.toggle('on', !isOn);
+  btn.classList.toggle('active', !isOn);
+  activePop = isOn ? null : pop;
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
+    document.querySelectorAll('.pop.on').forEach(function(p){p.classList.remove('on');});
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+    activePop = null;
+  }
+});
+
+/* ══ Modal ════════════════════════════════════════════════════════ */
+var currentMjId = null;
+
+function openModal(mjId) {
+  var m = MJ_DATA.find(function(x){return x.id===mjId;});
+  if (!m) return;
+  currentMjId = mjId;
+
+  document.getElementById('modal-title').textContent = m.id + ' — ' + m.name;
+
+  /* Banner */
+  var banner = '';
+  if (m.noshow >= 3)
+    banner = '<div class="banner bn-r">🚨 <div><strong>Auto-blacklist flag active:</strong> ' + m.noshow + ' no-shows recorded. Staff must review and confirm blacklist, or clear the flag if reason is valid.</div></div>';
+  else if (m.noshow === 2)
+    banner = '<div class="banner bn-a">⚠️ <div><strong>Approaching threshold:</strong> 2 no-shows recorded. 1 more will trigger auto-blacklist flag. Monitor closely.</div></div>';
+  else if (m.status === 'Blacklisted')
+    banner = '<div class="banner bn-r">✕ <div><strong>Blacklisted:</strong> No new task assignments permitted. Remove flag manually to reactivate.</div></div>';
+  else if (m.status === 'Suspended')
+    banner = '<div class="banner bn-a">⏸ <div><strong>Suspended:</strong> Temporarily cannot be assigned. C4Me access should be revoked. Review and reactivate when appropriate.</div></div>';
+  else if (m.status === 'Withdrawn' || m.status === 'Terminated')
+    banner = '<div class="banner" style="background:#E8E8ED;color:#444;border:1px solid #D0D0D0">— <div><strong>' + m.status + ':</strong> Terminal status. No reactivation permitted. Records retained for audit.</div></div>';
+
+  /* Info grid */
+  var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + TYPE_ICON[m.type] + ' ' + m.type + '</span>';
+  var grid = '<div class="m-info-grid">' +
+    '<div class="m-info-box"><div class="m-info-label">Status</div><div class="m-info-val" style="margin-top:2px">' + (STAT_HTML[m.status]||m.status) + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">MJ Type</div><div class="m-info-val" style="margin-top:2px">' + typePill + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Joined</div><div class="m-info-val">' + m.joined + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Language(s)</div><div class="m-info-val">' + m.language + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Service district</div><div class="m-info-val">District ' + m.district + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Contact</div><div class="m-info-val">' + m.phone + '</div></div>' +
+    '</div>';
+
+  /* Jobs summary */
+  var jobSummary = '<div class="m-info-grid">' +
+    '<div class="m-info-box"><div class="m-info-label">Completed</div><div class="m-info-val" style="color:var(--g)">' + m.jobs.completed + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">Cancelled</div><div class="m-info-val" style="color:var(--rm)">' + m.jobs.cancelled + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">No-shows</div><div class="m-info-val" style="color:' + (m.noshow>=3?'var(--rm)':m.noshow>=1?'var(--am)':'var(--ink4)') + '">' + m.noshow + (m.noshow>=3?' 🚨':m.noshow>=2?' ⚠':'') + '</div></div>' +
+    '</div>';
+
+  /* OJT table */
+  var ojtRows = [
+    {label:'🤝 Chaperone',       key:'chaperone'},
+    {label:'💬 Befriending',     key:'befriending'},
+    {label:'🏠 Home Assessment', key:'homeAssessment'},
+    {label:'🏛 Centre Assistant',key:'centreAssistant'},
+  ];
+  var ojtHtml = '<div class="sect-title">Training &amp; OJT Eligibility</div><table class="ojt-tbl"><thead><tr><th>Service Role</th><th>OJT Status</th><th>Eligible</th></tr></thead><tbody>';
+  ojtRows.forEach(function(r) {
+    var stat = m.ojt[r.key];
+    var cls = {NA:'ps-na',Pending:'ps-pend',Scheduled:'ps-sched','In Progress':'ps-prog',Completed:'ps-done'}[stat]||'ps-na';
+    var elig = stat==='Completed' ? '<span class="elig-yes">✓ Yes</span>' : '<span class="elig-no">✕ No</span>';
+    ojtHtml += '<tr><td>' + r.label + '</td><td><span class="pill-stat ' + cls + '">' + stat + '</span></td><td>' + elig + '</td></tr>';
+  });
+  ojtHtml += '</tbody></table>';
+
+  /* History */
+  var hist = HIST_DATA[mjId] || [];
+  var histHtml = '<div class="sect-title">Recent Job History</div>';
+  if (!hist.length) {
+    histHtml += '<div style="font-size:12px;color:var(--ink4);padding:8px 0">No job history recorded.</div>';
+  } else {
+    hist.forEach(function(h) {
+      var bc = h.s==='Completed'?'hb-comp':h.s.indexOf('No-show')===0?'hb-ns':'hb-can';
+      histHtml += '<div class="hist-row"><div class="hist-type">' + h.type + '</div><div class="hist-date">' + h.date + ' 2026</div><span class="hist-badge ' + bc + '">' + h.s + '</span></div>';
+    });
+  }
+
+  /* Notes */
+  var notesHtml = m.notes ? '<div class="sect-title">Staff Notes</div><div style="font-size:12px;color:var(--ink2);background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;line-height:1.6">' + m.notes + '</div>' : '';
+
+  document.getElementById('modal-body').innerHTML = banner + grid + '<div class="sect-title">Assignment History Summary</div>' + jobSummary + ojtHtml + histHtml + notesHtml;
+
+  var locked = m.status==='Withdrawn'||m.status==='Terminated';
+  document.getElementById('btn-status').disabled = locked;
+  document.getElementById('mjModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('mjModal').style.display = 'none';
+  currentMjId = null;
+}
+function handleOverlayClick(e) { if(e.target.id==='mjModal') closeModal(); }
+
+/* ══ Status Change ════════════════════════════════════════════════ */
+var ALLOWED_TRANSITIONS = {
+  'Screening':  ['Training'],
+  'Training':   ['Active','Screening'],
+  'Active':     ['Suspended','Withdrawn','Terminated','Blacklisted'],
+  'Suspended':  ['Active','Terminated','Blacklisted'],
+  'Blacklisted':['Active'],
+  'Withdrawn':  [],
+  'Terminated': [],
+};
+var NEEDS_ACK = ['Withdrawn','Terminated'];
+var NEEDS_REVOKE = ['Suspended','Terminated','Blacklisted'];
+
+function openStatusChange() {
+  var m = MJ_DATA.find(function(x){return x.id===currentMjId;});
+  if (!m) return;
+  var options = ALLOWED_TRANSITIONS[m.status] || [];
+
+  document.getElementById('status-modal-title').textContent = 'Change status — ' + m.name;
+
+  var optHtml = options.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+  var body = '<div style="font-size:12px;color:var(--ink3);margin-bottom:10px">Current status: ' + (STAT_HTML[m.status]||m.status) + '</div>';
+  if (!options.length) {
+    body += '<div class="banner bn-r">This status is terminal. No further transitions are permitted.</div>';
+  } else {
+    body += '<label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em">Change to</label>';
+    body += '<select class="status-select" id="newStatusSelect" onchange="onStatusSelectChange()">' +
+      '<option value="">— Select new status —</option>' + optHtml + '</select>';
+    body += '<div class="ack-box" id="ackBox">' +
+      '<label><input type="checkbox" id="ackCheck"> I confirm that <strong>offline acknowledgement has been obtained from the MJ</strong> before proceeding with this status change. <span style="opacity:.7">[Required for Withdrawn / Terminated — §4.4, M10]</span></label>' +
+      '</div>';
+    body += '<div id="revokeNote" style="display:none;margin-top:10px;padding:10px;background:var(--al);border:1px solid var(--ab);border-radius:var(--r);font-size:12px;color:var(--am)">⚠ This status change will <strong>revoke the MJ\'s C4Me access</strong>. They will no longer be able to view job listings or submit attendance until manually reactivated. [M7]</div>';
+  }
+
+  document.getElementById('status-modal-body').innerHTML = body;
+  document.getElementById('statusModal').style.display = 'flex';
+}
+
+function onStatusSelectChange() {
+  var val = document.getElementById('newStatusSelect').value;
+  var ackBox = document.getElementById('ackBox');
+  var revokeNote = document.getElementById('revokeNote');
+  if (ackBox) ackBox.style.display = NEEDS_ACK.indexOf(val) >= 0 ? 'block' : 'none';
+  if (revokeNote) revokeNote.style.display = NEEDS_REVOKE.indexOf(val) >= 0 ? 'block' : 'none';
+}
+
+function confirmStatusChange() {
+  var sel = document.getElementById('newStatusSelect');
+  if (!sel || !sel.value) { alert('Please select a new status.'); return; }
+  var newStat = sel.value;
+  if (NEEDS_ACK.indexOf(newStat) >= 0) {
+    var ack = document.getElementById('ackCheck');
+    if (!ack || !ack.checked) { alert('Please confirm offline acknowledgement has been obtained before proceeding.'); return; }
+  }
+  var m = MJ_DATA.find(function(x){return x.id===currentMjId;});
+  if (m) m.status = newStat;
+  alert('Status updated to "' + newStat + '". (Prototype: no backend call made.)');
+  closeStatusModal();
+  if (dt) dt.draw();
+}
+
+function closeStatusModal() { document.getElementById('statusModal').style.display = 'none'; }
+function handleStatusOverlayClick(e) { if(e.target.id==='statusModal') closeStatusModal(); }
+
+</script>
+</div><!-- end #page-content -->
+</div><!-- end #wrapper -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      var toggle = document.getElementById('sidebarToggle');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+        });
+      }
+      document.querySelectorAll('.sidebar-collapsible').forEach(function (t) {
+        var el = document.querySelector(t.getAttribute('data-bs-target'));
+        if (el) {
+          el.addEventListener('show.bs.collapse', function () {
+            t.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
+          });
+          el.addEventListener('hide.bs.collapse', function () {
+            t.querySelector('.collapse-icon').style.transform = 'rotate(0deg)';
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

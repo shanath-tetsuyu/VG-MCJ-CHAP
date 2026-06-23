@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARES — AIC Reporting</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./index.css">
+<style>
+/* ─── AIC Report — page-specific ─────────────────────────────── */
+
+/* KPI row (4 cols on desktop) */
+.kpi-row-rpt{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* Charts row */
+.charts-row{display:flex;gap:14px}
+.chart-card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:18px;position:relative}
+.chart-main{flex:3}
+.chart-side{flex:2;min-width:0}
+.chart-wrap{position:relative;height:220px}
+
+/* Role bar rows */
+.role-rows{margin-top:12px}
+.role-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.role-lbl{font-size:11px;font-weight:500;color:var(--ink2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-bar-wrap{flex:1;background:var(--bdr2);border-radius:4px;height:7px;overflow:hidden}
+.role-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.role-val{font-size:12px;font-weight:700;color:var(--ink);width:24px;text-align:right;flex-shrink:0}
+.role-pct{font-size:10px;color:var(--ink4);width:32px;text-align:right;flex-shrink:0}
+
+/* Legend */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Donut centre label */
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dc-num{font-size:22px;font-weight:700;color:var(--ink);line-height:1.1}
+.dc-lbl{font-size:10px;color:var(--ink4);text-align:center}
+
+/* Center detail table */
+.rpt-tbl{width:100%;border-collapse:collapse}
+.rpt-tbl thead th{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:2px solid var(--bdr);background:var(--s);white-space:nowrap;text-align:left}
+.rpt-tbl tbody tr{border-bottom:1px solid var(--bdr2);transition:background .1s}
+.rpt-tbl tbody tr:hover{background:#FAFBFC}
+.rpt-tbl tbody tr.tot-row{background:var(--gl)}
+.rpt-tbl td{font-size:12px;padding:9px 12px;color:var(--ink2);vertical-align:middle}
+.c-name{font-weight:600;color:var(--ink)}
+.n-cell{font-family:monospace;font-size:12px;text-align:right}
+.n-hl{font-weight:700;color:var(--g)}
+.n-warn{color:var(--am);font-weight:600}
+.pay-cell{font-family:monospace;font-size:12px;font-weight:600;color:var(--g);text-align:right}
+
+/* Period tabs */
+.period-tabs{display:flex;gap:4px}
+.ptab{font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 11px;border:1px solid var(--bdr);border-radius:20px;background:var(--s);color:var(--ink3);cursor:pointer;transition:all .15s}
+.ptab.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* Export btns */
+.btn-xls{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 13px;border:none;border-radius:8px;background:var(--g);color:#fff;cursor:pointer;width:100%;text-align:left}
+.btn-xls:hover{background:#0A5C46}
+.btn-xls-ghost{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 13px;border:1px solid var(--bdr);border-radius:8px;background:var(--s);color:var(--ink2);cursor:pointer;width:100%;text-align:left}
+.btn-xls-ghost:hover{background:var(--bg)}
+.export-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+
+/* Toast */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Mobile responsive ─────────────────────────────────────────── */
+@media (max-width:900px){
+  .charts-row{flex-direction:column}
+  .chart-side,.chart-main{flex:none;width:100%}
+}
+@media (max-width:768px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  .sidebar{
+    width:100%;height:54px;flex-direction:row;justify-content:center;
+    padding:4px 8px;gap:4px;
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    border-top:1px solid rgba(255,255,255,.12)
+  }
+  .s-logo{display:none}
+  .mob-spacer{display:none}
+  .main{margin-bottom:54px;overflow:auto;height:auto}
+  .topbar{position:sticky;top:0;z-index:100}
+  .layout{flex-direction:column;overflow:visible;height:auto}
+  .left-scroll{overflow:visible;height:auto;padding:14px}
+  .right-panel{width:100%;border-left:none;border-top:1px solid var(--bdr)}
+  .kpi-row-rpt{grid-template-columns:1fr 1fr}
+  .charts-row{flex-direction:column}
+  .filter-bar{flex-wrap:wrap}
+  #toast{bottom:62px}
+}
+@media (max-width:480px){
+  .kpi-row-rpt{grid-template-columns:1fr}
+}
+</style>
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- V2 Sidebar CSS -->
+  <link rel="stylesheet" href="../portal/index.css">
+  <style>
+    body { display: block !important; }
+    #wrapper { display: flex; height: 100vh; }
+    #sidebar { background-color: #6B21A8 !important; flex-shrink: 0; }
+    #page-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════════════ -->
+<div class="d-flex" id="wrapper">
+
+<nav id="sidebar" class="sidebar d-flex flex-column">
+  <div class="sidebar-profile p-3 text-center">
+    <div class="sidebar-avatar mx-auto mb-2">
+      <i class="bi bi-person-fill fs-3 text-white"></i>
+    </div>
+    <div class="sidebar-username text-white fw-semibold small">John David</div>
+    <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+      Admin
+      <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+    </div>
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-1">
+    <li class="nav-item">
+      <a class="nav-link sidebar-link" href="./index.html">
+        <i class="bi bi-grid-fill me-2"></i>Dashboard
+      </a>
+    </li>
+    <ul class="nav flex-column sidebar">
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./attendance.html">Attendance</a></li>
+      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./settings.html">Settings</a></li>
+    </ul>
+  </ul>
+</nav>
+
+<div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden">
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar"><button id="sidebarToggle" class="btn btn-sm me-2" type="button" style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8"><i class="bi bi-list fs-5"></i></button>
+    <div class="topbar-title">AIC Reporting</div>
+    <span style="color:var(--ink4);font-size:13px;margin:0 4px">·</span>
+    <span style="font-size:12px;color:var(--ink3)">§9.1 — By Center &amp; All Centers</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="period-tabs">
+        <button class="ptab on" id="ptab-month" onclick="setPeriod('month',this)">Month</button>
+        <button class="ptab" id="ptab-quarter" onclick="setPeriod('quarter',this)">Quarter</button>
+        <button class="ptab" id="ptab-year" onclick="setPeriod('year',this)">YTD</button>
+      </div>
+      <span style="font-size:12px;color:var(--ink4)">21 May 2026</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- ─── LEFT SCROLL ──────────────────────────────────────── -->
+    <div class="left-scroll">
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label>Center</label>
+        <select id="fCenter" onchange="applyReport()">
+          <option value="">All Centers</option>
+          <option>VG — Buona Vista</option>
+          <option>VG — Clementi</option>
+          <option>SCC — Queenstown</option>
+          <option>SCC — Toa Payoh</option>
+          <option>SCC — Bishan</option>
+        </select>
+        <label>Month</label>
+        <select id="fMonth" onchange="applyReport()">
+          <option value="">All months</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5" selected>May</option>
+        </select>
+        <label>Year</label>
+        <select id="fYear" onchange="applyReport()">
+          <option value="2026" selected>2026</option>
+          <option value="2025">2025</option>
+        </select>
+        <button class="btn-clear" onclick="clearFilters()">Clear</button>
+        <div style="margin-left:auto">
+          <button class="btn-pub-new" onclick="showToast()">Export Excel</button>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row-rpt" id="kpiRow"></div>
+
+      <!-- Charts row -->
+      <div class="charts-row">
+
+        <!-- Monthly role trend -->
+        <div class="chart-card chart-main">
+          <div class="card-head">
+            <div class="card-icon ci-b"></div>
+            <div class="card-label">Roles Activated — Monthly Trend (<span id="chartYearLabel">2026</span>)</div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div class="legend" id="trendLegend"></div>
+        </div>
+
+        <!-- Role distribution donut -->
+        <div class="chart-card chart-side">
+            <h1>Blank canvas</h1>
+        <div class="chart-wrap" style="height:185px">
+            <!-- <canvas id="roleChart"></canvas> -->
+            <div class="donut-center">
+              <div class="dc-num" id="donutNum">—</div>
+              <!-- <div class="dc-lbl">Role<br>activations</div> -->
+            </div>
+          </div>
+          <div class="role-rows" id="roleRows"></div>
+        </div>
+      </div>
+
+      <!-- Per-center breakdown table -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon ci-g"></div>
+          <div class="card-label">Per-Center Breakdown</div>
+          <div style="margin-left:auto;font-size:11px;color:var(--ink4)" id="tableScope"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="rpt-tbl">
+            <thead>
+              <tr>
+                <th>Center</th>
+                <th style="text-align:right">No. of MJ</th>
+                <th style="text-align:right">Chaperone</th>
+                <th style="text-align:right">Home Assess.</th>
+                <th style="text-align:right">Befriender</th>
+                <th style="text-align:right">Ctr. Assist.</th>
+                <th style="text-align:right">Hours</th>
+                <th style="text-align:right">Est. Payment (S$)</th>
+              </tr>
+            </thead>
+            <tbody id="rptBody"></tbody>
+            <tfoot id="rptFoot"></tfoot>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--am);background:var(--al);border:1px solid var(--ab);border-radius:7px;padding:8px 10px;margin-top:12px">
+          <strong>[H3]</strong> Payment column uses a placeholder rate of <strong>$20/hr flat</strong> across all roles. Actual rates are role-specific and have not been confirmed by Finance. Do not use this column for payment processing until fee table is received.
+        </div>
+      </div>
+
+    </div><!-- /left-scroll -->
+
+
+  </div><!-- /layout -->
+</div><!-- /main -->
+
+<div id="toast">Export requires backend integration — not available in prototype</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   MOCK DATA
+   All figures are illustrative. Payment uses $20/hr placeholder rate.
+   Roles counts = distinct MJs who completed ≥1 job in that role.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const MONTHLY = {
+  '2026': [
+    { m:'Jan', mj:35, chap:5, ha:7,  bef:3, ca:14, hrs:140, pay:2800 },
+    { m:'Feb', mj:37, chap:6, ha:8,  bef:3, ca:16, hrs:155, pay:3100 },
+    { m:'Mar', mj:38, chap:6, ha:9,  bef:4, ca:18, hrs:162, pay:3240 },
+    { m:'Apr', mj:40, chap:7, ha:9,  bef:4, ca:19, hrs:168, pay:3360 },
+    { m:'May', mj:41, chap:7, ha:10, bef:4, ca:20, hrs:175, pay:3500 },
+  ],
+  '2025': [
+    { m:'Jan', mj:28, chap:4, ha:5, bef:2, ca:11, hrs:108, pay:2160 },
+    { m:'Feb', mj:29, chap:4, ha:6, bef:2, ca:12, hrs:115, pay:2300 },
+    { m:'Mar', mj:30, chap:5, ha:6, bef:3, ca:12, hrs:120, pay:2400 },
+    { m:'Apr', mj:31, chap:5, ha:6, bef:3, ca:13, hrs:128, pay:2560 },
+    { m:'May', mj:32, chap:5, ha:7, bef:3, ca:13, hrs:132, pay:2640 },
+    { m:'Jun', mj:32, chap:5, ha:7, bef:3, ca:14, hrs:135, pay:2700 },
+    { m:'Jul', mj:33, chap:5, ha:7, bef:3, ca:14, hrs:138, pay:2760 },
+    { m:'Aug', mj:33, chap:6, ha:7, bef:3, ca:14, hrs:140, pay:2800 },
+    { m:'Sep', mj:34, chap:6, ha:7, bef:3, ca:15, hrs:143, pay:2860 },
+    { m:'Oct', mj:34, chap:6, ha:7, bef:3, ca:15, hrs:146, pay:2920 },
+    { m:'Nov', mj:35, chap:6, ha:7, bef:3, ca:15, hrs:148, pay:2960 },
+    { m:'Dec', mj:35, chap:6, ha:7, bef:3, ca:15, hrs:150, pay:3000 },
+  ]
+};
+
+/* Per-center data keyed as "center|monthIdx|year"
+   monthIdx: 1-based month number; 0 = all months                   */
+const CTR_SEEDS = {
+  'VG — Buona Vista':  { mjW:.22, chapW:.29, haW:.20, befW:.25, caW:.20, hrsW:.217 },
+  'VG — Clementi':     { mjW:.20, chapW:.14, haW:.20, befW:.25, caW:.20, hrsW:.194 },
+  'SCC — Queenstown':  { mjW:.24, chapW:.29, haW:.30, befW:.25, caW:.20, hrsW:.240 },
+  'SCC — Toa Payoh':   { mjW:.20, chapW:.14, haW:.20, befW:.25, caW:.20, hrsW:.194 },
+  'SCC — Bishan':      { mjW:.15, chapW:.14, haW:.10, befW:.00, caW:.20, hrsW:.154 },
+};
+
+const CENTERS = Object.keys(CTR_SEEDS);
+const ROLE_COLORS = ['#1D9E75','#1A5FA8','#6B21A8','#C07A1A'];
+const ROLE_LABELS = ['🤝 Chaperone','🏠 Home Assessment','💬 Befriender','🏛 Centre Assistant'];
+const ROLE_KEYS   = ['chap','ha','bef','ca'];
+
+/* ═══ Data helpers ════════════════════════════════════════════════ */
+function getMonthRow(year, monthIdx) {
+  /* monthIdx: 1-based; 0 = aggregate all */
+  var rows = MONTHLY[year] || MONTHLY['2026'];
+  if (monthIdx > 0) {
+    return rows[Math.min(monthIdx - 1, rows.length - 1)];
+  }
+  /* Aggregate: MJ = max (last month); roles = max; hrs/pay = sum */
+  return rows.reduce(function(acc, r) {
+    return {
+      m: 'YTD', mj: Math.max(acc.mj, r.mj),
+      chap: Math.max(acc.chap, r.chap), ha: Math.max(acc.ha, r.ha),
+      bef: Math.max(acc.bef, r.bef),   ca: Math.max(acc.ca, r.ca),
+      hrs: acc.hrs + r.hrs,            pay: acc.pay + r.pay,
+    };
+  }, { m:'', mj:0, chap:0, ha:0, bef:0, ca:0, hrs:0, pay:0 });
+}
+
+function scaleRow(row, seed) {
+  return {
+    mj:   Math.max(1, Math.round(row.mj   * seed.mjW)),
+    chap: Math.max(0, Math.round(row.chap * seed.chapW)),
+    ha:   Math.max(0, Math.round(row.ha   * seed.haW)),
+    bef:  Math.max(0, Math.round(row.bef  * seed.befW)),
+    ca:   Math.max(0, Math.round(row.ca   * seed.caW)),
+    hrs:  Math.max(1, Math.round(row.hrs  * seed.hrsW)),
+    pay:  Math.max(20, Math.round(row.pay * seed.hrsW)),
+  };
+}
+
+function getAggRow(centerFilter, monthIdx, year) {
+  var base = getMonthRow(year, monthIdx);
+  if (!centerFilter) return Object.assign({}, base);
+  return scaleRow(base, CTR_SEEDS[centerFilter]);
+}
+
+/* ═══ KPI ════════════════════════════════════════════════════════ */
+function renderKPI(d) {
+  var totalRoles = d.chap + d.ha + d.bef + d.ca;
+  document.getElementById('kpiRow').innerHTML =
+    kpiBox('k-tak', d.mj, 'Total MJ engaged', 'Unique MJs · completed jobs') +
+    kpiBox('k-pub', totalRoles, 'Total roles activated', 'Sum across 4 service types') +
+    kpiBox('k-com', d.hrs + ' hrs', 'Hours activated', 'Actual MJ attendance hrs') +
+    kpiBox('k-risk', '$' + d.pay.toLocaleString(), 'Est. payment (SGD)', '⚠ Placeholder rate $20/hr');
+}
+function kpiBox(cls, n, label, sub) {
+  return '<div class="kpi-box ' + cls + '"><div class="kpi-n">' + n + '</div>' +
+    '<div class="kpi-l">' + label + '</div>' +
+    '<div class="kpi-sub">' + sub + '</div></div>';
+}
+
+/* ═══ Trend Chart ════════════════════════════════════════════════ */
+var trendInst = null;
+function renderTrendChart(centerFilter, year) {
+  document.getElementById('chartYearLabel').textContent = year;
+  var rows = MONTHLY[year] || MONTHLY['2026'];
+  var labels = [], dChap=[], dHA=[], dBef=[], dCA=[];
+  var seed = centerFilter ? CTR_SEEDS[centerFilter] : null;
+  rows.forEach(function(r) {
+    labels.push(r.m);
+    var base = seed ? scaleRow(r, seed) : r;
+    dChap.push(base.chap); dHA.push(base.ha); dBef.push(base.bef); dCA.push(base.ca);
+  });
+
+  if (trendInst) trendInst.destroy();
+  trendInst = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label:'Chaperone',       data:dChap, backgroundColor:ROLE_COLORS[0], borderRadius:2, stack:'r' },
+        { label:'Home Assessment', data:dHA,   backgroundColor:ROLE_COLORS[1], borderRadius:2, stack:'r' },
+        { label:'Befriender',      data:dBef,  backgroundColor:ROLE_COLORS[2], borderRadius:2, stack:'r' },
+        { label:'Centre Assistant',data:dCA,   backgroundColor:ROLE_COLORS[3], borderRadius:2, stack:'r' },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          mode:'index', intersect:false,
+          callbacks: {
+            title: function(items){ return items[0].label + ' ' + year; },
+            footer: function(items){ return 'Total: ' + items.reduce(function(a,i){return a+i.raw;},0) + ' MJ roles'; }
+          }
+        }
+      },
+      scales:{
+        x:{ stacked:true, grid:{ display:false }, ticks:{ font:{ size:11, family:'DM Sans' } } },
+        y:{ stacked:true, beginAtZero:true, grid:{ color:'#F0F0F0' },
+            ticks:{ font:{ size:11, family:'DM Sans' }, stepSize:5, precision:0 },
+            title:{ display:true, text:'MJ roles activated', font:{ size:10, family:'DM Sans' }, color:'#AAA' } }
+      }
+    }
+  });
+
+  var lhtml = '';
+  ROLE_LABELS.forEach(function(l,i){
+    lhtml += '<div class="legend-item"><div class="legend-dot" style="background:'+ROLE_COLORS[i]+'"></div>'+l+'</div>';
+  });
+  document.getElementById('trendLegend').innerHTML = lhtml;
+}
+
+/* ═══ Role Donut ════════════════════════════════════════════════ */
+var roleInst = null;
+function renderRoleChart(d) {
+    return; // blank canvas for now
+  var vals = [d.chap, d.ha, d.bef, d.ca];
+  var total = vals.reduce(function(a,b){return a+b;},0);
+  document.getElementById('donutNum').textContent = total;
+
+  if (roleInst) roleInst.destroy();
+  roleInst = new Chart(document.getElementById('roleChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Chaperone','Home Assessment','Befriender','Centre Assistant'],
+      datasets:[{ data:vals, backgroundColor:ROLE_COLORS, borderWidth:2, borderColor:'#fff', hoverBorderColor:'#fff' }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{
+          label:function(ctx){ return ctx.label+': '+ctx.raw+' MJ ('+Math.round(ctx.raw/total*100)+'%)'; }
+        }}
+      }
+    }
+  });
+
+  var html = '';
+  ROLE_KEYS.forEach(function(k,i){
+    var v = d[k]; var pct = total>0 ? Math.round(v/total*100) : 0;
+    html += '<div class="role-row">' +
+      '<div class="role-lbl">'+ROLE_LABELS[i]+'</div>' +
+      '<div class="role-bar-wrap"><div class="role-bar-fill" style="width:'+pct+'%;background:'+ROLE_COLORS[i]+'"></div></div>' +
+      '<div class="role-val">'+v+'</div>' +
+      '<div class="role-pct">'+pct+'%</div>' +
+      '</div>';
+  });
+  document.getElementById('roleRows').innerHTML = html;
+}
+
+/* ═══ Center Table ════════════════════════════════════════════════ */
+function renderTable(centerFilter, monthIdx, year) {
+  var base = getMonthRow(year, monthIdx);
+  var rows = centerFilter
+    ? [Object.assign({ c: centerFilter }, scaleRow(base, CTR_SEEDS[centerFilter]))]
+    : CENTERS.map(function(c){ return Object.assign({ c:c }, scaleRow(base, CTR_SEEDS[c])); });
+
+  var totMJ=0, totChap=0, totHA=0, totBef=0, totCA=0, totHrs=0, totPay=0;
+  var html = '';
+  rows.forEach(function(r){
+    totMJ+=r.mj; totChap+=r.chap; totHA+=r.ha; totBef+=r.bef; totCA+=r.ca; totHrs+=r.hrs; totPay+=r.pay;
+    html += '<tr>' +
+      '<td><span class="c-name">'+r.c+'</span></td>' +
+      '<td class="n-cell n-hl">'+r.mj+'</td>' +
+      '<td class="n-cell">'+r.chap+'</td>' +
+      '<td class="n-cell">'+r.ha+'</td>' +
+      '<td class="n-cell '+(r.bef===0?'n-warn':'')+'">'+r.bef+'</td>' +
+      '<td class="n-cell">'+r.ca+'</td>' +
+      '<td class="n-cell n-hl">'+r.hrs+'</td>' +
+      '<td class="pay-cell">$'+r.pay.toLocaleString()+'</td>' +
+      '</tr>';
+  });
+  document.getElementById('rptBody').innerHTML = html;
+  document.getElementById('rptFoot').innerHTML =
+    '<tr class="tot-row">' +
+    '<td><strong>All Centers Total</strong></td>' +
+    '<td class="n-cell n-hl"><strong>'+totMJ+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totChap+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totHA+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totBef+'</strong></td>' +
+    '<td class="n-cell"><strong>'+totCA+'</strong></td>' +
+    '<td class="n-cell n-hl"><strong>'+totHrs+'</strong></td>' +
+    '<td class="pay-cell"><strong>$'+totPay.toLocaleString()+'</strong></td>' +
+    '</tr>';
+
+  var scopeParts = [];
+  if (centerFilter) scopeParts.push(centerFilter);
+  var months2026 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var months2025 = months2026;
+  var monthNames = year==='2026' ? months2026 : months2025;
+  if (monthIdx > 0) scopeParts.push(monthNames[monthIdx-1]+' '+year);
+  else scopeParts.push('YTD '+year);
+  document.getElementById('tableScope').textContent = scopeParts.join(' · ');
+}
+
+/* ═══ Master apply ════════════════════════════════════════════════ */
+function applyReport() {
+  var center = document.getElementById('fCenter').value;
+  var month  = parseInt(document.getElementById('fMonth').value) || 0;
+  var year   = document.getElementById('fYear').value || '2026';
+
+  var d = getAggRow(center, month, year);
+  renderKPI(d);
+  renderTrendChart(center, year);
+  renderRoleChart(d);
+  renderTable(center, month, year);
+}
+
+function clearFilters() {
+  document.getElementById('fCenter').value = '';
+  document.getElementById('fMonth').value  = '5';
+  document.getElementById('fYear').value   = '2026';
+  document.querySelectorAll('.ptab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('ptab-month').classList.add('on');
+  applyReport();
+}
+
+function setPeriod(mode, btn) {
+  document.querySelectorAll('.ptab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  var fMonth = document.getElementById('fMonth');
+  if (mode === 'month') {
+    fMonth.value = '5';
+  } else {
+    fMonth.value = '';
+  }
+  applyReport();
+}
+
+/* ═══ Popovers ════════════════════════════════════════════════════ */
+var activePop = null;
+function togglePop(id, btn) {
+  var pop = document.getElementById(id); if (!pop) return;
+  if (activePop && activePop !== pop) {
+    activePop.classList.remove('on');
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+  }
+  var isOn = pop.classList.contains('on');
+  pop.classList.toggle('on', !isOn);
+  btn.classList.toggle('active', !isOn);
+  activePop = isOn ? null : pop;
+}
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
+    document.querySelectorAll('.pop.on').forEach(function(p){p.classList.remove('on');});
+    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(function(b){b.classList.remove('active');});
+    activePop = null;
+  }
+});
+
+/* ═══ Toast ════════════════════════════════════════════════════════ */
+var toastTimer = null;
+function showToast() {
+  var t = document.getElementById('toast');
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 3200);
+}
+
+/* ═══ Init ════════════════════════════════════════════════════════ */
+$(document).ready(function(){ applyReport(); });
+</script>
+</div><!-- end #page-content -->
+</div><!-- end #wrapper -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      var toggle = document.getElementById('sidebarToggle');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+        });
+      }
+      document.querySelectorAll('.sidebar-collapsible').forEach(function (t) {
+        var el = document.querySelector(t.getAttribute('data-bs-target'));
+        if (el) {
+          el.addEventListener('show.bs.collapse', function () {
+            t.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
+          });
+          el.addEventListener('hide.bs.collapse', function () {
+            t.querySelector('.collapse-icon').style.transform = 'rotate(0deg)';
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
