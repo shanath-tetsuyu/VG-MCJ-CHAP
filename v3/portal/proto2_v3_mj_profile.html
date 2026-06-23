@@ -211,7 +211,6 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
     </li>
     <ul class="nav flex-column sidebar">
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
@@ -262,8 +261,8 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
     <div class="tab" onclick="showTab('at',this)">Attendance</div>
     <div class="tab" onclick="showTab('jh',this)">Job history</div>
     <div class="tab" onclick="showTab('py',this)">Payment</div>
-    <div class="tab" onclick="showTab('cx',this)">Cancellations <span class="upd-badge">↻ Updated</span></div>
-    <div class="tab" onclick="showTab('st',this)">MJ App statuses</div>
+    <div class="tab" onclick="showTab('cx',this)" style="display:none;">Cancellations</div>
+    <div class="tab" onclick="showTab('st',this)" style="display:none;">MJ App statuses</div>
     <div class="tab" onclick="showTab('nt',this)">Notes</div>
   </div>
 
@@ -285,7 +284,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
         <div class="eng eng-p">Jun</div><div class="eng eng-p">Jul</div><div class="eng eng-p">Aug</div><div class="eng eng-p">Sep</div><div class="eng eng-p">Oct</div><div class="eng eng-p">Nov</div><div class="eng eng-p">Dec</div>
       </div>
       <div style="display:flex;gap:16px;font-size:11px;color:var(--ink4)">
-        <span>5 months engaged</span><span>·</span><span>Last job: 3 May 2026</span><span>·</span><span style="color:var(--g);font-weight:500">Q2: on track (2/3 months)</span>
+        <span>5 months engaged</span><span>·</span><span>Last job: 3 May 2026</span><span>·</span>
       </div>
     </div>
     <div class="g2">
@@ -299,7 +298,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
           <dt>Languages</dt><dd>Mandarin, Hokkien</dd>
           <dt>MJ type</dt><dd>Senior + MJ</dd>
           <dt>Interests</dt><dd>Health, Gardening</dd>
-          <dt>C4Me access</dt><dd style="color:var(--g)">✓ Granted — MJ module</dd>
+          <dt>C4Me access</dt><dd style="color:var(--g)">Granted</dd>
         </dl>
       </div>
       <div class="card" style="position:relative">
@@ -334,12 +333,6 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
           <tr><td><strong>Centre Assistant</strong></td><td><div class="st"><div class="dot d-n"></div>Not enrolled</div></td><td><div class="st"><div class="dot d-n"></div>N/A</div></td><td><span class="pill p-gr">Not enrolled</span></td><td></td></tr>
         </tbody>
       </table>
-    </div>
-    <div class="rule-inline">
-      <div>
-        <div class="rib-type rt-q">Open item — Maisarah (overdue 30 Apr)</div>
-        <div style="font-size:12px;line-height:1.5;color:var(--ink2)">Full training list for all 4 roles (and 5+ additional roles) not yet received. Training table above is partial — cannot be marked complete until list is confirmed.</div>
-      </div>
     </div>
   </div>
 
@@ -450,7 +443,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
       <div class="stat"><div class="sn">$14/h</div><div class="sl">Chaperone rate*</div></div>
       <div class="stat"><div class="sn">$14/h</div><div class="sl">Befriending rate*</div></div>
     </div>
-    <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders — fee table pending Finance (Filbert)</div>
+    <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders</div>
     <div class="card" style="position:relative">
       <div class="card-t">
         Claims — May 2026
@@ -471,7 +464,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
   </div>
 
   <!-- CANCELLATIONS (updated) -->
-  <div class="tc" id="tc-cx">
+  <div class="tc" id="tc-cx" style="display:none;">
     <div class="card" style="position:relative">
       <div class="card-t">
         MJ cancellation policy
@@ -488,12 +481,6 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
           <tr><td colspan="3" style="background:var(--al);color:var(--am);font-size:11px;padding:7px 8px">If deadline falls on / before a PH: system blocks. Staff to handle manually by phone.</td></tr>
         </tbody>
       </table>
-      <div class="rule-inline" style="margin-top:10px">
-        <div>
-          <div class="rib-type rt-s">System rule — revised waitlist model</div>
-          <div style="font-size:12px;line-height:1.6;color:var(--ink2)">When confirmed MJ cancels → all waitlisted MJs notified simultaneously and can grab. First MJ confirmed ≥ 1 BD before job date gets the slot. If nobody confirms → auto-cancel → client informed.</div>
-        </div>
-      </div>
     </div>
     <div class="card" style="position:relative">
       <div class="card-t">
@@ -541,12 +528,6 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
           </tr>
         </tbody>
       </table>
-      <div class="rule-inline" style="margin-top:10px">
-        <div>
-          <div class="rib-type rt-b">Business rule — Messaging on rejection</div>
-          <div style="font-size:12px;line-height:1.5;color:var(--ink2)">When a Centre Assistant MJ is not confirmed, the message shown is <em>"Job is no longer available"</em> or <em>"Job has been taken"</em> — not "Rejected". Exact copy TBC with AAC.</div>
-        </div>
-      </div>
     </div>
   </div>
 

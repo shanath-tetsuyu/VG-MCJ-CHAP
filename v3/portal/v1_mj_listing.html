@@ -80,10 +80,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 
 /* ── Badges & Pills ── */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
-.b-active{background:var(--gl);color:var(--g)}
-.b-training{background:var(--bl);color:var(--bm)}
+.b-active{background:#7db86e;color:#13795B}
+.b-training{background:#90BFED;color:#1A5FA8}
 .b-screening{background:#E8E8ED;color:#555}
-.b-suspended{background:var(--al);color:var(--am)}
+.b-suspended{background:#cfb48a;color:#C07A1A}
 .b-blacklisted{background:var(--rl);color:var(--rm)}
 .b-withdrawn{background:#E8E8ED;color:#555}
 .b-terminated{background:#E8E8ED;color:#333}
@@ -245,7 +245,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
     </li>
     <ul class="nav flex-column sidebar">
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
@@ -288,7 +287,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
         <div class="kpi-box k-sus">
           <div class="kpi-n">1</div>
           <div class="kpi-l">Suspended (temporary)</div>
-          <div class="kpi-sub">⚠ Review needed</div>
+          <div class="kpi-sub">Review needed</div>
         </div>
         <div class="kpi-box k-blk">
           <div class="kpi-n">1</div>
@@ -338,7 +337,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
             <option>Home Assessment</option>
             <option>Centre Assistant</option>
           </select>
-          <input type="text" id="fSearch" placeholder="Search name, ID, district…" oninput="applyFilters()" style="width:190px">
+          <input type="text" id="fSearch" placeholder="Search…" oninput="applyFilters()" style="width:190px">
           <button class="btn-clear" onclick="clearFilters()">Clear</button>
           <button class="btn-add-mj" style="margin-left:auto" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Register MJ</button>
         </div>
@@ -685,7 +684,7 @@ const MJ_DATA = [
     noshow:2, lastActive:'12 May 2026', joined:'Apr 2025',
     jobs:{completed:6, cancelled:2, pending:0},
     phone:'8xxx xxxx', email:'grace.chua@email.com',
-    notes:'⚠ 2 no-shows recorded. 1 more will trigger auto-blacklist flag.'
+    notes:'2 no-shows recorded. 1 more will trigger auto-blacklist flag.'
   },
   {
     id:'MJ-0006', name:'Lily Tan Ah Mooi', gender:'F',
@@ -745,7 +744,7 @@ const MJ_DATA = [
     noshow:3, lastActive:'7 May 2026', joined:'Oct 2024',
     jobs:{completed:13, cancelled:4, pending:0},
     phone:'9xxx xxxx', email:'ng.beehoon@email.com',
-    notes:'🚨 Auto-blacklist flag active (3 no-shows). Pending staff review and blacklist confirmation.'
+    notes:'Auto-blacklist flag active (3 no-shows). Pending staff review and blacklist confirmation.'
   },
   {
     id:'MJ-0012', name:'David Teo Beng Kee', gender:'M',
@@ -825,7 +824,7 @@ const MJ_DATA = [
     noshow:2, lastActive:'15 May 2026', joined:'Nov 2024',
     jobs:{completed:10, cancelled:2, pending:1},
     phone:'9xxx xxxx', email:'gopalan.rajan@email.com',
-    notes:'⚠ 2 no-shows. 1 more triggers auto-flag. Centre Assistant eligible.'
+    notes:'2 no-shows. 1 more triggers auto-flag. Centre Assistant eligible.'
   },
   {
     id:'MJ-0020', name:'Lee Ah Kow', gender:'M',
@@ -840,11 +839,11 @@ const MJ_DATA = [
 ];
 
 const HIST_DATA = {
-  'MJ-0001': [{type:'🤝 Chaperone', date:'16 May', s:'Completed'},{type:'💬 Befriending', date:'14 May', s:'Completed'},{type:'🤝 Chaperone', date:'10 May', s:'Completed'},{type:'💬 Befriending', date:'7 May', s:'No-show (client)'}],
-  'MJ-0002': [{type:'🤝 Chaperone', date:'15 May', s:'Completed'},{type:'🤝 Chaperone', date:'8 May', s:'Completed'},{type:'🤝 Chaperone', date:'1 May', s:'No-show (MJ)'}],
-  'MJ-0004': [{type:'🏠 Home Assess.', date:'13 May', s:'Completed'},{type:'🤝 Chaperone', date:'12 May', s:'Completed'},{type:'💬 Befriending', date:'10 May', s:'Completed'},{type:'🏠 Home Assess.', date:'7 May', s:'Completed'}],
-  'MJ-0005': [{type:'💬 Befriending', date:'12 May', s:'Completed'},{type:'💬 Befriending', date:'30 Apr', s:'No-show (MJ)'},{type:'💬 Befriending', date:'22 Apr', s:'No-show (MJ)'}],
-  'MJ-0011': [{type:'🤝 Chaperone', date:'7 May', s:'Completed'},{type:'💬 Befriending', date:'3 May', s:'No-show (MJ)'},{type:'🤝 Chaperone', date:'28 Apr', s:'No-show (MJ)'},{type:'💬 Befriending', date:'20 Apr', s:'No-show (MJ)'}],
+  'MJ-0001': [{type:'Chaperone', date:'16 May', s:'Completed'},{type:'Befriending', date:'14 May', s:'Completed'},{type:'Chaperone', date:'10 May', s:'Completed'},{type:'Befriending', date:'7 May', s:'No-show (client)'}],
+  'MJ-0002': [{type:'Chaperone', date:'15 May', s:'Completed'},{type:'Chaperone', date:'8 May', s:'Completed'},{type:'Chaperone', date:'1 May', s:'No-show (MJ)'}],
+  'MJ-0004': [{type:'Home Assess.', date:'13 May', s:'Completed'},{type:'Chaperone', date:'12 May', s:'Completed'},{type:'Befriending', date:'10 May', s:'Completed'},{type:'Home Assess.', date:'7 May', s:'Completed'}],
+  'MJ-0005': [{type:'Befriending', date:'12 May', s:'Completed'},{type:'Befriending', date:'30 Apr', s:'No-show (MJ)'},{type:'Befriending', date:'22 Apr', s:'No-show (MJ)'}],
+  'MJ-0011': [{type:'Chaperone', date:'7 May', s:'Completed'},{type:'Befriending', date:'3 May', s:'No-show (MJ)'},{type:'Chaperone', date:'28 Apr', s:'No-show (MJ)'},{type:'Befriending', date:'20 Apr', s:'No-show (MJ)'}],
 };
 
 /* ══ Build role chips ════════════════════════════════════════════ */
@@ -858,8 +857,8 @@ function eligibleRoles(mj) {
 
 function rolesHtml(mj) {
   var roles = eligibleRoles(mj);
-  if (!roles.length) return '<span class="role-chip-none">None yet</span>';
-  return roles.map(function(r){ return '<span class="role-chip">✓ '+r+'</span>'; }).join('');
+  if (!roles.length) return '<span class="role-chip-none">None</span>';
+  return roles.map(function(r){ return '<span class="role-chip">'+r+'</span>'; }).join('');
 }
 
 function rolesText(mj) {
@@ -868,7 +867,7 @@ function rolesText(mj) {
 
 /* ══ Type pill ═══════════════════════════════════════════════════ */
 const TYPE_CLASS = {'Pure MJ':'tp-mj','MJ + Senior':'tp-sr','MJ + Volunteer':'tp-vol','MJ + Vol + Senior':'tp-svr'};
-const TYPE_ICON  = {'Pure MJ':'💼','MJ + Senior':'🧓','MJ + Volunteer':'🤲','MJ + Vol + Senior':'🌟'};
+const TYPE_ICON  = {'Pure MJ':'','MJ + Senior':'','MJ + Volunteer':'','MJ + Vol + Senior':''};
 
 /* ══ Status badge ════════════════════════════════════════════════ */
 const STAT_HTML = {
@@ -884,15 +883,15 @@ const STAT_HTML = {
 /* ══ No-show display ══════════════════════════════════════════════ */
 function noshowHtml(n) {
   if (n === 0) return '<span class="ns-zero">—</span>';
-  if (n >= 3)  return '<span class="ns-chip ns-high">🚨 ' + n + '</span>';
-  return '<span class="ns-chip ns-low">⚠ ' + n + '</span>';
+  if (n >= 3)  return '<span class="ns-chip ns-high">' + n + '</span>';
+  return '<span class="ns-chip ns-low">' + n + '</span>';
 }
 
 /* ══ DataTable ════════════════════════════════════════════════════ */
 var dt;
 $(document).ready(function() {
   var rows = MJ_DATA.map(function(m) {
-    var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + TYPE_ICON[m.type] + ' ' + m.type + '</span>';
+    var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + m.type + '</span>';
     return [
       '<span class="mj-id-cell">' + m.id + '</span>',
       '<div class="mj-name-cell">' + m.name + '</div><div class="mj-meta">' + m.language + ' · ' + m.gender + '</div>',
@@ -919,6 +918,7 @@ $(document).ready(function() {
       {title:'Last active'},
       {title:'Actions', orderable:false},
     ],
+    columnDefs:[{visible:false, targets:0}],
     pageLength: 10,
     order: [[0,'asc']],
     dom: 't<"dt-pg-wrap"ip>',
@@ -1002,9 +1002,9 @@ function openModal(mjId) {
   /* Banner */
   var banner = '';
   if (m.noshow >= 3)
-    banner = '<div class="banner bn-r">🚨 <div><strong>Auto-blacklist flag active:</strong> ' + m.noshow + ' no-shows recorded. Staff must review and confirm blacklist, or clear the flag if reason is valid.</div></div>';
+    banner = '<div class="banner bn-r"><div><strong>Auto-blacklist flag active:</strong> ' + m.noshow + ' no-shows recorded. Staff must review and confirm blacklist, or clear the flag if reason is valid.</div></div>';
   else if (m.noshow === 2)
-    banner = '<div class="banner bn-a">⚠️ <div><strong>Approaching threshold:</strong> 2 no-shows recorded. 1 more will trigger auto-blacklist flag. Monitor closely.</div></div>';
+    banner = '<div class="banner bn-a"><div><strong>Approaching threshold:</strong> 2 no-shows recorded. 1 more will trigger auto-blacklist flag. Monitor closely.</div></div>';
   else if (m.status === 'Blacklisted')
     banner = '<div class="banner bn-r">✕ <div><strong>Blacklisted:</strong> No new task assignments permitted. Remove flag manually to reactivate.</div></div>';
   else if (m.status === 'Suspended')
@@ -1013,7 +1013,7 @@ function openModal(mjId) {
     banner = '<div class="banner" style="background:#E8E8ED;color:#444;border:1px solid #D0D0D0">— <div><strong>' + m.status + ':</strong> Terminal status. No reactivation permitted. Records retained for audit.</div></div>';
 
   /* Info grid */
-  var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + TYPE_ICON[m.type] + ' ' + m.type + '</span>';
+  var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + m.type + '</span>';
   var grid = '<div class="m-info-grid">' +
     '<div class="m-info-box"><div class="m-info-label">Status</div><div class="m-info-val" style="margin-top:2px">' + (STAT_HTML[m.status]||m.status) + '</div></div>' +
     '<div class="m-info-box"><div class="m-info-label">MJ Type</div><div class="m-info-val" style="margin-top:2px">' + typePill + '</div></div>' +
@@ -1027,21 +1027,21 @@ function openModal(mjId) {
   var jobSummary = '<div class="m-info-grid">' +
     '<div class="m-info-box"><div class="m-info-label">Completed</div><div class="m-info-val" style="color:var(--g)">' + m.jobs.completed + '</div></div>' +
     '<div class="m-info-box"><div class="m-info-label">Cancelled</div><div class="m-info-val" style="color:var(--rm)">' + m.jobs.cancelled + '</div></div>' +
-    '<div class="m-info-box"><div class="m-info-label">No-shows</div><div class="m-info-val" style="color:' + (m.noshow>=3?'var(--rm)':m.noshow>=1?'var(--am)':'var(--ink4)') + '">' + m.noshow + (m.noshow>=3?' 🚨':m.noshow>=2?' ⚠':'') + '</div></div>' +
+    '<div class="m-info-box"><div class="m-info-label">No-shows</div><div class="m-info-val" style="color:' + (m.noshow>=3?'var(--rm)':m.noshow>=1?'var(--am)':'var(--ink4)') + '">' + m.noshow + '</div></div>' +
     '</div>';
 
   /* OJT table */
   var ojtRows = [
-    {label:'🤝 Chaperone',       key:'chaperone'},
-    {label:'💬 Befriending',     key:'befriending'},
-    {label:'🏠 Home Assessment', key:'homeAssessment'},
-    {label:'🏛 Centre Assistant',key:'centreAssistant'},
+    {label:'Chaperone',       key:'chaperone'},
+    {label:'Befriending',     key:'befriending'},
+    {label:'Home Assessment', key:'homeAssessment'},
+    {label:'Centre Assistant',key:'centreAssistant'},
   ];
   var ojtHtml = '<div class="sect-title">Training &amp; OJT Eligibility</div><table class="ojt-tbl"><thead><tr><th>Service Role</th><th>OJT Status</th><th>Eligible</th></tr></thead><tbody>';
   ojtRows.forEach(function(r) {
     var stat = m.ojt[r.key];
     var cls = {NA:'ps-na',Pending:'ps-pend',Scheduled:'ps-sched','In Progress':'ps-prog',Completed:'ps-done'}[stat]||'ps-na';
-    var elig = stat==='Completed' ? '<span class="elig-yes">✓ Yes</span>' : '<span class="elig-no">✕ No</span>';
+    var elig = stat==='Completed' ? '<span class="elig-yes">Yes</span>' : '<span class="elig-no">No</span>';
     ojtHtml += '<tr><td>' + r.label + '</td><td><span class="pill-stat ' + cls + '">' + stat + '</span></td><td>' + elig + '</td></tr>';
   });
   ojtHtml += '</tbody></table>';
@@ -1105,7 +1105,7 @@ function openStatusChange() {
     body += '<div class="ack-box" id="ackBox">' +
       '<label><input type="checkbox" id="ackCheck"> I confirm that <strong>offline acknowledgement has been obtained from the MJ</strong> before proceeding with this status change. <span style="opacity:.7">[Required for Withdrawn / Terminated — §4.4, M10]</span></label>' +
       '</div>';
-    body += '<div id="revokeNote" style="display:none;margin-top:10px;padding:10px;background:var(--al);border:1px solid var(--ab);border-radius:var(--r);font-size:12px;color:var(--am)">⚠ This status change will <strong>revoke the MJ\'s C4Me access</strong>. They will no longer be able to view job listings or submit attendance until manually reactivated. [M7]</div>';
+    body += '<div id="revokeNote" style="display:none;margin-top:10px;padding:10px;background:var(--al);border:1px solid var(--ab);border-radius:var(--r);font-size:12px;color:var(--am)">This status change will <strong>revoke the MJ\'s C4Me access</strong>. They will no longer be able to view job listings or submit attendance until manually reactivated. [M7]</div>';
   }
 
   document.getElementById('status-modal-body').innerHTML = body;

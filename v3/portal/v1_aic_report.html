@@ -133,7 +133,6 @@
     </li>
     <ul class="nav flex-column sidebar">
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
@@ -312,7 +311,7 @@ const CTR_SEEDS = {
 
 const CENTERS = Object.keys(CTR_SEEDS);
 const ROLE_COLORS = ['#1D9E75','#1A5FA8','#6B21A8','#C07A1A'];
-const ROLE_LABELS = ['🤝 Chaperone','🏠 Home Assessment','💬 Befriender','🏛 Centre Assistant'];
+const ROLE_LABELS = ['Chaperone','Home Assessment','Befriender','Centre Assistant'];
 const ROLE_KEYS   = ['chap','ha','bef','ca'];
 
 /* ═══ Data helpers ════════════════════════════════════════════════ */
@@ -358,7 +357,7 @@ function renderKPI(d) {
     kpiBox('k-tak', d.mj, 'Total MJ engaged', 'Unique MJs · completed jobs') +
     kpiBox('k-pub', totalRoles, 'Total roles activated', 'Sum across 4 service types') +
     kpiBox('k-com', d.hrs + ' hrs', 'Hours activated', 'Actual MJ attendance hrs') +
-    kpiBox('k-risk', '$' + d.pay.toLocaleString(), 'Est. payment (SGD)', '⚠ Placeholder rate $20/hr');
+    kpiBox('k-risk', '$' + d.pay.toLocaleString(), 'Est. payment (SGD)', 'Placeholder rate $20/hr');
 }
 function kpiBox(cls, n, label, sub) {
   return '<div class="kpi-box ' + cls + '"><div class="kpi-n">' + n + '</div>' +

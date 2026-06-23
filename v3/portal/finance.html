@@ -208,7 +208,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
     </li>
     <ul class="nav flex-column sidebar">
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
@@ -296,7 +295,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
               <thead>
                 <tr>
                   <th>MJ Name</th>
-                  <th>Job ID</th>
                   <th>Service</th>
                   <th>Facility</th>
                   <th>Date</th>
@@ -342,6 +340,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
       <button class="btn-primary" id="modal-approve-btn" style="display:none" onclick="approveAmendment()">
         ✓ Approve Amendment
       </button>
+      <a id="btn-view-job" href="#" target="_blank" class="btn-ghost" style="font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;"><i class="bi bi-file-text"></i> View Job Details</a>
       <button class="btn-ghost" style="margin-left:auto;" onclick="closeModal()">Close</button>
     </div>
   </div>
@@ -504,9 +503,7 @@ function renderTable(data) {
     tr.innerHTML = `
       <td>
         <div style="font-size:12px;font-weight:500;">${row.name}</div>
-        <div style="font-size:10px;color:var(--ink4);">${row.mjId}</div>
       </td>
-      <td style="font-family:monospace;font-size:11px;font-weight:600;color:var(--bm);">${row.id}</td>
       <td>${svcBadge}</td>
       <td style="font-size:11px;color:var(--ink3);">${row.facility}</td>
       <td style="font-size:11px;color:var(--ink3);white-space:nowrap;">${row.date}</td>
@@ -604,8 +601,6 @@ function openModal(row) {
     <div class="sect-title">Job Details</div>
     <div class="m-info-grid">
       <div class="m-info-box"><div class="m-info-label">MJ Name</div><div class="m-info-val">${row.name}</div></div>
-      <div class="m-info-box"><div class="m-info-label">MJ ID</div><div class="m-info-val" style="font-family:monospace;">${row.mjId}</div></div>
-      <div class="m-info-box"><div class="m-info-label">Job ID</div><div class="m-info-val" style="font-family:monospace;color:var(--bm);">${row.id}</div></div>
       <div class="m-info-box"><div class="m-info-label">Service Type</div><div class="m-info-val">${row.service}</div></div>
       <div class="m-info-box"><div class="m-info-label">Facility</div><div class="m-info-val">${row.facility}</div></div>
       <div class="m-info-box"><div class="m-info-label">Date</div><div class="m-info-val">${row.date}</div></div>
@@ -662,6 +657,7 @@ function openModal(row) {
     </div>
   `;
 
+  document.getElementById('btn-view-job').href = './job_detail.html?id=' + row.id;
   document.getElementById('jobModal').style.display = 'flex';
 }
 

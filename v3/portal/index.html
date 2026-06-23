@@ -42,7 +42,6 @@
 
     <ul class="nav flex-column sidebar">
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto2_v3_mj_profile.html">MJ Profile</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
       <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
@@ -165,7 +164,7 @@
 
         <!-- Filter bar -->
         <div class="filter-bar">
-          <label>Facility</label>
+          <!-- <label>Facility</label>
           <select id="fFacility" onchange="applyFilters()">
             <option value="">All</option>
             <option>VG — Buona Vista</option>
@@ -173,7 +172,7 @@
             <option>SCC — Queenstown</option>
             <option>SCC — Toa Payoh</option>
             <option>SCC — Bishan</option>
-          </select>
+          </select> -->
           <label>Type</label>
           <select id="fType" onchange="applyFilters()">
             <option value="">All</option>
@@ -205,7 +204,7 @@
           <input type="date" id="fDateStart" onchange="applyFilters()">
           <label>End Date</label>
           <input type="date" id="fDateEnd" onchange="applyFilters()">
-          <input type="text" id="fSearch" placeholder="Search ID, client, MJ…" oninput="applyFilters()" style="width:180px">
+          <input type="text" id="fSearch" placeholder="Search…" oninput="applyFilters()" style="width:180px">
           <button class="btn-clear" onclick="clearFilters()">Clear</button>
           <a href="./proto1_v3_publish.html" style="margin-left:auto"><button class="btn-pub-new">+ Publish new job</button></a>
         </div>
@@ -247,6 +246,7 @@
     <div class="modal-head">
       <div class="card-icon ci-b" style="font-size:16px"></div>
       <div class="modal-head-title" id="modal-title">Manage Assignment</div>
+      <a id="btn-view-detail" href="#" target="_blank" style="font-size:12px;font-weight:600;color:var(--pm);text-decoration:none;border:1px solid var(--pb);padding:4px 10px;border-radius:7px;background:var(--pl);white-space:nowrap;">View full details →</a>
       <button class="modal-close" onclick="closeModal()">✕ Close</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
@@ -324,21 +324,17 @@ const JOB_DATA = [
   {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',       status:'Taken',     mj:'Ahmad Razif',     wl:2, urgency:'Standard' },
   {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',   date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',     status:'Completed', mj:'Lily Tan',        wl:0, urgency:'Standard' },
   {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Open',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-005',type:'Centre Assistant',facility:'SCC — Bishan',    date:'23 May 2026',sd:'2026-05-23',time:'13:00–17:00',client:'—',                status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed', mj:'Fatimah bte Ali', wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',  mj:null,              wl:1, urgency:'Standard' },
   {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',     mj:'Susan Lim',       wl:0, urgency:'Standard' },
-  {id:'MJ-2026-009',type:'Centre Assistant',facility:'VG — Clementi',   date:'24 May 2026',sd:'2026-05-24',time:'08:00–17:00',client:'—',                status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
   {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Open',  mj:null,              wl:3, urgency:'Urgent'  },
   {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',  mj:null,              wl:3, urgency:'Standard' },
   {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed', mj:'Ravi Kumar',      wl:0, urgency:'Standard' },
-  {id:'MJ-2026-014',type:'Centre Assistant',facility:'SCC — Queenstown',date:'29 May 2026',sd:'2026-05-29',time:'09:00–18:00',client:'—',                status:'Open',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',    date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',      status:'Cancelled', mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',     mj:'Grace Chua',      wl:0, urgency:'Standard' },
   {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
   {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-019',type:'Centre Assistant',facility:'SCC — Toa Payoh', date:'01 Jun 2026',sd:'2026-06-01',time:'08:00–13:00',client:'—',                status:'Open',  mj:null,              wl:3, urgency:'Standard' },
   {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Open',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',  mj:null,              wl:1, urgency:'Standard' },
   {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',  mj:null,              wl:0, urgency:'Standard' },
@@ -365,13 +361,13 @@ const WAITLIST_DATA = {
 
 const TYPE_ICON = {'Chaperone':'🤝','Befriending':'💬','Home Assessment':'🏠','Centre Assistant':'🏛'};
 const STATUS_HTML = {
-  'Open':      '<span class="badge b-pub">● Open</span>',
-  'Taken':     '<span class="badge b-tak">✓ Taken</span>',
-  'Completed': '<span class="badge b-com">✔ Completed</span>',
-  'Cancelled': '<span class="badge b-can">✕ Cancelled</span>',
+  'Open':      '<span class="badge b-pub"> Open</span>',
+  'Taken':     '<span class="badge b-tak"> Taken</span>',
+  'Completed': '<span class="badge b-com"> Completed</span>',
+  'Cancelled': '<span class="badge b-can"> Cancelled</span>',
   'Waitlisted':'<span class="badge b-wl">Waitlisted</span>',
-  'At Risk':   '<span class="badge b-risk">⚠ At Risk</span>',
-  'Re-opened': '<span class="badge b-reopen">↺ Re-opened</span>',
+  'At Risk':   '<span class="badge b-risk"> At Risk</span>',
+  'Re-opened': '<span class="badge b-reopen"> Re-opened</span>',
 };
 
 /* ══ DataTable ═════════════════════════════════════════════════════ */
@@ -553,6 +549,7 @@ function openModal(jobId) {
   document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
   document.getElementById('btn-complete').disabled = locked;
   document.getElementById('btn-cancel-job').disabled = locked;
+  document.getElementById('btn-view-detail').href = './job_detail.html?id=' + jobId;
   document.getElementById('assignModal').style.display = 'flex';
 }
 
