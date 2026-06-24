@@ -645,6 +645,34 @@
     </div>
   </div>
 
+    <!-- Task Detail Modal -->
+    <div id="taskDetailModal" class="modal-overlay" style="display:none;" onclick="handleTaskDetailOverlayClick(event)">
+      <div class="modal-box" style="max-width:560px;padding:0;overflow:hidden;">
+        <div class="modal-head" style="padding:16px 20px;border-bottom:1px solid #e0e0e0;">
+          <div class="modal-head-title" style="font-size:15px;font-weight:600;">Task Details</div>
+        </div>
+        <div style="padding:20px 24px;max-height:60vh;overflow-y:auto;" id="taskDetailBody">
+        </div>
+        <div class="modal-footer" style="flex-direction:column;gap:8px;align-items:flex-end;padding:14px 20px;border-top:1px solid #e0e0e0;">
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('complete')">Complete this Task</button>
+            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('not-complete')">Task is not Completed</button>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('view')">View Complete Detail</button>
+            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('duplicate')">Duplicate</button>
+            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit')">Edit</button>
+            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit-all')">Edit All</button>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete')">Delete</button>
+            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete-all')">Delete All</button>
+            <button class="btn-ghost" onclick="closeTaskDetail()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- No-Show Modal -->
     <div id="noShowModal" class="modal-overlay" style="display:none;" onclick="handleNoShowOverlayClick(event)">
       <div class="modal-box" style="max-width:440px;">
@@ -713,7 +741,8 @@
     <script>
 /* ══ Data ══════════════════════════════════════════════════════════ */
 const JOB_DATA = [
-  {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'At Risk',    mj:null,                       wl:0, urgency:'Urgent'  }
+  {id:'MJ-2026-001',type:'Chaperone', facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian', status:'Published', mj:null, wl:0, urgency:'Urgent'  },
+  {id:'MJ-2026-002',type:'Chaperone', facility:'SCC — Bedok', date:'29 May 2026',sd:'2026-05-29',time:'14:00–16:00',client:'Md Afiq', status:'Published', mj:1, wl:0, urgency:'Standard'  }
 ];
 
 const WAITLIST_DATA = {
@@ -733,13 +762,13 @@ const WAITLIST_DATA = {
 };
 
 const STATUS_HTML = {
-  'Published':   '<span class="badge b-pub">● Published</span>',
-  'Taken':       '<span class="badge b-tak">✓ Taken</span>',
-  'Completed':   '<span class="badge b-com">✔ Completed</span>',
-  'Cancelled':   '<span class="badge b-can">✕ Cancelled</span>',
-  'Waitlisted':  '<span class="badge b-wl">⏳ Waitlisted</span>',
-  'At Risk':     '<span class="badge b-risk">⚠ At Risk</span>',
-  'In Progress': '<span class="badge b-tak">▶ In Progress</span>',
+  'Published':   '<span class="badge b-pub"> Published</span>',
+  'Taken':       '<span class="badge b-tak"> Taken</span>',
+  'Completed':   '<span class="badge b-com"> Completed</span>',
+  'Cancelled':   '<span class="badge b-can"> Cancelled</span>',
+  'Waitlisted':  '<span class="badge b-wl"> Waitlisted</span>',
+  'At Risk':     '<span class="badge b-risk"> At Risk</span>',
+  'In Progress': '<span class="badge b-tak"> In Progress</span>',
 };
 
 /* ══ Helpers ════════════════════════════════════════════════════════ */
@@ -797,7 +826,7 @@ function renderTaskList() {
       var slot = fmtSlot(j.time);
       var title = j.type + (j.client && j.client !== '—' ? ' - ' + j.client : '');
       var mjLine = j.mj ? '<div class="tm-task-sub"><span class="tm-loc-label">Assigned MJ:</span><span class="tm-loc-val">' + j.mj + '</span></div>' : '';
-      html += '<div class="tm-task-row">';
+      html += '<div class="tm-task-row" style="cursor:pointer;" onclick="openTaskDetail(\'' + j.id + '\')">';
       html += '<div class="tm-task-time">' + slot + '</div>';
       html += '<div class="tm-task-dot" style="background:' + dot + ';"></div>';
       html += '<div class="tm-task-detail">';
@@ -1008,6 +1037,63 @@ function addRecipientRow() {
   var tpl = '<div class="row g-2 mb-1"><div class="col-10"><input type="text" class="form-control form-control-sm" placeholder="Search recipient…"></div>' +
     '<div class="col-2 d-flex align-items-center gap-1"><button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;" onclick="addRecipientRow()"><i class="fa fa-plus"></i></button><button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;" onclick="this.closest(\'.row\').remove()"><i class="fa fa-minus"></i></button></div></div>';
   list.insertAdjacentHTML('beforeend', tpl);
+}
+
+/* ══ Task Detail Modal ══════════════════════════════════════════════ */
+function openTaskDetail(jobId) {
+  var j = JOB_DATA.find(function(x){ return x.id === jobId; });
+  if (!j) return;
+
+  var assignedHtml = j.mj
+    ? '<div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#666;overflow:hidden;"></div><div style="font-size:13px;margin-top:4px;">MJobber {Name}</div>'
+    : '<div style="width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:18px;color:#aaa;"><i class="bi bi-person-fill"></i></div>';
+
+  var taskDate = '';
+  if (j.sd && j.time) {
+    var d = new Date(j.sd + 'T00:00:00');
+    var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var parts = j.time.split('–');
+    var startFmt = parts.length >= 1 ? fmt12(parts[0].trim()) : j.time;
+    var endFmt = parts.length >= 2 ? fmt12(parts[1].trim()) : '';
+    taskDate = mo[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + startFmt + (endFmt ? ' - ' + endFmt : '');
+  }
+
+  var locationText = j.facility || '';
+
+  var html = '<div style="display:flex;gap:40px;">';
+
+  html += '<div style="flex:1;">';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Facility</div><div style="font-size:13px;color:#444;">' + (j.facility || '') + '</div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Patients</div><div style="font-size:13px;"><a href="#" style="color:#1a9e80;text-decoration:none;">' + (j.client || '') + '</a></div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Action Type</div><div style="font-size:13px;color:#444;">' + (j.type || '') + '</div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Services Required</div><div style="font-size:13px;color:#888;font-style:italic;"></div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Task Series Remarks</div><div style="font-size:13px;color:#888;"></div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Individual Tasks Remarks</div><div style="font-size:13px;color:#888;"></div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Task Date</div><div style="font-size:13px;color:#444;">' + taskDate + '</div></div>';
+  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Location</div><div style="font-size:13px;color:#444;line-height:1.6;">' + locationText + '</div></div>';
+  html += '</div>';
+
+  html += '<div style="min-width:100px;text-align:center;">';
+  html += '<div style="font-weight:600;font-size:13px;margin-bottom:8px;">Assigned To</div>';
+  html += assignedHtml;
+  html += '</div>';
+
+  if(j.mj){
+  html += '<div style="font-weight:500; font-size:13px; min-width:100px;text-align:center;">WaitListed Mjobbers</div>';
+  }
+  html += '</div>';
+
+  document.getElementById('taskDetailBody').innerHTML = html;
+  document.getElementById('taskDetailModal').style.display = 'flex';
+}
+function closeTaskDetail() {
+  document.getElementById('taskDetailModal').style.display = 'none';
+}
+function handleTaskDetailOverlayClick(e) {
+  if (e.target.id === 'taskDetailModal') closeTaskDetail();
+}
+function taskDetailAction(action) {
+  closeTaskDetail();
 }
 
 /* ══ Init ═══════════════════════════════════════════════════════════ */

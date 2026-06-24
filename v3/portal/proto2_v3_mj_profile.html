@@ -345,9 +345,8 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
           <input type="date" id="attFrom" onchange="filterAttendance()">
           <label>To</label>
           <input type="date" id="attTo" onchange="filterAttendance()">
-          <label>Job ID</label>
-          <input type="text" id="attJobId" placeholder="e.g. MJ-2026-037" oninput="filterAttendance()" style="width:160px">
           <button class="btn-act" onclick="clearAttFilters()">Clear</button>
+          <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;" onclick="exportAttendance()">Export to Excel</button>
         </div>
 
       <div class="card-t">Attendance record</div>
@@ -419,19 +418,31 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
 
   <!-- JOB HISTORY -->
   <div class="tc" id="tc-jh">
+    <div class="filter-bar" style="margin-bottom:14px">
+      <label>From</label>
+      <input type="date" id="jhFrom" onchange="filterJobHistory()">
+      <label>To</label>
+      <input type="date" id="jhTo" onchange="filterJobHistory()">
+      <label>Status</label>
+      <select id="jhStatus" onchange="filterJobHistory()">
+        <option value="">All</option>
+        <option value="completed">Completed</option>
+        <option value="no-show">No-show</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn-act" onclick="clearJhFilters()">Clear</button>
+      <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;" onclick="exportJobHistory()">Export to Excel</button>
+    </div>
     <div class="card" style="position:relative">
-      <div class="card-t" style="justify-content:space-between">
-        <span style="display:flex;align-items:center;gap:6px">
-          Job history
-        </span>
-        <select style="font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 8px;border:1px solid var(--bdr);border-radius:6px;background:var(--bg);color:var(--ink4)"><option>All types</option><option>Chaperone</option><option>Befriending</option></select>
-      </div>
+      <div class="card-t">Job history</div>
       <div style="display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)"><span>Date</span><span>Status</span><span>Type</span><span>Details</span><span>Earned</span></div>
-      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Lee Geok Eng → SGH A&E · 2h</span><span style="color:var(--g);font-weight:600">$28</span></div>
-      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Befriending</span><span style="color:var(--ink3)">Ng Ah Beng (AAC) · 1h · Recurring</span><span style="color:var(--g);font-weight:600">$14</span></div>
-      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">10 Apr 2026</span><span class="pill p-r" style="font-size:10px">No-show</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Tan Ah Kow → NUH · Flagged by SCC</span><span style="color:var(--ink4)">—</span></div>
-      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">2 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Chan Bee Kim → Polyclinic · 1h</span><span style="color:var(--g);font-weight:600">$14</span></div>
-      <div class="jrow"><span style="font-size:11px;color:var(--ink4)">15 Mar 2026</span><span class="pill p-a" style="font-size:10px">Cancelled</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Client cancelled with sufficient notice</span><span style="color:var(--ink4)">—</span></div>
+      <div id="jhRows">
+        <div class="jrow" data-date="2026-05-03" data-status="completed"><span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Lee Geok Eng → SGH A&E · 2h</span><span style="color:var(--g);font-weight:600">$28</span></div>
+        <div class="jrow" data-date="2026-04-22" data-status="completed"><span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Befriending</span><span style="color:var(--ink3)">Ng Ah Beng (AAC) · 1h · Recurring</span><span style="color:var(--g);font-weight:600">$14</span></div>
+        <div class="jrow" data-date="2026-04-10" data-status="no-show"><span style="font-size:11px;color:var(--ink4)">10 Apr 2026</span><span class="pill p-r" style="font-size:10px">No-show</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Tan Ah Kow → NUH · Flagged by SCC</span><span style="color:var(--ink4)">—</span></div>
+        <div class="jrow" data-date="2026-04-02" data-status="completed"><span style="font-size:11px;color:var(--ink4)">2 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Chan Bee Kim → Polyclinic · 1h</span><span style="color:var(--g);font-weight:600">$14</span></div>
+        <div class="jrow" data-date="2026-03-15" data-status="cancelled"><span style="font-size:11px;color:var(--ink4)">15 Mar 2026</span><span class="pill p-a" style="font-size:10px">Cancelled</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Client cancelled with sufficient notice</span><span style="color:var(--ink4)">—</span></div>
+      </div>
     </div>
   </div>
 
@@ -583,25 +594,51 @@ function showTab(id, el) {
 }
 
 function filterAttendance() {
-  const from  = document.getElementById('attFrom').value;
-  const to    = document.getElementById('attTo').value;
-  const jobId = document.getElementById('attJobId').value.toLowerCase().trim();
+  const from = document.getElementById('attFrom').value;
+  const to   = document.getElementById('attTo').value;
   document.querySelectorAll('#attTbl tbody tr').forEach(function(row) {
     const d = row.getAttribute('data-date');
-    const j = row.getAttribute('data-jobid') || '';
     let show = true;
     if (from && d < from) show = false;
     if (to   && d > to)   show = false;
-    if (jobId && j.indexOf(jobId) === -1) show = false;
     row.style.display = show ? '' : 'none';
   });
 }
 
 function clearAttFilters() {
-  document.getElementById('attFrom').value  = '';
-  document.getElementById('attTo').value    = '';
-  document.getElementById('attJobId').value = '';
+  document.getElementById('attFrom').value = '';
+  document.getElementById('attTo').value   = '';
   filterAttendance();
+}
+
+function exportAttendance() {
+  alert('Exporting attendance records to Excel...');
+}
+
+function filterJobHistory() {
+  var from   = document.getElementById('jhFrom').value;
+  var to     = document.getElementById('jhTo').value;
+  var status = document.getElementById('jhStatus').value;
+  document.querySelectorAll('#jhRows .jrow').forEach(function(row) {
+    var d = row.getAttribute('data-date');
+    var s = row.getAttribute('data-status');
+    var show = true;
+    if (from && d < from) show = false;
+    if (to   && d > to)   show = false;
+    if (status && s !== status) show = false;
+    row.style.display = show ? '' : 'none';
+  });
+}
+
+function clearJhFilters() {
+  document.getElementById('jhFrom').value   = '';
+  document.getElementById('jhTo').value     = '';
+  document.getElementById('jhStatus').value = '';
+  filterJobHistory();
+}
+
+function exportJobHistory() {
+  alert('Exporting job history to Excel...');
 }
 
 var _attEditRow = null;

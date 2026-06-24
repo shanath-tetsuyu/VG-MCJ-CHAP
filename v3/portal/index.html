@@ -186,6 +186,7 @@
             <option value="">All</option>
             <option>In Progress</option>
             <option>Open</option>
+            <option>Draft</option>
             <option>Taken</option>
             <option>Waitlisted</option>
             <option>At Risk</option>
@@ -327,7 +328,7 @@ const JOB_DATA = [
   {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed', mj:'Fatimah bte Ali', wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',  mj:null,              wl:1, urgency:'Standard' },
   {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',     mj:'Susan Lim',       wl:0, urgency:'Standard' },
-  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Open',  mj:null,              wl:3, urgency:'Urgent'  },
+  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Draft',  mj:null,              wl:0, urgency:'Urgent'  },
   {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',  mj:null,              wl:3, urgency:'Standard' },
   {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed', mj:'Ravi Kumar',      wl:0, urgency:'Standard' },
@@ -335,7 +336,7 @@ const JOB_DATA = [
   {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',     mj:'Grace Chua',      wl:0, urgency:'Standard' },
   {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
   {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Open',  mj:null,              wl:2, urgency:'Standard' },
+  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Draft',  mj:null,              wl:2, urgency:'Standard' },
   {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',  mj:null,              wl:1, urgency:'Standard' },
   {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',  mj:null,              wl:0, urgency:'Standard' },
   {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress',  mj:'Nigel Tan, Lawrence Tan',     wl:0, urgency:'Standard' },
@@ -347,7 +348,6 @@ const WAITLIST_DATA = {
   'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
   'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
   'MJ-2026-009':[{n:'Tan Siew Lian',t:'16 May 08:30'},{n:'Abdul Halim',t:'16 May 09:15'},{n:'Mei Ling Chua',t:'16 May 12:00'},{n:'Raj Gopal',t:'17 May 07:45'}],
-  'MJ-2026-010':[{n:'Wong Kah Meng',t:'16 May 10:00'},{n:'Lim Soo Bee',t:'16 May 13:30'},{n:'Ng Ah Cheh',t:'17 May 08:00'}],
   'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
   'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
   'MJ-2026-014':[{n:'Sarah Tan',t:'18 May 07:45'},{n:'Vijay Kumar',t:'18 May 09:30'}],
@@ -505,9 +505,8 @@ function openModal(jobId) {
       '<div class="slot-num ' + (hasMJ ? 'sn-filled' : 'sn-empty') + '">' + (hasMJ ? '✓' : (i + 1)) + '</div>' +
       '<div style="flex:1"><div class="slot-name"' + (hasMJ ? '' : ' style="color:var(--ink4);font-style:italic"') + '>' + (hasMJ ? j.mj : 'Empty — awaiting MJ') + '</div>' +
       '<div class="slot-meta">' + (hasMJ ? 'Confirmed · Grabbed 16 May 09:30' : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')) + '</div></div>';
-    if (!locked) {
-      if (hasMJ) slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
-      else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
+    if (!locked && hasMJ) {
+      slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
     }
 
     if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>' +
@@ -542,8 +541,7 @@ function openModal(jobId) {
   } else {
     wlHtml = '<div class="sect-title">Assignment</div>' +
       '<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr)">' +
-      'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.' +
-      (!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(\'' + jobId + '\',0)">+ Assign MJ manually</button>' : '') + '</div>';
+      'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.</div>';
   }
 
   document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
@@ -576,18 +574,6 @@ function removeSlot(btn, jobId, idx) {
   row.querySelector('.slot-num').className = 'slot-num sn-empty';
   row.querySelector('.slot-num').textContent = String(idx + 1);
   btn.textContent = 'Removed'; btn.disabled = true;
-}
-function assignManually(jobId, idx) {
-  var name = prompt('Enter MJ name to assign manually:');
-  if (!name || !name.trim()) return;
-  var row = document.getElementById('slot-' + idx);
-  if (row) {
-    row.querySelector('.slot-name').textContent = name.trim();
-    row.querySelector('.slot-name').style.cssText = '';
-    row.querySelector('.slot-meta').textContent = 'Manually assigned · Just now';
-    row.querySelector('.slot-num').className = 'slot-num sn-filled';
-    row.querySelector('.slot-num').textContent = '✓';
-  }
 }
 
 /* ══ Cancel Job ═════════════════════════════════════════════════════ */

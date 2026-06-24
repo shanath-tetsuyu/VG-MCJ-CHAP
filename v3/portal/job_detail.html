@@ -72,19 +72,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
 /* Badges */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
 .b-pub{background:var(--bl);color:var(--bm);}
-.b-tak{background:var(--gl);color:var(--g);}
-.b-com{background:var(--gl);color:var(--g);}
-.b-can{background:var(--rl);color:var(--rm);}
-.b-wl{background:var(--al);color:var(--am);}
-.b-risk{background:var(--rl);color:var(--rm);}
-.b-reopen{background:var(--pl);color:var(--pm);}
-.b-prog{background:var(--bl);color:var(--bm);}
-.b-urg{background:#FFF3EC;color:#C04A00;border:1px solid #FFCFB2;}
-.b-std{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr);}
-.b-draft{background:#E8E8ED;color:#555;}
-.b-submitted{background:var(--bl);color:var(--bm);}
-.b-processed{background:var(--gl);color:var(--g);}
-.b-amended{background:var(--al);color:var(--am);}
+.b-tak{background:var(--gl);color:var(--g);padding:12px; font-size:13px;}
+.b-com{background:var(--gl);color:var(--g);padding:12px; font-size:13px;}
+.b-can{background:var(--rl);color:var(--rm);padding:12px; font-size:13px;}
+.b-wl{background:var(--al);color:var(--am);padding:12px; font-size:13px;}
+.b-risk{background:var(--rl);color:var(--rm);padding:12px; font-size:13px;}
+.b-reopen{background:var(--pl);color:var(--pm);padding:12px; font-size:13px;}
+.b-prog{background:var(--bl);color:var(--bm);padding:12px; font-size:13px;}
+.b-urg{background:#FFF3EC;color:#C04A00;border:1px solid #FFCFB2;padding:12px; font-size:13px;}
+.b-std{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr);padding:12px; font-size:13px;}
+.b-draft{background:#E8E8ED;color:#555;padding:12px; font-size:13px;}
+.b-submitted{background:var(--bl);color:var(--bm);padding:12px; font-size:13px;}
+.b-processed{background:var(--gl);color:var(--g);padding:12px; font-size:13px;}
+.b-amended{background:var(--al);color:var(--am);padding:12px; font-size:13px;}
 
 /* Sect title */
 .sect-title{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;margin-top:16px;}
@@ -159,6 +159,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
 .btn-danger{background:var(--rm);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .btn-danger:hover{background:#8C2020;}
 
+/* Draft footer */
+.page-footer{height:56px;background:var(--s);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0;}
+.btn-pub{background:var(--g);color:#fff;border:none;border-radius:var(--r);padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;}
+.btn-pub:hover{background:#0A5C46;}
+.btn-save-draft{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 18px;font-size:13px;color:var(--ink3);cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;}
+.btn-save-draft:hover{background:var(--bg);}
+
 /* Not found state */
 .not-found{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--ink4);}
 .not-found i{font-size:48px;margin-bottom:12px;opacity:.3;}
@@ -222,6 +229,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
       <!-- Populated by JS -->
     </div>
   </div>
+
+  <div id="page-footer" class="page-footer" style="display:none;">
+    <button class="btn-save-draft" onclick="handleSaveDraft()"><i class="bi bi-floppy"></i> Save as Draft</button>
+    <button class="btn-pub" onclick="handlePublish()"><i class="bi bi-send"></i> Publish</button>
+  </div>
 </div>
 
 </div><!-- /page-content -->
@@ -239,7 +251,7 @@ const JOB_DATA = [
   {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed',   mj:'Fatimah bte Ali',          wl:0, urgency:'Urgent',   venueFrom:'Blk 55 Queenstown Rd #06-22',venueTo:'TTSH, Block 9 Medical',clientAge:75,clientGender:'Female',clientRace:'Chinese',funcLevel:'Dependent',dementia:'Moderate',weight:50,clientRemarks:'Requires wheelchair. Cannot be left alone. Has sundowning tendencies.',complexity:'H',genderPref:'Any gender',language:'Mandarin',skills:['Chaperone OJT','Wheelchair Transfer']},
   {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',        mj:null,                       wl:1, urgency:'Standard', venueFrom:'Blk 20 Buona Vista Ave 6 #03-06',venueTo:'',clientAge:70,clientGender:'Male',clientRace:'Indian',funcLevel:'Independent',dementia:'None',weight:68,clientRemarks:'Speaks Tamil and English. Cooperative and punctual.',complexity:'L',genderPref:'Any gender',language:'English',skills:['Home Assessment OJT']},
   {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',       mj:'Susan Lim',                wl:0, urgency:'Standard', venueFrom:'SCC — Queenstown, Meeting Room',venueTo:'',clientAge:74,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:60,clientRemarks:'Hearing aid user. Prefers to speak Cantonese.',complexity:'L',genderPref:'Any gender',language:'Cantonese',skills:['Befriending OJT']},
-  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Open',        mj:null,                       wl:3, urgency:'Urgent',   venueFrom:'Blk 91 Toa Payoh Lor 4 #12-55',venueTo:'Tan Tock Seng Hospital, Clinic C',clientAge:82,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:45,clientRemarks:'Frail. Slow walker. Please allow extra time.',complexity:'H',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT','First Aid Certified']},
+  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Draft',        mj:null,                       wl:3, urgency:'Urgent',   venueFrom:'Blk 91 Toa Payoh Lor 4 #12-55',venueTo:'Tan Tock Seng Hospital, Clinic C',clientAge:82,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:45,clientRemarks:'Frail. Slow walker. Please allow extra time.',complexity:'H',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT','First Aid Certified']},
   {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',        mj:null,                       wl:2, urgency:'Standard', venueFrom:'VG — Buona Vista, Common Room',venueTo:'',clientAge:66,clientGender:'Female',clientRace:'Malay',funcLevel:'Independent',dementia:'None',weight:58,clientRemarks:'Active and social. Enjoys music sessions.',complexity:'L',genderPref:'Any gender',language:'Malay',skills:['Befriending OJT']},
   {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',        mj:null,                       wl:3, urgency:'Standard', venueFrom:'Blk 261 Bishan St 22 #05-02',venueTo:'',clientAge:79,clientGender:'Male',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:70,clientRemarks:'Mobility issues. Lives alone. Family overseas.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
   {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed',   mj:'Ravi Kumar',               wl:0, urgency:'Standard', venueFrom:'Blk 411 Clementi Ave 1 #07-44',venueTo:'NUH Eye Centre',clientAge:71,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:54,clientRemarks:'Eye condition. Bright light sensitive — sunglasses may help.',complexity:'L',genderPref:'Any gender',language:'English',skills:['Chaperone OJT']},
@@ -247,7 +259,7 @@ const JOB_DATA = [
   {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',       mj:'Grace Chua',               wl:0, urgency:'Standard', venueFrom:'SCC — Toa Payoh, Activity Hall',venueTo:'',clientAge:73,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:66,clientRemarks:'Enjoys chess and card games. Very friendly.',complexity:'L',genderPref:'Any gender',language:'Mandarin',skills:['Befriending OJT']},
   {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',  mj:null,                       wl:4, urgency:'Standard', venueFrom:'Blk 6 Buona Vista Rd #02-10',venueTo:'',clientAge:69,clientGender:'Male',clientRace:'Malay',funcLevel:'Needs assistance',dementia:'None',weight:72,clientRemarks:'Diabetic. Check on medication compliance during visit.',complexity:'M',genderPref:'Any gender',language:'Malay',skills:['Home Assessment OJT']},
   {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',        mj:null,                       wl:4, urgency:'Standard', venueFrom:'Blk 22 Buona Vista Ave 1 #11-06',venueTo:'NUHCS, Cardiac Centre',clientAge:76,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:53,clientRemarks:'Heart condition. No heavy lifting. Please walk slowly.',complexity:'M',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT']},
-  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Open',        mj:null,                       wl:2, urgency:'Standard', venueFrom:'VG — Clementi, Common Room',venueTo:'',clientAge:77,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:50,clientRemarks:'Withdrawn personality. Patience required to engage.',complexity:'M',genderPref:'Female MJ only',language:'Cantonese',skills:['Befriending OJT']},
+  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Draft',        mj:null,                       wl:2, urgency:'Standard', venueFrom:'VG — Clementi, Common Room',venueTo:'',clientAge:77,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:50,clientRemarks:'Withdrawn personality. Patience required to engage.',complexity:'M',genderPref:'Female MJ only',language:'Cantonese',skills:['Befriending OJT']},
   {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',        mj:null,                       wl:1, urgency:'Standard', venueFrom:'Blk 303 Clementi Ave 3 #09-12',venueTo:'NUH, Oncology Centre',clientAge:67,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:49,clientRemarks:'Chemotherapy patient. May feel tired. Bring light snacks if possible.',complexity:'M',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT']},
   {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',        mj:null,                       wl:0, urgency:'Standard', venueFrom:'Blk 54 Queenstown Rd #07-17',venueTo:'',clientAge:81,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:47,clientRemarks:'Lives with daughter. Assess kitchen safety and bathroom rails.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
   {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress', mj:'Nigel Tan, Lawrence Tan',  wl:0, urgency:'Standard', venueFrom:'Blk 54 Queenstown Rd #07-17',venueTo:'',clientAge:81,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:47,clientRemarks:'Currently in progress — MJs on site.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
@@ -290,6 +302,7 @@ const STATUS_BADGE = {
   'At Risk':     '<span class="badge b-risk">⚠ At Risk</span>',
   'Re-opened':   '<span class="badge b-reopen">↺ Re-opened</span>',
   'In Progress': '<span class="badge b-prog">In Progress</span>',
+  'Draft':       '<span class="badge b-prog">Draft</span>',
 };
 
 function calcBillableHours(mins) {
@@ -307,38 +320,38 @@ function fmtDuration(mins) {
 }
 
 /* ══ Activity log mock ═════════════════════════════════════════════ */
-function getActivityLog(j) {
-  const log = [];
-  log.push({dot:'ad-k', title:'Job created', detail:`Published by John David · Open to MJ grab`, time:j.date + ', 09:00'});
+// function getActivityLog(j) {
+//   const log = [];
+//   log.push({dot:'ad-k', title:'Job created', detail:`Published by John David · Open to MJ grab`, time:j.date + ', 09:00'});
 
-  if (j.status === 'Taken' || j.status === 'Completed' || j.status === 'In Progress') {
-    if (j.mj) {
-      const mjs = j.mj.split(',').map(n => n.trim());
-      mjs.forEach(name => {
-        log.push({dot:'ad-g', title:'MJ confirmed', detail:`${name} grabbed the job`, time:j.date.replace(/\d+ /, d => (parseInt(d)-4) + ' ') + ', 14:22'});
-      });
-    }
-  }
-  if (j.status === 'Completed') {
-    log.push({dot:'ad-b', title:'MJ checked in', detail:`Check-in recorded at job location`, time:j.date + ', ' + j.time.split('–')[0]});
-    log.push({dot:'ad-g', title:'Job completed', detail:`MJ checked out. Attendance recorded.`, time:j.date + ', ' + j.time.split('–')[1]});
-  }
-  if (j.status === 'In Progress') {
-    log.push({dot:'ad-b', title:'MJ checked in', detail:`Check-in recorded at job location`, time:j.date + ', ' + j.time.split('–')[0]});
-    log.push({dot:'ad-p', title:'Job in progress', detail:`MJ currently at client location`, time:'Now'});
-  }
-  if (j.status === 'At Risk') {
-    log.push({dot:'ad-r', title:'At-risk flag raised', detail:`No confirmed MJ — auto-cancel triggers 1 BD before job date`, time:'System · ' + j.date.replace(/\d+ /, d => (parseInt(d)-2) + ' ')});
-  }
-  if (j.status === 'Cancelled') {
-    log.push({dot:'ad-r', title:'Job cancelled', detail:`Cancelled by SCC Coordinator · Client hospitalised`, time:j.date + ', 08:45'});
-  }
-  if (j.status === 'Re-opened') {
-    log.push({dot:'ad-a', title:'MJ cancelled', detail:`${j.cancelledBy} cancelled (same-day) at ${j.cancelledAt}`, time:j.cancelledAt});
-    log.push({dot:'ad-p', title:'Job re-opened', detail:`Slot re-opened for grab`, time:j.cancelledAt});
-  }
-  return log.reverse();
-}
+//   if (j.status === 'Taken' || j.status === 'Completed' || j.status === 'In Progress') {
+//     if (j.mj) {
+//       const mjs = j.mj.split(',').map(n => n.trim());
+//       mjs.forEach(name => {
+//         log.push({dot:'ad-g', title:'MJ confirmed', detail:`${name} grabbed the job`, time:j.date.replace(/\d+ /, d => (parseInt(d)-4) + ' ') + ', 14:22'});
+//       });
+//     }
+//   }
+//   if (j.status === 'Completed') {
+//     log.push({dot:'ad-b', title:'MJ checked in', detail:`Check-in recorded at job location`, time:j.date + ', ' + j.time.split('–')[0]});
+//     log.push({dot:'ad-g', title:'Job completed', detail:`MJ checked out. Attendance recorded.`, time:j.date + ', ' + j.time.split('–')[1]});
+//   }
+//   if (j.status === 'In Progress') {
+//     log.push({dot:'ad-b', title:'MJ checked in', detail:`Check-in recorded at job location`, time:j.date + ', ' + j.time.split('–')[0]});
+//     log.push({dot:'ad-p', title:'Job in progress', detail:`MJ currently at client location`, time:'Now'});
+//   }
+//   if (j.status === 'At Risk') {
+//     log.push({dot:'ad-r', title:'At-risk flag raised', detail:`No confirmed MJ — auto-cancel triggers 1 BD before job date`, time:'System · ' + j.date.replace(/\d+ /, d => (parseInt(d)-2) + ' ')});
+//   }
+//   if (j.status === 'Cancelled') {
+//     log.push({dot:'ad-r', title:'Job cancelled', detail:`Cancelled by SCC Coordinator · Client hospitalised`, time:j.date + ', 08:45'});
+//   }
+//   if (j.status === 'Re-opened') {
+//     log.push({dot:'ad-a', title:'MJ cancelled', detail:`${j.cancelledBy} cancelled (same-day) at ${j.cancelledAt}`, time:j.cancelledAt});
+//     log.push({dot:'ad-p', title:'Job re-opened', detail:`Slot re-opened for grab`, time:j.cancelledAt});
+//   }
+//   return log.reverse();
+// }
 
 /* ══ Render ══════════════════════════════════════════════════════════ */
 function render() {
@@ -352,8 +365,8 @@ function render() {
   const j = JOB_DATA.find(x => x.id === jobId);
   if (!j) { showNotFound(main, rp, `Job "${jobId}" not found.`); return; }
 
-  document.title = `CARES — ${j.id}`;
-  document.getElementById('crumb-label').textContent = j.id + ' · ' + j.type;
+  document.title = `CARES — ${j.type}`;
+  document.getElementById('crumb-label').textContent = j.type + ' · ' + j.facility;
 
   const wl  = WAITLIST_DATA[jobId] || [];
   const fin = AP_DATA_MAP[jobId];
@@ -361,6 +374,7 @@ function render() {
   const isBef = j.type === 'Befriending';
   const slots = isHA ? 2 : 1;
   const rate  = RATES[j.type] || 12;
+  const locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
 
   /* ── Banner ── */
   let banner = '';
@@ -386,7 +400,7 @@ function render() {
   <div class="job-header">
     <div class="job-header-icon ${TYPE_CLASS[j.type] || 'ci-p'}">${TYPE_ICON[j.type] || '<i class="bi bi-briefcase"></i>'}</div>
     <div class="job-header-main">
-      <div class="job-id">${j.id}</div>
+
       <div class="job-title">${j.type}</div>
       <div class="job-subtitle">${j.facility} · ${j.date} · ${j.time}</div>
       <div class="job-header-badges">
@@ -396,7 +410,7 @@ function render() {
       </div>
     </div>
     <div class="job-header-actions">
-      <a href="./proto1_v3_publish.html" class="btn-ghost" style="font-size:12px;padding:6px 12px;"><i class="bi bi-pencil"></i> Edit Job</a>
+      <a onclick="editJobAlert()" class="btn-ghost" style="font-size:12px;padding:6px 12px;"><i class="bi bi-pencil"></i> Edit Job</a>
       <a href="./index.html" class="btn-ghost" style="font-size:12px;padding:6px 12px;"><i class="bi bi-arrow-left"></i> Back</a>
     </div>
   </div>`;
@@ -459,6 +473,7 @@ function render() {
       <div class="info-box"><div class="info-label">Complexity</div><div class="info-val"><span class="badge ${cplxClass}">${cplxLabel}</span></div></div>
       <div class="info-box"><div class="info-label">Gender Preference</div><div class="info-val">${j.genderPref}</div></div>
       <div class="info-box"><div class="info-label">Language Required</div><div class="info-val">${j.language}</div></div>
+      <div class="info-box" style="display:${j.status === 'Draft' ? 'block' : 'none'};"><div class="info-label">Potential MJobber(s)</div><div class="info-val">2</div></div>
     </div>
     <div class="sect-title">Skills / OJT Required</div>
     <div style="margin-top:4px;">${skillTags || '<span style="font-size:12px;color:var(--ink4)">None specified</span>'}</div>
@@ -470,13 +485,15 @@ function render() {
   for (let i = 0; i < slots; i++) {
     const hasMJ = i < mjNames.length && mjNames[i];
     slotsHtml += `
-    <div class="slot-row">
-      <div class="slot-num ${hasMJ ? 'sn-filled' : 'sn-empty'}">${hasMJ ? '✓' : (i+1)}</div>
+    <div class="slot-row" id="slot-${i}">
+      <div class="slot-num ${hasMJ ? 'sn-filled' : 'sn-empty'}" id="slot-num-${i}">${hasMJ ? '✓' : (i+1)}</div>
       <div style="flex:1">
-        <div class="slot-name" style="${hasMJ ? '' : 'color:var(--ink4);font-style:italic'}">${hasMJ ? mjNames[i] : 'Empty — awaiting MJ'}</div>
-        <div class="slot-meta">${hasMJ ? 'Confirmed · Grabbed ' + j.date : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')}</div>
+        <div class="slot-name" id="slot-name-${i}" style="${hasMJ ? '' : 'color:var(--ink4);font-style:italic'}">${hasMJ ? mjNames[i] : 'Empty — awaiting MJ'}</div>
+        <div class="slot-meta" id="slot-meta-${i}">${hasMJ ? 'Confirmed · Grabbed ' + j.date : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')}</div>
       </div>
-      ${hasMJ ? `<a href="./proto2_v3_mj_profile.html" class="btn-ghost" style="font-size:11px;padding:4px 10px;"><i class="bi bi-person-lines-fill"></i> View MJ</a>` : ''}
+      ${hasMJ
+        ? `<a href="./proto2_v3_mj_profile.html" class="btn-ghost" style="font-size:11px;padding:4px 10px;"><i class="bi bi-person-lines-fill"></i> View MJ</a>`
+        : (!locked ? `<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(${i})">+ Assign</button>` : '')}
     </div>`;
   }
 
@@ -511,6 +528,7 @@ function render() {
     <div class="sect-title" style="margin-top:14px;">Assignment Note</div>
     <div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr);">
       Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist.
+      ${!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(0)">+ Assign MJ manually</button>' : ''}
     </div>`;
   }
 
@@ -526,27 +544,27 @@ function render() {
   </div>`;
 
   /* ── Activity log ── */
-  const actLog = getActivityLog(j);
-  const actHtml = actLog.map(a => `
-  <div class="act-row">
-    <div class="act-dot ${a.dot}"></div>
-    <div class="act-body">
-      <div class="act-title">${a.title}</div>
-      <div class="act-detail">${a.detail}</div>
-    </div>
-    <div class="act-time">${a.time}</div>
-  </div>`).join('');
+  // const actLog = getActivityLog(j);
+  // const actHtml = actLog.map(a => `
+  // <div class="act-row">
+  //   <div class="act-dot ${a.dot}"></div>
+  //   <div class="act-body">
+  //     <div class="act-title">${a.title}</div>
+  //     <div class="act-detail">${a.detail}</div>
+  //   </div>
+  //   <div class="act-time">${a.time}</div>
+  // </div>`).join('');
 
-  const actCard = `
-  <div class="card">
-    <div class="card-head">
-      <div class="card-icon" style="background:var(--bg);border:1px solid var(--bdr);"><i class="bi bi-clock-history" style="font-size:13px;color:var(--ink3)"></i></div>
-      <div class="card-label">Activity Log</div>
-    </div>
-    ${actHtml}
-  </div>`;
+  // const actCard = `
+  // <div class="card">
+  //   <div class="card-head">
+  //     <div class="card-icon" style="background:var(--bg);border:1px solid var(--bdr);"><i class="bi bi-clock-history" style="font-size:13px;color:var(--ink3)"></i></div>
+  //     <div class="card-label">Activity Log</div>
+  //   </div>
+  //   ${actHtml}
+  // </div>`;
 
-  main.innerHTML = banner + header + jobCard + clientCard + matchCard + assignCard + actCard;
+  main.innerHTML = banner + header + jobCard + clientCard + matchCard + assignCard;
 
   /* ══ Right panel ════════════════════════════════════════════════ */
   let finBlock = '';
@@ -560,17 +578,17 @@ function render() {
       'Amended':   `<span class="badge b-amended">⚠ Amended</span>`,
     }[fin.status] || `<span class="badge b-draft">${fin.status}</span>`;
 
-    finBlock = `
-    <div class="rp-title"><i class="bi bi-cash-stack"></i> Finance Summary</div>
-    <div class="fin-block">
-      <div class="fin-row"><span style="color:var(--ink3)">Scheduled</span><span>${fmtDuration(fin.schedMins)}</span></div>
-      <div class="fin-row"><span style="color:var(--ink3)">Actual (MJ)</span><span>${fin.isNoShow ? 'No-show (min 1h)' : fmtDuration(fin.actualMins)}</span></div>
-      <div class="fin-row"><span style="color:var(--ink3)">Billable hrs</span><span style="font-weight:600;color:var(--pm)">${billable} hr${billable!==1?'s':''}</span></div>
-      <div class="fin-row"><span style="color:var(--ink3)">Rate</span><span>$${(fin.billRate || rate).toFixed(2)} / hr</span></div>
-      <div class="fin-row"><span style="color:var(--ink3)">AP Status</span><span>${statusBadge}</span></div>
-      <div class="fin-total"><span class="fin-total-label">Total payable</span><span class="fin-total-val">$${amount}</span></div>
-    </div>
-    <a href="./finance.html" class="btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:12px;"><i class="bi bi-receipt"></i> View in Finance</a>`;
+    // finBlock = `
+    // <div class="rp-title"><i class="bi bi-cash-stack"></i> Finance Summary</div>
+    // <div class="fin-block">
+    //   <div class="fin-row"><span style="color:var(--ink3)">Scheduled</span><span>${fmtDuration(fin.schedMins)}</span></div>
+    //   <div class="fin-row"><span style="color:var(--ink3)">Actual (MJ)</span><span>${fin.isNoShow ? 'No-show (min 1h)' : fmtDuration(fin.actualMins)}</span></div>
+    //   <div class="fin-row"><span style="color:var(--ink3)">Billable hrs</span><span style="font-weight:600;color:var(--pm)">${billable} hr${billable!==1?'s':''}</span></div>
+    //   <div class="fin-row"><span style="color:var(--ink3)">Rate</span><span>$${(fin.billRate || rate).toFixed(2)} / hr</span></div>
+    //   <div class="fin-row"><span style="color:var(--ink3)">AP Status</span><span>${statusBadge}</span></div>
+    //   <div class="fin-total"><span class="fin-total-label">Total payable</span><span class="fin-total-val">$${amount}</span></div>
+    // </div>
+    // <a href="./finance.html" class="btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:12px;"><i class="bi bi-receipt"></i> View in Finance</a>`;
   } else {
     finBlock = `
     <div class="rp-title"><i class="bi bi-cash-stack"></i> Finance</div>
@@ -594,11 +612,12 @@ function render() {
   <div class="rp-title">Quick Actions</div>
   <div style="display:flex;flex-direction:column;gap:8px;">
     <a href="./index.html?manage=${j.id}" class="btn-ghost" style="font-size:12px;justify-content:center;"><i class="bi bi-person-check"></i> Manage Assignment</a>
-    <a href="./proto1_v3_publish.html" class="btn-ghost" style="font-size:12px;justify-content:center;"><i class="bi bi-pencil-square"></i> Edit Job</a>
     <a href="./v1_mj_listing.html" class="btn-ghost" style="font-size:12px;justify-content:center;"><i class="bi bi-people"></i> MJ Registry</a>
   </div>`;
 
   rp.innerHTML = `<div class="rp">${finBlock}${slotsInfo}${links}</div>`;
+
+  document.getElementById('page-footer').style.display = j.status === 'Draft' ? 'flex' : 'none';
 }
 
 function showNotFound(main, rp, msg) {
@@ -614,12 +633,38 @@ function showNotFound(main, rp, msg) {
 
 render();
 
+function assignManually(idx) {
+  var name = prompt('Enter MJ name to assign manually:');
+  if (!name || !name.trim()) return;
+  var row = document.getElementById('slot-' + idx);
+  if (!row) return;
+  document.getElementById('slot-name-' + idx).textContent = name.trim();
+  document.getElementById('slot-name-' + idx).style.cssText = '';
+  document.getElementById('slot-meta-' + idx).textContent = 'Manually assigned · Just now';
+  document.getElementById('slot-num-' + idx).className = 'slot-num sn-filled';
+  document.getElementById('slot-num-' + idx).textContent = '✓';
+  var btn = row.querySelector('button');
+  if (btn) btn.remove();
+}
+
 /* Sidebar toggle */
 const sidebarToggle = document.getElementById('sidebarToggle');
 if (sidebarToggle) {
   sidebarToggle.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
   });
+}
+
+function editJobAlert() {
+  alert('This would open the job editing interface where user can modify job details.');
+}
+
+function handleSaveDraft() {
+  alert('Draft saved. Redirecting to job detail page...');
+}
+
+function handlePublish() {
+  alert('Job published successfully. Redirecting to job detail page...');
 }
 
 </script>
