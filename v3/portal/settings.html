@@ -81,6 +81,11 @@
           </button>
         </li>
         <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-rules" type="button" role="tab">
+            <i class="bi bi-sliders me-1"></i>Business Rules
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-facilities" type="button" role="tab">
             <i class="bi bi-building-fill me-1"></i>Facilities
           </button>
@@ -146,6 +151,160 @@
             </table>
           </div><!-- /set-card -->
         </div><!-- /pane-roles -->
+
+        <!-- ══ BUSINESS RULES ═════════════════════════════════════════ -->
+        <div class="tab-pane fade" id="pane-rules" role="tabpanel">
+
+          <!-- Scheduling & Lead Times -->
+          <div class="set-card">
+            <div class="set-card-title"><i class="bi bi-calendar3 me-1"></i>Scheduling &amp; Lead Times</div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Job Publication Lead Time
+                <div class="rule-desc">Minimum number of business days before the appointment date that a job can be published.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="3" min="1" max="30">
+                <span class="rule-unit">business days</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Urgent Job Threshold
+                <div class="rule-desc">Jobs published within this window are flagged as Urgent in the MJ app.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="3" min="1" max="30">
+                <span class="rule-unit">business days before</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Waitlist Settings -->
+          <div class="set-card">
+            <div class="set-card-title"><i class="bi bi-list-ol me-1"></i>Waitlist Settings</div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Chaperone
+                <div class="rule-desc">Maximum number of MJs that can be placed on the waitlist for Chaperone jobs.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="4" min="1" max="20">
+                <span class="rule-unit">slots</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Befriending
+                <div class="rule-desc">Maximum number of MJs that can be placed on the waitlist for Befriending jobs.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="4" min="1" max="20">
+                <span class="rule-unit">slots</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Safe Steps
+                <div class="rule-desc">Maximum number of MJs that can be placed on the waitlist for Safe Steps jobs.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="4" min="1" max="20">
+                <span class="rule-unit">slots</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Centre Assistant
+                <div class="rule-desc">Maximum number of MJs that can be placed on the waitlist for Centre Assistant jobs.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="4" min="1" max="20">
+                <span class="rule-unit">slots</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Confirmation Window per Slot
+                <div class="rule-desc">Time given to each waitlisted MJ to confirm before the slot passes to the next person.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="12" min="1" max="72">
+                <span class="rule-unit">hours</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cancellation & Auto-Actions -->
+          <div class="set-card">
+            <div class="set-card-title"><i class="bi bi-x-circle me-1"></i>Cancellation &amp; Auto-Actions</div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                MJ Cancellation Window
+                <div class="rule-desc">MJs must cancel at least this many business days before the appointment; past this deadline, they must contact centre staff.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="2" min="1" max="10">
+                <span class="rule-unit">business days before</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Auto-Cancel if No Takers
+                <div class="rule-desc">Job is automatically cancelled and client is notified if no MJ confirms by this threshold.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="1" min="1" max="5">
+                <span class="rule-unit">business day before</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Client Cancellation Cutoff
+                <div class="rule-desc">Client must cancel at least this many hours before the appointment to avoid being charged in full.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="24" min="1" max="72">
+                <span class="rule-unit">hours before</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance & Billing -->
+          <div class="set-card" style="display:none;">
+            <div class="set-card-title"><i class="bi bi-clock-history me-1"></i>Attendance &amp; Billing</div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Overtime Notification Buffer
+                <div class="rule-desc">Alert SCC staff to amend billing if job runs over scheduled end time by more than this buffer.</div>
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="15" min="5" max="120">
+                <span class="rule-unit">minutes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save -->
+          <div class="d-flex justify-content-end gap-2 mb-2">
+            <button class="btn btn-sm btn-light border" style="font-size:13px;">Reset to Defaults</button>
+            <button class="btn btn-sm" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;" onclick="saveBizRules()">
+              <i class="bi bi-check2 me-1"></i>Save Changes
+            </button>
+          </div>
+
+        </div><!-- /pane-rules -->
 
         <!-- ══ FACILITIES ═════════════════════════════════════════ -->
         <div class="tab-pane fade" id="pane-facilities" role="tabpanel">

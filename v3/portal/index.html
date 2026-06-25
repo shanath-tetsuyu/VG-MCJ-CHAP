@@ -221,6 +221,7 @@
                 <th>Client</th>
                 <th class="no-sort">Status</th>
                 <th>MJ assigned</th>
+                <th>SCC Staff</th>
                 <th class="no-sort">Waitlist</th>
                 <th class="no-sort">Urgency</th>
                 <th class="no-sort">Actions</th>
@@ -321,26 +322,26 @@
 <script>
 /* ══ Mock data ══════════════════════════════════════════════════════ */
 const JOB_DATA = [
-  {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',    status:'At Risk',   mj:null,              wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',       status:'Taken',     mj:'Ahmad Razif',     wl:2, urgency:'Standard' },
-  {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',   date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',     status:'Completed', mj:'Lily Tan',        wl:0, urgency:'Standard' },
-  {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Open',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed', mj:'Fatimah bte Ali', wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',  mj:null,              wl:1, urgency:'Standard' },
-  {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',     mj:'Susan Lim',       wl:0, urgency:'Standard' },
-  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Draft',  mj:null,              wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',  mj:null,              wl:2, urgency:'Standard' },
-  {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',  mj:null,              wl:3, urgency:'Standard' },
-  {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed', mj:'Ravi Kumar',      wl:0, urgency:'Standard' },
-  {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',    date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',      status:'Cancelled', mj:null,              wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',     mj:'Grace Chua',      wl:0, urgency:'Standard' },
-  {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',  mj:null,              wl:4, urgency:'Standard' },
-  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Draft',  mj:null,              wl:2, urgency:'Standard' },
-  {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',  mj:null,              wl:1, urgency:'Standard' },
-  {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',  mj:null,              wl:0, urgency:'Standard' },
-  {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress',  mj:'Nigel Tan, Lawrence Tan',     wl:0, urgency:'Standard' },
-  {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown',date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',     status:'Re-opened', mj:null,              wl:2, urgency:'Standard', cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
+  {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'At Risk',    mj:null,                      wl:0, urgency:'Urgent',   sccStaff:null              },
+  {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',        status:'Taken',      mj:'Ahmad Razif',             wl:2, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh',  date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',       status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:'Noor Azizah'     },
+  {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown', date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',      status:'Completed',  mj:'Fatimah bte Ali',         wl:0, urgency:'Urgent',   sccStaff:null              },
+  {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',         status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',     status:'Taken',      mj:'Susan Lim',               wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh',  date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',      status:'Draft',      mj:null,                      wl:0, urgency:'Urgent',   sccStaff:'Noor Azizah'     },
+  {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof',  status:'Open',       mj:null,                      wl:2, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',     date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',       status:'Open',       mj:null,                      wl:3, urgency:'Standard', sccStaff:'Chen Li Ling'    },
+  {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',    date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',    status:'Completed',  mj:'Ravi Kumar',              wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',     date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',       status:'Cancelled',  mj:null,                      wl:0, urgency:'Urgent',   sccStaff:'Chen Li Ling'    },
+  {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh',  date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',      status:'Taken',      mj:'Grace Chua',              wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan', status:'Waitlisted', mj:null,                      wl:4, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',      status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',    date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',       status:'Draft',      mj:null,                      wl:2, urgency:'Standard', sccStaff:'Rajan Kumar'     },
+  {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',    date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',     status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'In Progress',mj:'Nigel Tan, Lawrence Tan', wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown', date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',      status:'Re-opened',  mj:null,                      wl:2, urgency:'Standard', sccStaff:null,              cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
 ];
 
 const WAITLIST_DATA = {
@@ -382,6 +383,7 @@ $(document).ready(function () {
     j.client,
     STATUS_HTML[j.status] || j.status,
     j.mj ? '<span class="mj-name">' + j.mj + '</span>' : '<span class="mj-empty">Unassigned</span>',
+    j.sccStaff ? '<span class="mj-name">' + j.sccStaff + '</span>' : '<span class="mj-empty">—</span>',
     j.wl > 0 ? '<span class="wl-chip">' + j.wl + '</span>' : '<span class="wl-zero">—</span>',
     j.urgency === 'Urgent' ? '<span class="badge b-urg">🔶 Urgent</span>' : '<span class="badge b-std">Standard</span>',
     '<button class="btn-manage" onclick="openModal(\'' + j.id + '\')">Manage →</button>',
@@ -393,6 +395,7 @@ $(document).ready(function () {
       {title:'Type'},{title:'Facility'},{title:'Date'},
       {title:'Time slot',orderable:false},{title:'Client'},
       {title:'Status',orderable:false},{title:'MJ assigned'},
+      {title:'SCC Staff'},
       {title:'Waitlist',className:'dt-center',orderable:false},
       {title:'Urgency',orderable:false},{title:'Actions',orderable:false},
     ],
@@ -621,8 +624,8 @@ function submitNoShow() {
   if (currentJobId && dt) {
     dt.rows().every(function() {
       var data = this.data();
-      if (data[0].indexOf(currentJobId) !== -1 && data[7].indexOf('no-show-badge') === -1) {
-        data[7] = data[7] + ' <span class="no-show-badge">No Show</span>';
+      if (data[0].indexOf(currentJobId) !== -1 && data[8].indexOf('no-show-badge') === -1) {
+        data[8] = data[8] + ' <span class="no-show-badge">No Show</span>';
         this.data(data);
       }
     });

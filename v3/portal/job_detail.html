@@ -231,8 +231,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
   </div>
 
   <div id="page-footer" class="page-footer" style="display:none;">
-    <button class="btn-save-draft" onclick="handleSaveDraft()"><i class="bi bi-floppy"></i> Save as Draft</button>
-    <button class="btn-pub" onclick="handlePublish()"><i class="bi bi-send"></i> Publish</button>
+    <button id="footer-duplicate" class="btn-save-draft" style="background-color:rgb(255, 255, 162)" onclick="handleDuplicate()"><i class="bi bi-copy"></i> Duplicate Job</button>
+    <button id="footer-save-draft" class="btn-save-draft" onclick="handleSaveDraft()"><i class="bi bi-floppy"></i> Save as Draft</button>
+    <button id="footer-publish" class="btn-pub" onclick="handlePublish()"><i class="bi bi-send"></i> Publish</button>
   </div>
 </div>
 
@@ -617,7 +618,11 @@ function render() {
 
   rp.innerHTML = `<div class="rp">${finBlock}${slotsInfo}${links}</div>`;
 
-  document.getElementById('page-footer').style.display = j.status === 'Draft' ? 'flex' : 'none';
+  var isDraft = j.status === 'Draft';
+  var isCancelled = j.status === 'Cancelled';
+  document.getElementById('page-footer').style.display = (isDraft || isCancelled) ? 'flex' : 'none';
+  document.getElementById('footer-save-draft').style.display = isDraft ? '' : 'none';
+  document.getElementById('footer-publish').style.display = isDraft ? '' : 'none';
 }
 
 function showNotFound(main, rp, msg) {
@@ -657,6 +662,10 @@ if (sidebarToggle) {
 
 function editJobAlert() {
   alert('This would open the job editing interface where user can modify job details.');
+}
+
+function handleDuplicate() {
+  alert('Job duplicated as a new Draft. Redirecting to the new job...');
 }
 
 function handleSaveDraft() {

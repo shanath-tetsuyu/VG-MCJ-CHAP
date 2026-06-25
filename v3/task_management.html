@@ -71,6 +71,19 @@
               </ul>
             </div>
           </li>
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              AIC Fee Management
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="preAdmissionMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Serviicse</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Consumable Logs</a></li>
+              </ul>
+            </div>
+          </li>
           <li class="nav-item" style="opacity:0.3;">
             <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#clientMenu" aria-expanded="false">
               <i class="bi bi-person-badge me-2"></i>Client
@@ -320,6 +333,15 @@
                     <option>Meal Assistance</option>
                     <option>Physiotherapy</option>
                     <option>Medication Administration</option>
+                  </select>
+                </div>
+
+                <!-- 3rd Party Services -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold" for="thirdPartyServices">3rd Party Services</label>
+                  <select class="form-select form-select-sm" id="thirdPartyServices" onchange="handleThirdPartyChange(this)">
+                    <option value="">-- Select a 3rd Party Service --</option>
+                    <option value="Chaperone">Chaperone</option>
                   </select>
                 </div>
 
@@ -660,13 +682,13 @@
           </div>
           <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('view')">View Complete Detail</button>
-            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('duplicate')">Duplicate</button>
-            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit')">Edit</button>
-            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit-all')">Edit All</button>
+            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('duplicate')">Duplicate</button> -->
+            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit')">Edit</button> -->
+            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit-all')">Edit All</button> -->
           </div>
           <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete')">Delete</button>
-            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete-all')">Delete All</button>
+            <!-- <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete-all')">Delete All</button> -->
             <button class="btn-ghost" onclick="closeTaskDetail()">Close</button>
           </div>
         </div>
@@ -700,6 +722,22 @@
         <div class="modal-footer">
           <button class="btn-primary" onclick="submitNoShow()">Submit</button>
           <button class="btn-ghost" onclick="cancelNoShow()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3rd Party Services Form Modal -->
+    <div id="thirdPartyModal" class="modal-overlay" style="display:none;" onclick="handleThirdPartyOverlayClick(event)">
+      <div class="modal-box" style="max-width:520px;">
+        <div class="modal-head">
+          <div class="modal-head-title" id="thirdPartyModalTitle">3rd Party Service Form</div>
+          <button class="modal-close" onclick="closeThirdPartyModal()">&#10005; Close</button>
+        </div>
+        <div class="modal-body" style="min-height:200px;">
+          <!-- form content to be filled in -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="closeThirdPartyModal()">Cancel</button>
         </div>
       </div>
     </div>
@@ -1094,6 +1132,27 @@ function handleTaskDetailOverlayClick(e) {
 }
 function taskDetailAction(action) {
   closeTaskDetail();
+}
+
+/* ══ 3rd Party Services ═════════════════════════════════════════════ */
+function handleThirdPartyChange(sel) {
+  var val = sel.value;
+  if (!val) return;
+  var confirmed = confirm('Selecting "' + val + '" requires filling up a separate form. Would you like to proceed?');
+  if (confirmed) {
+    document.getElementById('thirdPartyModalTitle').textContent = val + ' — 3rd Party Service Form';
+    var bsModal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
+    if (bsModal) bsModal.hide();
+    document.getElementById('thirdPartyModal').style.display = 'flex';
+  } else {
+    sel.value = '';
+  }
+}
+function closeThirdPartyModal() {
+  document.getElementById('thirdPartyModal').style.display = 'none';
+}
+function handleThirdPartyOverlayClick(e) {
+  if (e.target.id === 'thirdPartyModal') closeThirdPartyModal();
 }
 
 /* ══ Init ═══════════════════════════════════════════════════════════ */
