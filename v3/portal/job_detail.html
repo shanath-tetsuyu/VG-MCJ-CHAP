@@ -231,7 +231,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
   </div>
 
   <div id="page-footer" class="page-footer" style="display:none;">
-    <button id="footer-duplicate" class="btn-save-draft" style="background-color:rgb(255, 255, 162)" onclick="handleDuplicate()"><i class="bi bi-copy"></i> Duplicate Job</button>
+    <button id="footer-duplicate" class="btn-save-draft" style="background-color:rgb(251, 255, 0); color:black" onclick="handleDuplicate()"><i class="bi bi-copy"></i> Duplicate Job</button>
     <button id="footer-save-draft" class="btn-save-draft" onclick="handleSaveDraft()"><i class="bi bi-floppy"></i> Save as Draft</button>
     <button id="footer-publish" class="btn-pub" onclick="handlePublish()"><i class="bi bi-send"></i> Publish</button>
   </div>
@@ -279,6 +279,14 @@ const WAITLIST_DATA = {
   'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
   'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
   'MJ-2026-024':[{n:'Ramesh Kumar',t:'20 May 10:15'},{n:'Joanna Lim',t:'20 May 11:02'}],
+};
+
+const INTERESTED_DATA = {
+  'MJ-2026-003': [{n:'Ahmad Razif',     t:'20 May 09:15'}, {n:'Susan Lim',        t:'20 May 10:02'}],
+  'MJ-2026-008': [{n:'Ravi Kumar',      t:'19 May 14:30'}, {n:'Grace Chua',       t:'19 May 15:00'}, {n:'Fatimah Zainal', t:'19 May 16:45'}],
+  'MJ-2026-011': [{n:'Lily Tan',        t:'17 May 08:00'}, {n:'David Teo',        t:'17 May 09:30'}],
+  'MJ-2026-016': [{n:'Ahmad Razif',     t:'21 May 11:00'}],
+  'MJ-2026-020': [{n:'Susan Yeo',       t:'17 May 14:00'}, {n:'Ng Bee Hoon',      t:'18 May 08:30'}],
 };
 
 const AP_DATA_MAP = {
@@ -525,12 +533,37 @@ function render() {
       wlHtml += `</div>`;
     }
   } else {
-    wlHtml = `
-    <div class="sect-title" style="margin-top:14px;">Assignment Note</div>
-    <div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr);">
-      Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist.
-      ${!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(0)">+ Assign MJ manually</button>' : ''}
-    </div>`;
+    const interested = INTERESTED_DATA[jobId] || [];
+    const alreadyFilled = mjNames.length > 0;
+    const canAssign = !locked && !alreadyFilled;
+
+    wlHtml = `<div class="sect-title" style="margin-top:14px;">Interested Applicants</div>`;
+
+    if (!interested.length) {
+      wlHtml += `<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr);">No MJs have expressed interest yet.</div>`;
+    } else {
+      wlHtml += `<div id="interested-list">`;
+      interested.forEach((w, idx) => {
+        wlHtml += `
+        <div class="slot-row" id="int-row-${idx}" style="margin-bottom:6px;">
+          <div class="slot-num sn-empty" id="int-num-${idx}">${idx + 1}</div>
+          <div style="flex:1;">
+            <div class="slot-name" id="int-name-${idx}">${w.n}</div>
+            <div class="slot-meta">Expressed interest · ${w.t}</div>
+          </div>
+          ${canAssign
+            ? `<button class="btn-ghost" id="int-btn-${idx}" style="font-size:11px;padding:4px 10px;" onclick="assignFromInterested('${w.n}', ${idx})">Assign</button>`
+            : alreadyFilled
+              ? `<span style="font-size:11px;color:var(--ink4);">Slot filled</span>`
+              : ''}
+        </div>`;
+      });
+      wlHtml += `</div>`;
+    }
+
+    if (canAssign) {
+      wlHtml += `<button class="btn-ghost" style="font-size:12px;margin-top:8px;" onclick="assignManually(0)">+ Assign other MJ</button>`;
+    }
   }
 
   const assignCard = `
@@ -620,7 +653,8 @@ function render() {
 
   var isDraft = j.status === 'Draft';
   var isCancelled = j.status === 'Cancelled';
-  document.getElementById('page-footer').style.display = (isDraft || isCancelled) ? 'flex' : 'none';
+  var isCompleted = j.status === 'Completed';
+  document.getElementById('page-footer').style.display = (isDraft || isCancelled || isCompleted) ? 'flex' : 'none';
   document.getElementById('footer-save-draft').style.display = isDraft ? '' : 'none';
   document.getElementById('footer-publish').style.display = isDraft ? '' : 'none';
 }
@@ -650,6 +684,40 @@ function assignManually(idx) {
   document.getElementById('slot-num-' + idx).textContent = '✓';
   var btn = row.querySelector('button');
   if (btn) btn.remove();
+}
+
+function assignFromInterested(name, selectedIdx) {
+  /* Fill the confirmed slot */
+  var slotName = document.getElementById('slot-name-0');
+  var slotMeta = document.getElementById('slot-meta-0');
+  var slotNum  = document.getElementById('slot-num-0');
+  var slotRow  = document.getElementById('slot-0');
+  if (slotName) { slotName.textContent = name; slotName.style.cssText = ''; }
+  if (slotMeta) slotMeta.textContent = 'Assigned · Just now';
+  if (slotNum)  { slotNum.className = 'slot-num sn-filled'; slotNum.textContent = '✓'; }
+  if (slotRow)  { var btn = slotRow.querySelector('button'); if (btn) btn.remove(); }
+
+  /* Update interested list — mark selected, disable all buttons */
+  document.querySelectorAll('[id^="int-row-"]').forEach(function(row, idx) {
+    var btn = document.getElementById('int-btn-' + idx);
+    if (btn) btn.remove();
+    var num = document.getElementById('int-num-' + idx);
+    if (idx === selectedIdx) {
+      if (num) { num.className = 'slot-num sn-filled'; num.textContent = '✓'; }
+      row.style.background = 'var(--gl)';
+      row.style.borderColor = 'var(--gb)';
+      var nameEl = document.getElementById('int-name-' + idx);
+      if (nameEl) nameEl.style.color = 'var(--g)';
+      var tag = document.createElement('span');
+      tag.style.cssText = 'font-size:11px;color:var(--g);font-weight:600;';
+      tag.textContent = 'Assigned';
+      row.appendChild(tag);
+    }
+  });
+
+  /* Remove "Assign other MJ" button if present */
+  var otherBtn = document.querySelector('#interested-list ~ button');
+  if (otherBtn) otherBtn.remove();
 }
 
 /* Sidebar toggle */
