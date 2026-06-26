@@ -288,9 +288,17 @@ textarea{resize:vertical;min-height:60px}
             <label>Search SCC Client</label>
             <input type="text" placeholder="Search by name or S/N…">
           </div>
-          <div class="fl fg-full" id="clientAddress" style="display:none">
+          <div class="fl" id="clientAddress">
             <label>Address</label>
             <input type="text" placeholder="Client's home address">
+          </div>
+          <div class="fl">
+            <label>Postal code</label>
+            <input type="text" value="120301" readonly style="background:var(--bdr2);color:var(--ink3)">
+          </div>
+          <div class="fl">
+            <label>Contact number</label>
+            <input type="text" value="9123 4567" readonly style="background:var(--bdr2);color:var(--ink3)">
           </div>
           <div class="fl">
             <label>Age</label>
@@ -452,14 +460,14 @@ function onJobType() {
   const isBefriending = t === 'befriending';
   const clientProfileBlock = document.getElementById('clientCardBlock');
 
-  if (t === 'centreassist') { clientProfileBlock.style.display = 'none'; }
+  clientProfileBlock.style.display = (t === 'centreassist') ? 'none' : '';
 
   if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
   else { note.style.display = 'none'; sc.textContent = '1'; }
 
   document.getElementById('venueFrom').style.display = isBefriending ? 'none' : '';
   document.getElementById('venueTo').style.display = isBefriending ? 'none' : '';
-  document.getElementById('clientAddress').style.display = isBefriending ? '' : 'none';
+  document.getElementById('clientAddress').style.display = '';
 
   const staffOption = document.getElementById('staffOption');
   const staffLabel = document.getElementById('staffLabel');
