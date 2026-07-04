@@ -4,20 +4,242 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>CARES — Job Listing</title>
+    <title>CARES — Job Schedule</title>
+
+    <!-- Bootstrap 5 CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DM Sans (used by the publish-form components) -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/job_listing.css">
+    <!-- CARES shell -->
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- FullCalendar 6 (global build — injects its own CSS) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+    <style>
+      /* ── Design tokens (from the portal / publish form) ─────────────── */
+      :root {
+        --g:#13795B; --gm:#1D9E75; --gl:#E8F7F2; --gb:#9FE1CB;
+        --am:#C07A1A; --al:#FDF3E3; --ab:#F0C060;
+        --rm:#B03030; --rl:#FDF0F0; --rb:#F0AAAA;
+        --bm:#1A5FA8; --bl:#EBF3FD; --bb:#90BFED;
+        --pm:#6B21A8; --pl:#F5F0FF; --pb:#C4B5FD;
+        --ink:#1C1C1E; --ink2:#444; --ink3:#777; --ink4:#AAA;
+        --s:#fff; --bg:#F5F6F8; --bdr:#E4E4E4; --bdr2:#F0F0F0;
+        --r:10px; --rl2:16px;
+      }
+
+      /* ── Page content area ──────────────────────────────────────────── */
+      .main-content { overflow-y: auto; }
+      .tm-wrap { padding: 20px 24px; }
+      .tm-header { margin-bottom: 14px; }
+      .tm-title { font-size: 22px; font-weight: 700; color: #1e3535; margin: 0; }
+      .tm-breadcrumb { font-size: 13px; color: #777; margin-top: 2px; }
+      .tm-breadcrumb a { color: #2a9d7f; text-decoration: none; }
+      .tm-breadcrumb a:hover { text-decoration: underline; }
+
+      /* Sync banner */
+      .tm-sync-banner {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--gl); border: 1px solid var(--gb); color: #0A5C46;
+        border-radius: var(--r); padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
+      }
+      .tm-sync-banner .bi { font-size: 16px; }
+
+      /* Toolbar above calendar */
+      .tm-toolbar {
+        display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px;
+      }
+      .tm-btn-post {
+        background: #2a9d7f; border: none; color: #fff; font-weight: 600;
+        font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+      }
+      .tm-btn-post:hover { background: #238c6f; }
+      .tm-legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+      .tm-leg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink2); }
+      .tm-leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+      /* Filter bar */
+      .tm-filter {
+        display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+        background: #fff; border: 1px solid var(--bdr); border-radius: var(--rl2);
+        padding: 14px 16px; margin-bottom: 14px; font-family: 'DM Sans', sans-serif;
+      }
+      .tm-filter .ff { display: flex; flex-direction: column; gap: 4px; }
+      .tm-filter .ff-lbl {
+        font-size: 10px; font-weight: 700; color: var(--ink4);
+        text-transform: uppercase; letter-spacing: .04em;
+      }
+      .tm-filter input, .tm-filter select {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px;
+        border: 1px solid var(--bdr); border-radius: 8px; background: var(--bg);
+        color: var(--ink); outline: none; transition: border-color .15s; min-width: 160px;
+      }
+      .tm-filter input:focus, .tm-filter select:focus { border-color: var(--gm); background: #fff; }
+      .tm-filter .tm-clear {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 8px 14px;
+        border: 1px solid var(--bdr); border-radius: 8px; background: #fff; color: var(--ink3); cursor: pointer;
+      }
+      .tm-filter .tm-clear:hover { background: var(--bg); }
+      .tm-filter .tm-count { font-size: 12px; color: var(--ink3); margin-left: auto; align-self: center; }
+
+      /* Calendar card */
+      .tm-cal-card { background: #fff; border: 1px solid var(--bdr); border-radius: var(--rl2); padding: 16px; }
+      #calendar { font-family: 'DM Sans', sans-serif; }
+      .fc .fc-toolbar-title { font-size: 18px; color: #1e3535; }
+      .fc .fc-button-primary {
+        background: #2a9d7f; border-color: #2a9d7f; text-transform: capitalize;
+        box-shadow: none;
+      }
+      .fc .fc-button-primary:hover { background: #238c6f; border-color: #238c6f; }
+      .fc .fc-button-primary:not(:disabled).fc-button-active,
+      .fc .fc-button-primary:not(:disabled):active { background: #1e3535; border-color: #1e3535; }
+      .fc .fc-button-primary:focus { box-shadow: none; }
+      .fc-event { cursor: pointer; font-size: 11px; }
+      .fc-event .fc-event-title { font-weight: 600; }
+
+      /* ── Publish-form component styles (ported from publish.css) ────── */
+      .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1200;
+        display: none; align-items: flex-start; justify-content: center; padding: 30px 16px; overflow-y: auto;
+      }
+      .modal-overlay.on { display: flex; }
+      .modal-box {
+        background: var(--s); border-radius: var(--rl2); width: 780px; max-width: 96vw;
+        box-shadow: 0 24px 70px rgba(0,0,0,.35); font-family: 'DM Sans', sans-serif;
+        display: flex; flex-direction: column; max-height: 92vh;
+      }
+      .modal-head {
+        padding: 16px 20px; border-bottom: 1px solid var(--bdr);
+        display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      }
+      .modal-head-title { font-size: 15px; font-weight: 700; color: var(--ink); flex: 1; }
+      .chip-draft { background: var(--al); color: var(--am); border: 1px solid var(--ab);
+        border-radius: 20px; padding: 3px 9px; font-size: 11px; font-weight: 600; }
+      .modal-close {
+        background: none; border: 1px solid var(--bdr); border-radius: 6px; padding: 4px 10px;
+        cursor: pointer; font-size: 12px; color: var(--ink3); font-family: 'DM Sans', sans-serif;
+      }
+      .modal-body { flex: 1; overflow-y: auto; padding: 18px 20px; background: var(--bg); }
+      .modal-footer {
+        padding: 12px 20px; border-top: 1px solid var(--bdr); display: flex; gap: 8px;
+        align-items: center; flex-shrink: 0;
+      }
+
+      /* ── View (detail) modal internals (mirrors portal manage modal) ─── */
+      .view-box { width: 560px; }
+      .status-pill {
+        display: inline-flex; align-items: center; gap: 5px; padding: 3px 11px;
+        border-radius: 20px; font-size: 11px; font-weight: 700; color: #fff;
+      }
+      .m-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+      .m-info-box { background: var(--bg); border-radius: var(--r); padding: 10px 12px; }
+      .m-info-box.full { grid-column: 1 / -1; }
+      .m-info-label { font-size: 10px; font-weight: 700; color: var(--ink4); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+      .m-info-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+      .sect-title { font-size: 11px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; margin-top: 16px; }
+      .slot-row { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 10px 13px; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+      .slot-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+      .sn-filled { background: var(--gl); color: var(--g); }
+      .sn-empty { background: var(--bdr2); color: var(--ink4); border: 1px dashed var(--bdr); }
+      .slot-name { font-size: 13px; font-weight: 500; }
+      .slot-meta { font-size: 11px; color: var(--ink4); }
+      .slot-prof { font-size: 11px; font-weight: 600; color: var(--g); text-decoration: none; white-space: nowrap; border: 1px solid var(--gb); padding: 4px 10px; border-radius: 20px; background: var(--s); }
+      .slot-prof:hover { background: var(--gl); }
+      .wl-row { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 9px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+      .wl-pos { width: 20px; height: 20px; border-radius: 50%; background: var(--al); color: var(--am); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+      .wl-name { flex: 1; font-size: 12px; font-weight: 500; color: var(--ink2); }
+      .wl-time { font-size: 10px; color: var(--ink4); }
+      .bn-g { background: var(--gl); color: #0A5C46; border: 1px solid var(--gb); }
+      .bn-a { background: var(--al); color: var(--am); border: 1px solid var(--ab); }
+      .bn-r { background: var(--rl); color: var(--rm); border: 1px solid var(--rb); }
+      .assign-note { font-size: 12px; color: var(--ink4); background: var(--bg); border-radius: var(--r); padding: 10px 12px; border: 1px solid var(--bdr); line-height: 1.5; }
+
+      /* Cards */
+      .card2 { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--rl2); padding: 18px; margin-bottom: 14px; }
+      .card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+      .card-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+      .ci-g { background: var(--gl); } .ci-b { background: var(--bl); } .ci-a { background: var(--al); }
+      .card-label { font-size: 12px; font-weight: 600; color: var(--ink2); flex: 1; }
+
+      /* Form grid */
+      .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .fg-full { grid-column: 1 / -1; }
+      .fl { display: flex; flex-direction: column; gap: 4px; position: relative; }
+      .fl-label { display: flex; align-items: center; gap: 5px; }
+      .modal-body label { font-size: 11px; font-weight: 600; color: var(--ink3); letter-spacing: .03em; text-transform: uppercase; }
+      .modal-body input, .modal-body select, .modal-body textarea {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--bdr);
+        border-radius: var(--r); background: var(--bg); color: var(--ink); outline: none; width: 100%; transition: border-color .15s;
+      }
+      .modal-body input:focus, .modal-body select:focus, .modal-body textarea:focus {
+        border-color: var(--gm); background: var(--s); box-shadow: 0 0 0 3px rgba(29,158,117,.08);
+      }
+      .modal-body textarea { resize: vertical; min-height: 60px; }
+
+      /* Complexity */
+      .cplx { display: flex; gap: 6px; }
+      .cb { flex: 1; padding: 8px 4px; border: 1px solid var(--bdr); border-radius: var(--r); text-align: center; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--bg); color: var(--ink3); transition: all .15s; }
+      .cb.cH { background: var(--rl); border-color: var(--rb); color: var(--rm); }
+      .cb.cM { background: var(--al); border-color: var(--ab); color: var(--am); }
+      .cb.cL { background: var(--gl); border-color: var(--gb); color: var(--g); }
+
+      /* Tags */
+      .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+      .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+      .tag-g { background: var(--gl); color: var(--g); font-weight: 500; }
+      .tag-add { background: var(--bg); color: var(--ink3); border: 1px dashed var(--bdr); }
+
+      /* Toggles */
+      .tog-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--bdr2); font-size: 13px; color: var(--ink2); position: relative; }
+      .tog-row:last-child { border-bottom: none; }
+      .tog { width: 34px; height: 20px; border-radius: 10px; background: #DDD; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+      .tog.on { background: var(--gm); }
+      .tog::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+      .tog.on::after { left: 16px; }
+      .tog-lbl { flex: 1; font-size: 13px; }
+      .tog-note { font-size: 11px; color: var(--ink4); }
+
+      /* Slots */
+      .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+      .slot-box { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 10px 8px; text-align: center; }
+      .slot-box.s-c { border-color: var(--gb); background: var(--gl); }
+      .slot-box.s-w { border-color: var(--ab); background: var(--al); }
+      .sn { font-size: 20px; font-weight: 700; }
+      .sl { font-size: 10px; color: var(--ink4); margin-top: 2px; line-height: 1.3; }
+      .s-c .sn { color: var(--g); } .s-w .sn { color: var(--am); }
+
+      /* Banners */
+      .banner { border-radius: var(--r); padding: 10px 12px; font-size: 12px; display: flex; gap: 8px; line-height: 1.5; margin-bottom: 10px; }
+      .b-g { background: var(--gl); color: #0A5C46; border: 1px solid var(--gb); }
+      .b-a { background: var(--al); color: var(--am); border: 1px solid var(--ab); }
+
+      /* Footer buttons */
+      .btn-pub { background: var(--g); color: #fff; border: none; border-radius: var(--r); padding: 9px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+      .btn-pub:hover { background: #0A5C46; }
+      .btn-ghost2 { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r); padding: 9px 16px; font-size: 13px; color: var(--ink2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+      .btn-cancel-job { background: var(--rl); border: 1px solid var(--rb); border-radius: var(--r); padding: 9px 16px; font-size: 13px; color: var(--rm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+      .btn-cancel-job:hover { background: var(--rm); color: #fff; }
+
+      /* Sync toast */
+      .tm-toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: #1e3535; color: #fff; padding: 10px 18px; border-radius: 24px;
+        font-size: 13px; display: none; align-items: center; gap: 8px; z-index: 1400;
+        box-shadow: 0 6px 20px rgba(0,0,0,.3);
+      }
+      .tm-toast.on { display: inline-flex; }
+    </style>
   </head>
   <body>
 
-    <div class="d-flex" id="wrapper" style="height:100vh;overflow:hidden;">
+    <!-- Wrapper -->
+    <div class="d-flex" id="wrapper">
 
-      <!-- Sidebar -->
+      <!-- Sidebar (CARES shell) -->
       <nav id="sidebar" class="sidebar d-flex flex-column">
+
         <div class="sidebar-profile p-3 text-center">
           <div class="sidebar-avatar mx-auto mb-2">
             <i class="bi bi-person-fill fs-3 text-white"></i>
@@ -28,15 +250,20 @@
             <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
           </div>
         </div>
+
         <ul class="nav flex-column sidebar-nav mt-1">
+
           <li class="nav-item">
-            <a class="nav-link sidebar-link active" href="./index.html">
-              <i class="bi bi-grid-fill me-2"></i>Dashboard
+            <a class="nav-link sidebar-link" href="./index.html">
+              <i class="bi bi-grid-fill me-2"></i>
+              Dashboard
             </a>
           </li>
-          <li class="nav-item" style="opacity:0.3;">
+
+          <li class="nav-item" style="opacity: 0.3;">
             <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#prospectsMenu" aria-expanded="false">
-              <i class="bi bi-person-circle me-2"></i>Prospects
+              <i class="bi bi-person-circle me-2"></i>
+              Prospects
               <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
             </a>
             <div class="collapse" id="prospectsMenu">
@@ -46,22 +273,40 @@
               </ul>
             </div>
           </li>
-          <!--Schedule-->
+
+          <!-- Schedule (expanded, MicroJobber active) -->
           <li class="nav-item">
-            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#scheduleMenu" aria-expanded="false">
+            <a class="nav-link sidebar-link sidebar-collapsible active" href="#" data-bs-toggle="collapse" data-bs-target="#scheduleMenu" aria-expanded="true">
               <i class="bi bi-calendar-event me-2"></i>
               Schedule
               <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
             </a>
-            <div class="collapse" id="scheduleMenu">
+            <div class="collapse show" id="scheduleMenu">
               <ul class="nav flex-column sidebar-submenu">
-                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./task_management.html">Task Management</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./task_management.html">MicroJobber</a></li>
                 <li class="nav-item"><a class="nav-link sidebar-sublink" href="#" onclick="openPortal()">Link To Portal</a></li>
               </ul>
             </div>
-          <li class="nav-item" style="opacity:0.3;">
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#feeMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              AIC Fee Management
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="feeMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Services</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Consumable Logs</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
             <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
-              <i class="bi bi-file-earmark-check me-2"></i>Pre-Admission
+              <i class="bi bi-file-earmark-check me-2"></i>
+              Pre-Admission
               <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
             </a>
             <div class="collapse" id="preAdmissionMenu">
@@ -71,22 +316,11 @@
               </ul>
             </div>
           </li>
+
           <li class="nav-item" style="opacity: 0.3;">
-            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
-              <i class="bi bi-file-earmark-check me-2"></i>
-              AIC Fee Management
-              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
-            </a>
-            <div class="collapse" id="preAdmissionMenu">
-              <ul class="nav flex-column sidebar-submenu">
-                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Serviicse</a></li>
-                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Consumable Logs</a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item" style="opacity:0.3;">
             <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#clientMenu" aria-expanded="false">
-              <i class="bi bi-person-badge me-2"></i>Client
+              <i class="bi bi-person-badge me-2"></i>
+              Client
               <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
             </a>
             <div class="collapse" id="clientMenu">
@@ -98,1067 +332,812 @@
           </li>
         </ul>
       </nav>
+      <!-- End Sidebar -->
 
       <!-- Page Content -->
-      <div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden;">
+      <div id="page-content" class="d-flex flex-column flex-grow-1">
 
-        <!-- Topbar -->
-        <nav class="navbar navbar-light bg-white topbar px-3 border-bottom shadow-sm" style="flex-shrink:0;">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-light bg-white topbar px-3 border-bottom shadow-sm">
           <button id="sidebarToggle" class="btn btn-sm btn-success me-3" type="button">
             <i class="bi bi-list fs-5"></i>
           </button>
+
           <span class="navbar-brand fw-bold text-dark fs-5 me-2">
-            <span class="brand-dot"></span>Vanguard
+            <span class="brand-dot"></span>
+            VANGUARD
           </span>
+
           <small class="text-muted me-auto">Session logout in <span id="sessionTimer">17520</span> seconds</small>
+
           <div class="d-flex align-items-center gap-3 ms-auto">
             <span class="text-muted small">Welcome to CARES</span>
-            <div class="input-group input-group-sm" style="width:220px;">
+
+            <div class="input-group input-group-sm" style="width: 220px;">
               <span class="input-group-text border-0 bg-light text-muted" style="font-size:0.75rem;">Client Search</span>
               <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Type 3+ characters to search..." id="clientSearchInput">
             </div>
-            <select class="form-select form-select-sm" style="width:220px;">
-              <option selected>Vanguard Senior Community Home</option>
-              <option>Vanguard Day Activity Centre</option>
-              <option>Vanguard Transitional Home</option>
+
+            <select class="form-select form-select-sm" style="width: 220px;">
+              <option selected>VANGUARD 1</option>
+              <option>VANGUARD 2</option>
+              <option>VANGUARD 3</option>
             </select>
+
             <button class="btn btn-sm btn-light position-relative border">
               <i class="bi bi-bell-fill text-muted"></i>
               <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.6rem;">10</span>
             </button>
+
             <button class="btn btn-sm btn-light border text-muted">
               <i class="bi bi-box-arrow-right me-1"></i> Log out
             </button>
           </div>
         </nav>
+        <!-- End Topbar -->
 
         <!-- Main Content -->
-        <div class="main" style="overflow-y:auto;overflow-x:hidden;">
+        <main class="main-content flex-grow-1">
+          <div class="tm-wrap">
 
-          <!-- Page Header -->
-          <div class="tm-page-header">
-            <h2 class="tm-title">Tasks</h2>
-            <div class="tm-breadcrumb">
-              <i class="bi bi-house-fill" style="color:#5B9EDB;font-size:11px;"></i>
-              <a href="./index.html" class="tm-bc-link"> Home</a>
-              <span class="tm-bc-sep">/</span>
-              <span>Tasks</span>
+            <div class="tm-header">
+              <h1 class="tm-title">Job Schedule</h1>
+              <div class="tm-breadcrumb">
+                <a href="./index.html">CARES</a> &rsaquo; Schedule &rsaquo; MicroJobber
+              </div>
             </div>
-          </div>
 
-          <!-- Filter Card -->
-          <div class="tm-filter-card">
+            <div class="tm-sync-banner">
+              <i class="bi bi-arrow-left-right"></i>
+              <div>Jobs shown here are shared live with the <strong>MicroJobber Chaperone Portal</strong>. Any job added or edited here appears in the portal, and vice versa.</div>
+            </div>
 
-            <!-- Row 1: Status selector + legend -->
-            <div class="tm-fc-row1">
-              <select class="tm-status-sel" id="tmStatusFilter" onchange="renderTaskList()">
-                <option value="">Task All Status</option>
-                <option value="Published">Published</option>
-                <option value="Taken">Taken</option>
-                <option value="In Progress">In Progress</option>
-                <option value="At Risk">At Risk</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-                <option value="Waitlisted">Waitlisted</option>
-              </select>
+            <div class="tm-toolbar">
+              <button class="tm-btn-post" onclick="openAddModal()"><i class="bi bi-plus-lg me-1"></i>Post Job</button>
+              <button class="tm-btn-post" style="background-color: #6B21A8;" onclick="openPortal()">To MicroJobber Portal</button>
               <div class="tm-legend">
-                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#FF9800;"></span> Pending</span>
-                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#2196F3;"></span> Active</span>
-                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#4CAF50;"></span> Completed</span>
-                <span class="tm-leg-item"><span class="tm-leg-dot" style="background:#F44336;"></span> Not Completed</span>
-                <span class="tm-leg-item"><span class="tm-leg-star">★</span> Event</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#1A5FA8"></span>Open</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#FF6B35"></span>Urgent</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#C07A1A"></span>Waitlisted</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#6B21A8"></span>In Progress / Re-opened</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#13795B"></span>Taken / Confirmed</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#6c757d"></span>Completed</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#B03030"></span>Cancelled</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#AAA"></span>Draft</span>
               </div>
             </div>
 
-            <!-- Filter grid: two columns -->
-            <div class="tm-fc-grid">
-
-              <!-- Left column -->
-              <div class="tm-fc-col">
-                <div class="tm-fc-field">
-                  <label class="tm-fc-lbl" style="min-width:52px;">Users:</label>
-                  <input type="text" class="tm-fc-inp" placeholder="Choose a User...">
-                </div>
-                <div class="tm-fc-field tm-fc-field-top">
-                  <div class="tm-fc-lbl-block">
-                    User Groups in<br>Resource To<br>Display:<br>
-                    <i class="bi bi-info-circle-fill tm-info-icon"></i>
-                  </div>
-                  <input type="text" class="tm-fc-inp" placeholder="Choose a User Group..." style="align-self:flex-end;">
-                </div>
-                <div class="tm-fc-field tm-fc-field-top">
-                  <label class="tm-fc-lbl" style="min-width:80px;padding-top:18px;">Action<br>Type:</label>
-                  <div style="flex:1;">
-                    <div class="tm-ua-note">**(UA - User Added)</div>
-                    <input type="text" class="tm-fc-inp" style="width:100%;" placeholder="Choose a Action Type...">
-                  </div>
-                </div>
-                <div class="tm-fc-field tm-fc-field-top">
-                  <div class="tm-fc-lbl-block" style="min-width:80px;">Recurrence<br>End Date:</div>
-                  <div style="display:flex;align-items:center;gap:8px;align-self:flex-end;">
-                    <input type="date" class="tm-fc-inp" style="width:130px;">
-                    <button class="tm-search-btn" onclick="renderTaskList()">Search</button>
-                  </div>
-                </div>
+            <div class="tm-filter">
+              <div class="ff">
+                <span class="ff-lbl">Client name</span>
+                <input type="text" id="fClient" placeholder="Search client…" oninput="applyFilters()">
               </div>
-
-              <!-- Right column -->
-              <div class="tm-fc-col">
-                <div class="tm-fc-field">
-                  <label class="tm-fc-lbl" style="min-width:52px;">Client:</label>
-                  <input type="text" class="tm-fc-inp" placeholder="Choose a Client(s)...">
-                </div>
-                <div class="tm-fc-field tm-fc-field-top">
-                  <div class="tm-fc-lbl-block">
-                    Users to<br>exclude in<br>Resources<br>View: <i class="bi bi-info-circle-fill tm-info-icon"></i>
-                  </div>
-                  <input type="text" class="tm-fc-inp" placeholder="Exclude a User..." style="align-self:flex-end;">
-                </div>
-                <div class="tm-fc-field">
-                  <label class="tm-fc-lbl" style="min-width:55px;">Facility</label>
-                  <input type="text" class="tm-fc-inp" placeholder="Choose a Facility...">
-                </div>
-                <div class="tm-timeslot-box">
-                  <div class="tm-ts-title">Display Time Slot:</div>
-                  <div class="tm-ts-track-wrap">
-                    <div class="tm-ts-thumb"></div>
-                    <div class="tm-ts-bar"></div>
-                    <div class="tm-ts-thumb"></div>
-                  </div>
-                  <div class="tm-ts-label">Selected Time Range: 00:00:00 - 24:00:00</div>
-                </div>
+              <div class="ff">
+                <span class="ff-lbl">Job type</span>
+                <select id="fType" onchange="applyFilters()">
+                  <option value="">All types</option>
+                  <option>Chaperone</option>
+                  <option>Befriending</option>
+                  <option>Home Assessment</option>
+                  <option>Centre Assistant</option>
+                </select>
               </div>
-
+              <div class="ff">
+                <span class="ff-lbl">Facility</span>
+                <select id="fFacility" onchange="applyFilters()">
+                  <option value="">All facilities</option>
+                  <option>VG — Buona Vista</option>
+                  <option>VG — Clementi</option>
+                  <option>SCC — Queenstown</option>
+                  <option>SCC — Toa Payoh</option>
+                  <option>SCC — Bishan</option>
+                </select>
+              </div>
+              <div class="ff">
+                <span class="ff-lbl">Status</span>
+                <select id="fStatus" onchange="applyFilters()">
+                  <option value="">All statuses</option>
+                  <option>Open</option>
+                  <option>Urgent</option>
+                  <option>Waitlisted</option>
+                  <option>In Progress</option>
+                  <option>Re-opened</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                  <option>Draft</option>
+                </select>
+              </div>
+              <button class="tm-clear" style="background-color: #1D9E75; color: white;" onclick="clearFilters()">Submit</button>
+              <button class="tm-clear" onclick="clearFilters()"><i class="bi bi-x-circle me-1"></i>Clear</button>
+              <span class="tm-count" id="fCount"></span>
             </div>
-          </div>
 
-          <!-- Action Toolbar -->
-          <div class="tm-toolbar">
-            <div class="tm-tb-left">
-              <button class="tm-tb-nav">&#8249;</button>
-              <button class="tm-tb-nav">&#8250;</button>
-              <button class="tm-tb-btn">today</button>
-              <button class="tm-tb-btn" data-bs-toggle="modal" data-bs-target="#newTaskModal">New Task</button>
-              <button class="tm-tb-btn">New</button>
-              <button class="tm-tb-btn">Export Tasks to Excel</button>
-              <button class="tm-tb-btn">Export PDF</button>
-              <button class="tm-tb-btn btn-sm btn-success" onclick="openPortal()"><i class="fa fa-arrow-right" aria-hidden="true"></i> MJobber Portal</button>
+            <div class="tm-cal-card">
+              <div id="calendar"></div>
             </div>
-            <div class="tm-tb-date" id="tmDateRange">Jun 22 – 28, 2026</div>
-            <div class="tm-tb-views">
-              <button class="tm-view-btn">month</button>
-              <button class="tm-view-btn">week</button>
-              <button class="tm-view-btn">day</button>
-              <button class="tm-view-btn">3-Day</button>
-              <button class="tm-view-btn tm-view-active">list</button>
-              <button class="tm-view-btn">R-Day</button>
-              <button class="tm-view-btn">R-Week</button>
-              <button class="tm-view-btn">R-Month</button>
-            </div>
+
           </div>
+        </main>
 
-          <!-- Task List -->
-          <div class="tm-list-area" id="tmListArea">
-            <!-- populated by renderTaskList() -->
-          </div>
-
-        </div>
-        <!-- End Main Content -->
-
-        <button class="btn need-help-btn position-fixed" style="bottom:20px;right:20px;border-radius:50px;z-index:999;background:#1e7a6e;color:#fff;font-size:0.8rem;padding:8px 16px;">
+        <!-- Need Help Button -->
+        <button class="btn btn-teal need-help-btn position-fixed" style="bottom: 20px; right: 20px; border-radius: 50px; z-index: 999;">
           <i class="bi bi-question-circle me-1"></i> Need Help?
         </button>
 
       </div>
+      <!-- End Page Content -->
+
     </div>
+    <!-- End Wrapper -->
 
-  <div class="modal modal-lg fade" id="newTaskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">New Task</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
-          <form id="newTaskForm" autocomplete="off">
-            <div class="row g-0">
-
-              <!-- ══ LEFT COLUMN ══════════════════════════════════════ -->
-              <div class="col-md-6 pe-3 border-end">
-
-                <!-- Facility -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold small text-uppercase text-muted" style="letter-spacing:.04em;">Facility</label>
-                  <div class="text-dark" style="font-size:13px;">Vanguard Senior Community Home</div>
-                </div>
-
-                <!-- Add Task To -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Add Task To</label>
-                  <ul class="list-group list-group-flush border rounded">
-                    <li class="list-group-item py-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <input class="form-check-input m-0" type="radio" name="taskType" id="taskTypeFacility" value="Facility" onchange="handleTaskTypeChange()">
-                        <label class="fw-semibold mb-0" for="taskTypeFacility" style="font-size:13px;">Facility</label>
-                      </div>
-                    </li>
-                    <li class="list-group-item py-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <input class="form-check-input m-0" type="radio" name="taskType" id="taskTypePatient" value="Patient" onchange="handleTaskTypeChange()">
-                        <label class="fw-semibold mb-0" for="taskTypePatient" style="font-size:13px;">Client / Patient</label>
-                      </div>
-                      <div class="mt-2 ms-4" id="patientInputWrap" style="display:none;">
-                        <input type="text" class="form-control form-control-sm" placeholder="Search patient name…">
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Action Type -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold" for="actionTypeInput">
-                    <span class="text-danger me-1">*</span>Action Type
-                    <i class="fa fa-info-circle ms-1" style="color:steelblue;font-size:13px;" title="UA - User Added · ST - Sub Task"></i>
-                  </label>
-                  <input type="text" id="actionTypeInput" class="form-control form-control-sm" placeholder="Choose an Action Type…">
-                </div>
-
-                <!-- Services Required -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Services Required</label>
-                  <select class="form-select form-select-sm" multiple style="height:75px;">
-                    <option>Nursing Care</option>
-                    <option>Chaperone</option>
-                    <option>Personal Hygiene</option>
-                    <option>Meal Assistance</option>
-                    <option>Physiotherapy</option>
-                    <option>Medication Administration</option>
-                  </select>
-                </div>
-
-                <!-- 3rd Party Services -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold" for="thirdPartyServices">3rd Party Services</label>
-                  <select class="form-select form-select-sm" id="thirdPartyServices" onchange="handleThirdPartyChange(this)">
-                    <option value="">-- Select a 3rd Party Service --</option>
-                    <option value="Chaperone">Chaperone</option>
-                  </select>
-                </div>
-
-                <!-- Task Series Remarks -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold" for="tf-remarks">Task Series Remarks</label>
-                  <textarea id="tf-remarks" class="form-control form-control-sm" rows="3"></textarea>
-                </div>
-
-                <!-- Individual Task Remarks -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold" for="tf-taskRemarks">Individual Tasks Remarks</label>
-                  <textarea id="tf-taskRemarks" class="form-control form-control-sm" rows="3"></textarea>
-                </div>
-
-                <!-- Date/Time — Never (single-occurrence, Add mode) -->
-                <div id="neverDateSection">
-                  <div id="timePeriodList">
-                    <div class="time-period-item mb-2 pb-2">
-                      <label class="form-label fw-semibold mb-1"><span class="text-danger me-1">*</span>Start</label>
-                      <div class="row g-2 mb-2">
-                        <div class="col-5">
-                          <div class="input-group input-group-sm">
-                            <input type="date" class="form-control">
-                            <span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span>
-                          </div>
-                        </div>
-                        <div class="col-5">
-                          <div class="input-group input-group-sm">
-                            <input type="time" class="form-control">
-                            <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                          </div>
-                        </div>
-                        <div class="col-2 d-flex align-items-center gap-1">
-                          <button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;" onclick="addTimePeriodRow()"><i class="fa fa-plus"></i></button>
-                          <button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-minus"></i></button>
-                        </div>
-                      </div>
-                      <label class="form-label fw-semibold mb-1"><span class="text-danger me-1">*</span>End</label>
-                      <div class="row g-2">
-                        <div class="col-5">
-                          <div class="input-group input-group-sm">
-                            <input type="date" class="form-control">
-                            <span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span>
-                          </div>
-                        </div>
-                        <div class="col-5">
-                          <div class="input-group input-group-sm">
-                            <input type="time" class="form-control">
-                            <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Date/Time — Recurring tasks (single date + time slots) -->
-                <div id="recurringDateSection" style="display:none;">
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Date</label>
-                    <div class="input-group input-group-sm">
-                      <input type="date" class="form-control">
-                      <span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span>
-                    </div>
-                  </div>
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Time</label>
-                  <div id="recurringTimeList" class="mb-3">
-                    <div class="row g-2 mb-1">
-                      <div class="col-5">
-                        <div class="input-group input-group-sm">
-                          <input type="time" class="form-control">
-                          <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                        </div>
-                      </div>
-                      <div class="col-5">
-                        <div class="input-group input-group-sm">
-                          <input type="time" class="form-control">
-                          <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                        </div>
-                      </div>
-                      <div class="col-2 d-flex align-items-center gap-1">
-                        <button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-plus"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Recurrence -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold" for="recurrenceSelect"><span class="text-danger me-1">*</span>Recurrence</label>
-                  <select class="form-select form-select-sm" id="recurrenceSelect" onchange="handleRecurrenceChange(this.value)">
-                    <option value="1">Never</option>
-                    <option value="2">Daily</option>
-                    <option value="3">Weekly</option>
-                    <option value="4">Monthly</option>
-                    <option value="5">Specific Dates</option>
-                  </select>
-                </div>
-
-                <!-- Daily — Weekend -->
-                <div class="mb-3" id="weekendSection" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Weekend</label>
-                  <select class="form-select form-select-sm">
-                    <option>Include Weekend</option>
-                    <option>Exclude Weekend</option>
-                  </select>
-                </div>
-
-                <!-- Weekly — Repeat On -->
-                <div class="mb-3" id="weeklySection" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Repeat On</label>
-                  <div class="mb-2" style="font-size:13px;">
-                    Every <input type="number" class="form-control form-control-sm d-inline-block" style="width:60px;" value="1"> week(s) on:
-                  </div>
-                  <div class="d-flex gap-3 flex-wrap">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbMon"><label class="form-check-label" for="cbMon">Mon</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbTue"><label class="form-check-label" for="cbTue">Tue</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbWed"><label class="form-check-label" for="cbWed">Wed</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbThu"><label class="form-check-label" for="cbThu">Thu</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbFri"><label class="form-check-label" for="cbFri">Fri</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbSat"><label class="form-check-label" for="cbSat">Sat</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="cbSun"><label class="form-check-label" for="cbSun">Sun</label></div>
-                  </div>
-                </div>
-
-                <!-- Monthly — Repeat On -->
-                <div class="mb-3" id="monthlySection" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Repeat On</label>
-                  <div class="form-check mb-2" style="font-size:13px;">
-                    <input class="form-check-input" type="radio" name="monthlyType" id="monthlyOnDate" checked>
-                    <label class="form-check-label" for="monthlyOnDate">
-                      Day <input type="number" class="form-control form-control-sm d-inline-block" style="width:55px;" value="1">
-                      of every <input type="number" class="form-control form-control-sm d-inline-block" style="width:55px;" value="1"> month(s)
-                    </label>
-                  </div>
-                  <div class="form-check" style="font-size:13px;">
-                    <input class="form-check-input" type="radio" name="monthlyType" id="monthlyOnDay">
-                    <label class="form-check-label" for="monthlyOnDay">
-                      The
-                      <select class="form-select form-select-sm d-inline-block" style="width:90px;"><option>First</option><option>Second</option><option>Third</option><option>Fourth</option><option>Last</option></select>
-                      <select class="form-select form-select-sm d-inline-block" style="width:115px;"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
-                      of every <input type="number" class="form-control form-control-sm d-inline-block" style="width:55px;" value="1"> month(s)
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Specific Dates -->
-                <div class="mb-3" id="specificDatesSection" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Specific Dates</label>
-                  <div id="specificDatesList">
-                    <div class="row g-2 mb-1">
-                      <div class="col-10">
-                        <div class="input-group input-group-sm">
-                          <input type="date" class="form-control">
-                          <span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span>
-                        </div>
-                      </div>
-                      <div class="col-2 d-flex align-items-center gap-1">
-                        <button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-plus"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- End Date (for Daily / Weekly / Monthly) -->
-                <div class="mb-3" id="endDateRecurSection" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>End Date</label>
-                  <div class="input-group input-group-sm">
-                    <input type="date" class="form-control">
-                    <span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span>
-                  </div>
-                </div>
-
-              </div>
-              <!-- end left col -->
-
-              <!-- ══ RIGHT COLUMN ═════════════════════════════════════ -->
-              <div class="col-md-6 ps-3">
-
-                <!-- Recipient -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Recipient</label>
-                  <div id="recipientList">
-                    <div class="row g-2 mb-1">
-                      <div class="col-10">
-                        <input type="text" class="form-control form-control-sm" placeholder="Search recipient…">
-                      </div>
-                      <div class="col-2 d-flex align-items-center gap-1">
-                        <button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;" onclick="addRecipientRow()"><i class="fa fa-plus"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-minus"></i></button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Assigned To -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Assigned To</label>
-                  <ul class="list-group list-group-flush border rounded">
-                    <li class="list-group-item py-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <input class="form-check-input m-0" type="radio" name="assignedTo" id="assignedToIndividual" value="Individual" checked onchange="handleAssignedToChange()">
-                        <label class="fw-semibold mb-0" for="assignedToIndividual" style="font-size:13px;">Individual</label>
-                      </div>
-                      <div class="mt-2 ms-4" id="individualAssigneeWrap">
-                        <div class="row g-2">
-                          <div class="col-10">
-                            <input type="text" class="form-control form-control-sm" placeholder="Search user…">
-                          </div>
-                          <div class="col-2 d-flex align-items-center gap-1">
-                            <button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-plus"></i></button>
-                            <button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;"><i class="fa fa-minus"></i></button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="list-group-item py-2">
-                      <div class="d-flex align-items-center gap-2">
-                        <input class="form-check-input m-0" type="radio" name="assignedTo" id="assignedToGroup" value="Group" onchange="handleAssignedToChange()">
-                        <label class="fw-semibold mb-0" for="assignedToGroup" style="font-size:13px;">Group</label>
-                      </div>
-                      <div class="mt-2 ms-4" id="groupAssigneeWrap" style="display:none;">
-                        <input type="text" class="form-control form-control-sm" placeholder="Search group…">
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Location -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Location</label>
-                  <ul class="list-group list-group-flush border rounded">
-                    <li class="list-group-item py-2">
-                      <div class="d-flex gap-2">
-                        <input class="form-check-input mt-1 flex-shrink-0" type="radio" name="location" id="locPatient" value="Patient">
-                        <div>
-                          <div class="fw-semibold" style="font-size:13px;">Client's Home</div>
-                          <div class="text-muted" style="font-size:12px;">232 Pasir Ris Drive 4, #10-18, Singapore 510232</div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="list-group-item py-2">
-                      <div class="d-flex gap-2">
-                        <input class="form-check-input mt-1 flex-shrink-0" type="radio" name="location" id="locFacility" value="Facility">
-                        <div>
-                          <div class="fw-semibold" style="font-size:13px;">Facility</div>
-                          <div class="text-muted" style="font-size:12px;">Vanguard Senior Community Home</div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="list-group-item py-2">
-                      <div class="d-flex gap-2">
-                        <input class="form-check-input mt-1 flex-shrink-0" type="radio" name="location" id="locOthers" value="Others" onchange="toggleOtherLocation()">
-                        <div class="fw-semibold" style="font-size:13px;">Others</div>
-                      </div>
-                      <div class="mt-2 ms-4" id="otherLocationWrap" style="display:none;">
-                        <textarea class="form-control form-control-sm" rows="2" id="otherLocationText" placeholder="Enter location…"></textarea>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Push notification: incomplete task -->
-                <div class="mb-2">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="isPushNotif" onchange="togglePushNotif()">
-                    <label class="form-check-label" for="isPushNotif" style="font-size:13px;">Add push notification reminder for incomplete Task</label>
-                  </div>
-                </div>
-                <div class="mb-3 border rounded p-2 bg-light" id="pushNotifSection" style="display:none;">
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="isRecurrencePush">
-                    <label class="form-check-label" for="isRecurrencePush" style="font-size:12px;">Schedule push notification on recurrence days</label>
-                  </div>
-                  <label class="form-label small fw-semibold">Time</label>
-                  <div class="input-group input-group-sm" style="max-width:200px;">
-                    <input type="time" class="form-control">
-                    <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                  </div>
-                </div>
-
-                <!-- Push notification: before task begins -->
-                <div class="mb-3">
-                  <div class="form-label fw-semibold" style="font-size:13px;">Schedule Push Notification before task begins</div>
-                  <div class="border rounded p-2 bg-light">
-                    <div class="form-check mb-2">
-                      <input class="form-check-input" type="checkbox" id="isIncomingRecurrence">
-                      <label class="form-check-label" for="isIncomingRecurrence" style="font-size:12px;">Schedule push notification on recurrence days</label>
-                    </div>
-                    <div class="input-group input-group-sm" style="max-width:200px;">
-                      <input type="time" class="form-control">
-                      <span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Add attendance for billing -->
-                <div class="mb-2">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="isBillable" onchange="toggleBillable()">
-                    <label class="form-check-label" for="isBillable" style="font-size:13px;">Add attendance for billing upon completion</label>
-                  </div>
-                </div>
-                <div class="mb-3" id="serviceToBillWrap" style="display:none;">
-                  <label class="form-label fw-semibold"><span class="text-danger me-1">*</span>Service to Bill</label>
-                  <input type="text" class="form-control form-control-sm" placeholder="Search service…">
-                </div>
-
-              </div>
-              <!-- end right col -->
-
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-    <!-- Task Detail Modal -->
-    <div id="taskDetailModal" class="modal-overlay" style="display:none;" onclick="handleTaskDetailOverlayClick(event)">
-      <div class="modal-box" style="max-width:560px;padding:0;overflow:hidden;">
-        <div class="modal-head" style="padding:16px 20px;border-bottom:1px solid #e0e0e0;">
-          <div class="modal-head-title" style="font-size:15px;font-weight:600;">Task Details</div>
-        </div>
-        <div style="padding:20px 24px;max-height:60vh;overflow-y:auto;" id="taskDetailBody">
-        </div>
-        <div class="modal-footer" style="flex-direction:column;gap:8px;align-items:flex-end;padding:14px 20px;border-top:1px solid #e0e0e0;">
-          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('complete')">Complete this Task</button>
-            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('not-complete')">Task is not Completed</button>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-            <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('view')">View Complete Detail</button>
-            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('duplicate')">Duplicate</button> -->
-            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit')">Edit</button> -->
-            <!-- <button class="btn-primary" style="background:#1a9e80;" onclick="taskDetailAction('edit-all')">Edit All</button> -->
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
-            <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete')">Delete</button>
-            <!-- <button class="btn-primary" style="background:#e53935;" onclick="taskDetailAction('delete-all')">Delete All</button> -->
-            <button class="btn-ghost" onclick="closeTaskDetail()">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- No-Show Modal -->
-    <div id="noShowModal" class="modal-overlay" style="display:none;" onclick="handleNoShowOverlayClick(event)">
-      <div class="modal-box" style="max-width:440px;">
+    <!-- ── Add / Edit Job Modal ─────────────────────────────────────────── -->
+    <div class="modal-overlay" id="jobModal" onclick="handleOverlayClick(event)">
+      <div class="modal-box" onclick="event.stopPropagation()">
         <div class="modal-head">
-          <div class="modal-head-title">Record No-Show</div>
-          <button class="modal-close" onclick="cancelNoShow()">✕ Close</button>
+          <span class="modal-head-title" id="modalTitle">Post new job</span>
+          <span class="chip-draft" id="modalJobId" style="display:none"></span>
+          <button class="modal-close" onclick="closeJobModal()">Close</button>
         </div>
+
         <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Reason for no-show</label>
-            <select id="noShowReason" class="form-sel" onchange="handleNoShowReasonChange()">
-              <option value="">— Select reason —</option>
-              <option value="client_cancelled">Client cancelled on the day</option>
-              <option value="client_no_answer">Client did not answer door / calls</option>
-              <option value="mj_no_show">MJ did not show up</option>
-              <option value="medical">Medical emergency</option>
-              <option value="others">Others</option>
-            </select>
+
+          <!-- Job Details -->
+          <div class="card2">
+            <div class="card-head"><div class="card-icon ci-g"><i class="bi bi-clipboard-check" style="color:var(--g)"></i></div><div class="card-label">Job details</div></div>
+            <div class="fg">
+              <div class="fl">
+                <div class="fl-label"><label>Job type</label></div>
+                <select id="jobType" onchange="onJobType()">
+                  <option value="chaperone">Chaperone</option>
+                  <option value="befriending">Befriending</option>
+                  <option value="homeassess">Home Assessment (Safe Steps)</option>
+                  <option value="centreassist">Centre Assistant</option>
+                </select>
+              </div>
+
+              <div class="fl">
+                <div class="fl-label"><label>SCC facility</label></div>
+                <select id="facility">
+                  <option>VG — Buona Vista</option>
+                  <option>VG — Clementi</option>
+                  <option>SCC — Queenstown</option>
+                  <option>SCC — Toa Payoh</option>
+                  <option>SCC — Bishan</option>
+                </select>
+              </div>
+
+              <div class="fl">
+                <div class="fl-label"><label>Date</label></div>
+                <input type="date" id="jobDate" value="2026-05-20">
+              </div>
+
+              <div class="fl">
+                <div class="fl-label"><label>Time slot</label></div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <input type="time" id="timeStart" value="14:00" style="flex:1">
+                  <span style="font-size:12px;color:var(--ink4)">–</span>
+                  <input type="time" id="timeEnd" value="16:00" style="flex:1">
+                </div>
+              </div>
+
+              <div class="fl" id="venueFrom"><label>Venue — From (pickup)</label><input type="text" value="Blk 301 Clementi Ave 4 #08-22"></div>
+              <div class="fl" id="venueTo"><label>Venue — To (destination)</label><input type="text" value="SGH, Block 1, A&amp;E Dept"></div>
+
+              <div class="fl">
+                <div class="fl-label"><label>Assignment</label></div>
+                <select id="assignmentSelect" onchange="toggleSearchStaff(this)">
+                  <option>Select Option</option>
+                  <option id="staffOption">To SCC Staff</option>
+                  <option>Open to MJ</option>
+                </select>
+              </div>
+              <div class="fl" id="searchStaff" style="display:none">
+                <div class="fl-label"><label id="staffLabel">SCC Staff <span style="color:red">*</span></label></div>
+                <input type="text" value="" placeholder="Search Staff..." style="border:1px solid var(--bdr);">
+              </div>
+            </div>
           </div>
-          <div class="form-group" id="noShowOthersWrap" style="display:none;">
-            <label class="form-label">Please specify</label>
-            <input type="text" id="noShowOthersText" class="form-inp" placeholder="Describe the reason…">
+
+          <!-- Client Profile -->
+          <div class="card2" id="clientCardBlock">
+            <div class="card-head"><div class="card-icon ci-b"><i class="bi bi-person-vcard" style="color:var(--bm)"></i></div><div class="card-label">Client profile <span style="font-size:11px;color:var(--ink4);font-weight:400">(shown to eligible MJs on listing)</span></div></div>
+            <div class="fg">
+              <div class="fl fg-full">
+                <label>SCC Client</label>
+                <input type="text" id="clientName" placeholder="Search by name or S/N…">
+              </div>
+              <div class="fl" id="clientAddress">
+                <label>Address</label>
+                <input type="text" placeholder="Client's home address" value="Blk 301 Clementi Ave 4 #08-22">
+              </div>
+              <div class="fl"><label>Postal code</label><input type="text" value="120301" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Contact number</label><input type="text" value="9123 4567" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Age</label><input type="text" value="73" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Gender</label><input type="text" value="Female" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Race</label><input type="text" value="Chinese" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Languages</label><input type="text" value="Chinese | English" readonly style="background:var(--bdr2);color:var(--ink3)"></div>
+              <div class="fl"><label>Functionality level</label><select><option>Independent</option><option selected>Needs assistance</option><option>Dependent</option></select></div>
+              <div class="fl"><div class="fl-label"><label>Weight (kg)</label></div><input type="text" value="52"></div>
+              <div class="fl"><label>Client's Preference</label><textarea>Likes apple juice</textarea></div>
+              <div class="fl fg-full"><label>Remarks</label><textarea>Uses walking frame. Speaks Hokkien and Mandarin. May be anxious in crowded areas — please speak calmly.</textarea></div>
+            </div>
           </div>
+
+          <!-- Matching Criteria -->
+          <div class="card2">
+            <div class="card-head">
+              <div class="card-icon ci-g"><i class="bi bi-sliders" style="color:var(--g)"></i></div>
+              <div class="card-label">Matching criteria (only appears if job is being assigned to a MicroJobber, not AAC or SCC staffs)</div>
+            </div>
+            <div class="fg" style="margin-bottom:12px">
+              <div class="fl">
+                <label>Complexity</label>
+                <div class="cplx">
+                  <div class="cb cH" onclick="setCplx(this,'H')">High</div>
+                  <div class="cb" onclick="setCplx(this,'M')">Medium</div>
+                  <div class="cb" onclick="setCplx(this,'L')">Low</div>
+                </div>
+              </div>
+              <div class="fl"><label>Gender preference</label><select><option>Any gender</option><option>Female MJ only</option><option>Male MJ only</option></select></div>
+              <div class="fl">
+                <label>Language required</label>
+                <select><option>Any</option><option selected>Mandarin</option><option>Hokkien</option><option>Malay</option><option>English</option></select>
+              </div>
+              <div class="fl"><label>MicroJobbers Required</label><input type="number" id="mjRequired" value="1" min="1"></div>
+              <div class="fl"><label>Service boundary (postal code)</label><input type="text" value="409051" placeholder="Postal code"></div>
+              <div class="fl fg-full">
+                <label>Skills / OJT required</label>
+                <div class="tags">
+                  <span class="tag tag-g">Chaperone OJT</span>
+                  <span class="tag tag-g">Wheelchair Transfer</span>
+                  <span class="tag tag-add">+ Add skill</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slots & Notifications -->
+          <div class="card2">
+            <div class="card-head">
+              <div class="card-icon ci-a"><i class="bi bi-bell" style="color:var(--am)"></i></div>
+              <div class="card-label">Slots &amp; notifications</div>
+            </div>
+            <div id="ha-note" style="display:none" class="banner b-a">Home Assessment: min <strong>2 confirmed MJs</strong> required. Confirmed MJ names displayed on job listing.</div>
+            <div class="slots">
+              <div class="slot-box s-c"><div class="sn" id="confirmedSlots">1</div><div class="sl">Confirmed slot(s)</div></div>
+              <div class="slot-box s-w"><div class="sn">4</div><div class="sl">Waitlist slots</div></div>
+              <div class="slot-box"><div class="sn" style="color:var(--g)">1 BD</div><div class="sl">Auto-cancel threshold</div></div>
+              <div class="slot-box"><div class="sn">48h</div><div class="sl">MJ cancel window</div></div>
+            </div>
+            <div style="height:1px;background:var(--bdr2);margin-bottom:10px"></div>
+            <div class="tog-row">
+              <div class="tog on" onclick="this.classList.toggle('on')"></div>
+              <div class="tog-lbl">Pre-task confirmation requests to MJ</div>
+              <div class="tog-note">On confirm · 5 BD · 24h before</div>
+            </div>
+            <div class="tog-row">
+              <div class="tog on" onclick="this.classList.toggle('on')"></div>
+              <div class="tog-lbl">Alert staff if no takers 2 BD before job</div>
+            </div>
+            <div class="tog-row">
+              <div class="tog on" onclick="this.classList.toggle('on')"></div>
+              <div class="tog-lbl">Geofencing on MJ check-in</div>
+              <div class="tog-note">Recommended for Chaperone</div>
+            </div>
+            <div class="tog-row">
+              <div class="tog" onclick="this.classList.toggle('on')"></div>
+              <div class="tog-lbl">Allow client to cancel / reschedule via C4Me</div>
+            </div>
+          </div>
+
         </div>
+
         <div class="modal-footer">
-          <button class="btn-primary" onclick="submitNoShow()">Submit</button>
-          <button class="btn-ghost" onclick="cancelNoShow()">Cancel</button>
+          <button class="btn-pub" onclick="saveJob()" id="saveBtn">Publish listing</button>
+          <button class="btn-ghost2" onclick="saveJob(true)">Save draft</button>
+          <button class="btn-cancel-job" id="cancelJobBtn" style="display:none;margin-left:auto" onclick="cancelJob()">Cancel job</button>
         </div>
       </div>
     </div>
 
-    <!-- 3rd Party Services Form Modal -->
-    <div id="thirdPartyModal" class="modal-overlay" style="display:none;" onclick="handleThirdPartyOverlayClick(event)">
-      <div class="modal-box" style="max-width:520px;">
+    <!-- ── View Job Detail Modal ────────────────────────────────────────── -->
+    <div class="modal-overlay" id="viewModal" onclick="handleViewOverlay(event)">
+      <div class="modal-box view-box" onclick="event.stopPropagation()">
         <div class="modal-head">
-          <div class="modal-head-title" id="thirdPartyModalTitle">3rd Party Service Form</div>
-          <button class="modal-close" onclick="closeThirdPartyModal()">&#10005; Close</button>
+          <span class="modal-head-title" id="viewTitle">Job details</span>
+          <span class="status-pill" id="viewStatus"></span>
+          <button class="modal-close" onclick="closeViewModal()">Close</button>
         </div>
-        <div class="modal-body" style="min-height:200px;">
-          <!-- form content to be filled in -->
-        </div>
+        <div class="modal-body" id="viewBody"></div>
         <div class="modal-footer">
-          <button class="btn-ghost" onclick="closeThirdPartyModal()">Cancel</button>
+          <button class="btn-pub" id="viewEditBtn" style="display:none" onclick="editFromView()"><i class="bi bi-pencil me-1"></i>Edit job</button>
+          <button class="btn-ghost2" style="margin-left:auto" onclick="closeViewModal()">Close</button>
         </div>
       </div>
     </div>
 
+    <!-- Sync toast -->
+    <div class="tm-toast" id="syncToast"><i class="bi bi-check-circle"></i><span id="syncToastMsg">Synced to MJ Portal</span></div>
+
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+      /* ── Shared mock data (mirrors v3/portal/index.html JOB_DATA) ─────── */
+      const JOB_DATA = [
+        {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'Urgent',     mj:null,                      wl:0, urgency:'Urgent',   sccStaff:null          },
+        {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh',  date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',       status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:'Noor Azizah' },
+        {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown', date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',      status:'Completed',  mj:'Fatimah bte Ali',         wl:0, urgency:'Urgent',   sccStaff:null          },
+        {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',         status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh',  date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',      status:'Draft',      mj:null,                      wl:0, urgency:'Urgent',   sccStaff:'Noor Azizah' },
+        {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof',  status:'Open',       mj:null,                      wl:2, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',     date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',       status:'Open',       mj:null,                      wl:3, urgency:'Standard', sccStaff:'Chen Li Ling'},
+        {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',    date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',    status:'Completed',  mj:'Ravi Kumar',              wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',     date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',       status:'Cancelled',  mj:null,                      wl:0, urgency:'Urgent',   sccStaff:'Chen Li Ling'},
+        {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan', status:'Waitlisted', mj:null,                      wl:4, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',      status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',    date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',       status:'Draft',      mj:null,                      wl:2, urgency:'Standard', sccStaff:'Rajan Kumar' },
+        {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',    date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',     status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'In Progress',mj:'Nigel Tan, Lawrence Tan', wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown', date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',      status:'Re-opened',  mj:null,                      wl:2, urgency:'Standard', sccStaff:null,          cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
+        {id:'MJ-2026-025',type:'Chaperone',       facility:'SCC — Queenstown', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Goh Poh Choo',      status:'Taken',      mj:'Melissa Chua',            wl:1, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-026',type:'Befriending',     facility:'VG — Clementi',    date:'22 May 2026',sd:'2026-05-22',time:'14:00–15:00',client:'Ong Kim Guan',      status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null          }
+      ];
+
+      /* Waitlist entries keyed by job id (mirrors v3/portal/index.html WAITLIST_DATA) */
+      const WAITLIST_DATA = {
+        'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
+        'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
+        'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
+        'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
+        'MJ-2026-017':[{n:'Grace Ho',t:'15 May 16:00'},{n:'Fatimah bte Salleh',t:'16 May 08:20'},{n:'Ravi Shankar',t:'16 May 11:45'},{n:'Yeo Bee Kheng',t:'17 May 07:30'}],
+        'MJ-2026-018':[{n:'Abdul Rahman',t:'17 May 15:00'},{n:'Lee Ah Kow Jr',t:'17 May 16:30'},{n:'Tan Sock Kiang',t:'18 May 08:00'},{n:'Gopalan s/o Rajan',t:'18 May 09:00'}],
+        'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
+        'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
+        'MJ-2026-024':[{n:'Ramesh Kumar',t:'20 May 10:15'},{n:'Joanna Lim',t:'20 May 11:02'}]
+      };
+
+      /* Job type <-> select value maps */
+      const TYPE_TO_VAL = {'Chaperone':'chaperone','Befriending':'befriending','Home Assessment':'homeassess','Centre Assistant':'centreassist'};
+      const VAL_TO_TYPE = {chaperone:'Chaperone',befriending:'Befriending',homeassess:'Home Assessment',centreassist:'Centre Assistant'};
+
+      /* Status -> event colour (matches portal badge palette) */
+      const STATUS_COLOR = {
+        'Open':        '#1A5FA8',
+        'Urgent':      '#FF6B35',
+        'Waitlisted':  '#C07A1A',
+        'In Progress': '#6B21A8',
+        'Re-opened':   '#6B21A8',
+        'Taken':       '#13795B',
+        'Confirmed':   '#13795B',
+        'Completed':   '#6c757d',
+        'Cancelled':   '#B03030',
+        'Draft':       '#AAA'
+      };
+
+      /* ── Build a FullCalendar event from a job record ─────────────────── */
+      function jobToEvent(job) {
+        const parts = String(job.time).split(/[–-]/).map(s => s.trim());
+        const start = job.sd + 'T' + (parts[0] || '09:00');
+        const end   = job.sd + 'T' + (parts[1] || parts[0] || '10:00');
+        const color = STATUS_COLOR[job.status] || '#6c757d';
+        const label = job.client ? (job.type + ' · ' + job.client) : job.type;
+        return {
+          id: job.id,
+          title: label,
+          start: start,
+          end: end,
+          backgroundColor: color,
+          borderColor: color,
+          extendedProps: { jobId: job.id, status: job.status }
+        };
+      }
+
+      /* ── Filtering ────────────────────────────────────────────────────── */
+      function getFilters() {
+        return {
+          client:   (document.getElementById('fClient')   || {}).value ? document.getElementById('fClient').value.trim().toLowerCase() : '',
+          type:     (document.getElementById('fType')      || {}).value || '',
+          facility: (document.getElementById('fFacility')  || {}).value || '',
+          status:   (document.getElementById('fStatus')    || {}).value || ''
+        };
+      }
+
+      function filteredJobs() {
+        const f = getFilters();
+        return JOB_DATA.filter(j => {
+          if (f.client   && !(j.client || '').toLowerCase().includes(f.client)) return false;
+          if (f.type     && j.type !== f.type)         return false;
+          if (f.facility && j.facility !== f.facility) return false;
+          if (f.status   && j.status !== f.status)     return false;
+          return true;
+        });
+      }
+
+      function allEvents() { return filteredJobs().map(jobToEvent); }
+
+      function applyFilters() {
+        refreshCalendar();
+        const shown = filteredJobs().length;
+        const el = document.getElementById('fCount');
+        if (el) el.textContent = 'Showing ' + shown + ' of ' + JOB_DATA.length + ' jobs';
+      }
+
+      function clearFilters() {
+        ['fClient','fType','fFacility','fStatus'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        applyFilters();
+      }
+
+      /* ── FullCalendar instance ────────────────────────────────────────── */
+      let calendar;
+      let editingJobId = null;
+
+      document.addEventListener('DOMContentLoaded', function () {
+        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+          initialView: 'timeGridWeek',
+          initialDate: '2026-05-20',      // demo data lives in May–Jun 2026
+          nowIndicator: true,
+          height: 'auto',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+          },
+          buttonText: { listWeek: 'List' },
+          views: {
+            listWeek: { buttonText: 'List' }
+          },
+          noEventsContent: 'No jobs scheduled for this period',
+          slotMinTime: '08:00:00',
+          slotMaxTime: '19:00:00',
+          allDaySlot: false,
+          businessHours: { daysOfWeek: [1,2,3,4,5], startTime: '09:00', endTime: '18:00' },
+          expandRows: true,
+          events: allEvents(),
+          eventClick: function (info) {
+            openViewModal(info.event.extendedProps.jobId);
+          },
+          dateClick: function (info) {
+            openAddModal(info.dateStr);
+          }
+        });
+        calendar.render();
+        applyFilters();   // initialise the "Showing X of Y" count
+      });
+
+      function refreshCalendar() {
+        calendar.removeAllEvents();
+        calendar.addEventSource(allEvents());
+      }
+
+      /* ── Modal open helpers ───────────────────────────────────────────── */
+      function openAddModal(dateStr) {
+        editingJobId = null;
+        document.getElementById('modalTitle').textContent = 'Post new job';
+        document.getElementById('modalJobId').style.display = 'none';
+        document.getElementById('cancelJobBtn').style.display = 'none';
+        document.getElementById('saveBtn').textContent = 'Publish listing';
+
+        // reset to sensible defaults
+        document.getElementById('jobType').value = 'chaperone';
+        document.getElementById('facility').selectedIndex = 0;
+        document.getElementById('clientName').value = '';
+        document.getElementById('assignmentSelect').selectedIndex = 0;
+        document.getElementById('mjRequired').value = 1;
+
+        if (dateStr) {
+          // dateStr may be 'YYYY-MM-DD' (month view) or 'YYYY-MM-DDTHH:MM:SS' (time grid)
+          const d = dateStr.split('T')[0];
+          document.getElementById('jobDate').value = d;
+          if (dateStr.indexOf('T') > -1) {
+            const hhmm = dateStr.split('T')[1].slice(0,5);
+            document.getElementById('timeStart').value = hhmm;
+            const [h,m] = hhmm.split(':').map(Number);
+            document.getElementById('timeEnd').value = String((h+2)%24).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+          }
+        } else {
+          document.getElementById('jobDate').value = '2026-05-20';
+          document.getElementById('timeStart').value = '14:00';
+          document.getElementById('timeEnd').value = '16:00';
+        }
+        onJobType();
+        toggleSearchStaff(document.getElementById('assignmentSelect'));
+        openModal();
+      }
+
+      /* ── View / detail modal (succinct, mirrors portal manage modal) ──── */
+      let viewingJobId = null;
+
+      function openViewModal(jobId) {
+        const j = JOB_DATA.find(x => x.id === jobId);
+        if (!j) return;
+        viewingJobId = jobId;
+
+        const wl = WAITLIST_DATA[jobId] || [];
+        const isHA  = j.type === 'Home Assessment';
+        const isBef = j.type === 'Befriending';
+        const slots = isHA ? 2 : 1;
+        const mjNames = j.mj ? j.mj.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+        document.getElementById('viewTitle').textContent = j.type + ' · ' + j.facility;
+        const pill = document.getElementById('viewStatus');
+        pill.textContent = j.status;
+        pill.style.background = STATUS_COLOR[j.status] || '#6c757d';
+
+        // Status banner
+        let banner = '';
+        if (j.status === 'Urgent')
+          banner = '<div class="banner bn-r"><div><strong>Urgent:</strong> No confirmed MicroJobber yet. Auto-cancel triggers 1 business day before the job date.</div></div>';
+        else if (j.status === 'Cancelled')
+          banner = '<div class="banner bn-r"><div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
+        else if (j.status === 'Completed')
+          banner = '<div class="banner bn-g"><div><strong>Completed:</strong> This job was successfully completed.</div></div>';
+        else if (isHA)
+          banner = '<div class="banner bn-a"><div><strong>Home Assessment:</strong> Minimum 2 confirmed MicroJobbers required. Confirmed names are visible to eligible MJs on the C4Me listing.</div></div>';
+
+        // Info grid
+        let grid = '<div class="m-info-grid">' +
+          '<div class="m-info-box"><div class="m-info-label">Date &amp; time</div><div class="m-info-val">' + j.date + ', ' + j.time + '</div></div>' +
+          '<div class="m-info-box"><div class="m-info-label">Client</div><div class="m-info-val">' + (j.client || '—') + '</div></div>' +
+          '<div class="m-info-box"><div class="m-info-label">Urgency</div><div class="m-info-val">' + (j.urgency === 'Urgent' ? 'Urgent' : 'Standard') + '</div></div>';
+        if (j.sccStaff)
+          grid += '<div class="m-info-box full"><div class="m-info-label">Assigned to (' + (isBef ? 'AAC' : 'SCC') + ' staff)</div><div class="m-info-val">' + j.sccStaff + '</div></div>';
+        grid += '</div>';
+
+        // MicroJobber assignment section
+        let mjHtml = '';
+        if (j.sccStaff && !mjNames.length) {
+          mjHtml = '<div class="sect-title">Assignment</div>' +
+            '<div class="assign-note">This job is <strong>staff-assigned</strong> and not open to MicroJobbers. No self-grab or waitlist.</div>';
+        } else if (isBef && !mjNames.length) {
+          mjHtml = '<div class="sect-title">Assignment</div>' +
+            '<div class="assign-note">Befriending jobs are <strong>staff-assigned only</strong>. No MicroJobber self-grab or waitlist available.</div>';
+        } else {
+          mjHtml = '<div class="sect-title">Assigned MicroJobber' + (slots > 1 ? 's' : '') + ' (' + slots + ' required)</div>';
+          for (let i = 0; i < slots; i++) {
+            const name = mjNames[i];
+            const hasMJ = !!name;
+            mjHtml += '<div class="slot-row">' +
+              '<div class="slot-num ' + (hasMJ ? 'sn-filled' : 'sn-empty') + '">' + (hasMJ ? '<i class="bi bi-check-lg"></i>' : (i + 1)) + '</div>' +
+              '<div style="flex:1">' +
+                '<div class="slot-name"' + (hasMJ ? '' : ' style="color:var(--ink4);font-style:italic"') + '>' + (hasMJ ? name : 'Empty — awaiting MicroJobber') + '</div>' +
+                '<div class="slot-meta">' + (hasMJ ? 'Confirmed MicroJobber · grabbed via C4Me' : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')) + '</div>' +
+              '</div>' +
+              (hasMJ ? '<a class="slot-prof" href="./portal/proto2_v3_mj_profile.html" target="_blank">View profile</a>' : '') +
+              '</div>';
+          }
+        }
+
+        // Re-opened: who cancelled
+        if (j.status === 'Re-opened' && j.cancelledBy) {
+          mjHtml += '<div class="sect-title">Cancelled by</div>' +
+            '<div class="assign-note" style="color:var(--rm);background:var(--rl);border-color:var(--rb)"><strong>' + j.cancelledBy + '</strong> &nbsp;·&nbsp; ' + j.cancelledAt + '</div>';
+        }
+
+        // Waitlist (not shown for Befriending / staff-assigned)
+        let wlHtml = '';
+        if (!isBef && !j.sccStaff) {
+          wlHtml = '<div class="sect-title">Waitlist (' + wl.length + ' / 4)</div>';
+          if (!wl.length) {
+            wlHtml += '<div style="font-size:12px;color:var(--ink4);padding:4px 0">No MicroJobbers on the waitlist yet.</div>';
+          } else {
+            wl.forEach(function (w, idx) {
+              wlHtml += '<div class="wl-row">' +
+                '<div class="wl-pos">' + (idx + 1) + '</div>' +
+                '<div class="wl-name">' + w.n + '</div>' +
+                '<div class="wl-time">' + w.t + '</div></div>';
+            });
+          }
+        }
+
+        document.getElementById('viewBody').innerHTML = banner + grid + mjHtml + wlHtml;
+
+        // Edit button only for Draft or Cancelled jobs
+        const canEdit = (j.status === 'Draft' || j.status === 'Cancelled');
+        document.getElementById('viewEditBtn').style.display = canEdit ? 'inline-block' : 'none';
+
+        document.getElementById('viewModal').classList.add('on');
+      }
+
+      function closeViewModal() { document.getElementById('viewModal').classList.remove('on'); }
+      function handleViewOverlay(e) { if (e.target.id === 'viewModal') closeViewModal(); }
+      function editFromView() {
+        const id = viewingJobId;
+        closeViewModal();
+        openEditModal(id);
+      }
+
+      function openEditModal(jobId) {
+        const job = JOB_DATA.find(j => j.id === jobId);
+        if (!job) return;
+        editingJobId = jobId;
+
+        document.getElementById('modalTitle').textContent = 'Edit job';
+        const chip = document.getElementById('modalJobId');
+        chip.style.display = 'inline-block';
+        chip.textContent = job.id + ' · ' + job.status;
+        document.getElementById('cancelJobBtn').style.display = (job.status === 'Cancelled') ? 'none' : 'inline-block';
+        document.getElementById('saveBtn').textContent = 'Save changes';
+
+        document.getElementById('jobType').value = TYPE_TO_VAL[job.type] || 'chaperone';
+        setSelectByText(document.getElementById('facility'), job.facility);
+        document.getElementById('jobDate').value = job.sd;
+        const parts = String(job.time).split(/[–-]/).map(s => s.trim());
+        document.getElementById('timeStart').value = parts[0] || '14:00';
+        document.getElementById('timeEnd').value = parts[1] || '16:00';
+        document.getElementById('clientName').value = job.client || '';
+
+        // assignment: staff vs open to MJ
+        const asgn = document.getElementById('assignmentSelect');
+        asgn.selectedIndex = job.sccStaff ? 1 : (job.mj ? 2 : 0);
+
+        onJobType();
+        toggleSearchStaff(asgn);
+        openModal();
+      }
+
+      function setSelectByText(sel, text) {
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].text === text) { sel.selectedIndex = i; return; }
+        }
+      }
+
+      function openModal()  { document.getElementById('jobModal').classList.add('on'); }
+      function closeJobModal() { document.getElementById('jobModal').classList.remove('on'); }
+      function handleOverlayClick(e) { if (e.target.id === 'jobModal') closeJobModal(); }
+
+      /* ── Save / Cancel (in-memory) ────────────────────────────────────── */
+      function saveJob(asDraft) {
+        const typeVal = document.getElementById('jobType').value;
+        const type    = VAL_TO_TYPE[typeVal];
+        const facility = document.getElementById('facility').value;
+        const sd       = document.getElementById('jobDate').value;
+        const t1       = document.getElementById('timeStart').value;
+        const t2       = document.getElementById('timeEnd').value;
+        const client   = document.getElementById('clientName').value.trim();
+        const asgnSel  = document.getElementById('assignmentSelect');
+        const asgnTxt  = asgnSel.options[asgnSel.selectedIndex].text;
+
+        const time = t1 + '–' + t2;
+        const displayDate = formatDisplayDate(sd);
+
+        if (editingJobId) {
+          const job = JOB_DATA.find(j => j.id === editingJobId);
+          job.type = type; job.facility = facility; job.sd = sd; job.time = time;
+          job.date = displayDate; job.client = client;
+          if (asDraft) job.status = 'Draft';
+          showToast('Job ' + job.id + ' updated · synced to MJ Portal');
+        } else {
+          const newJob = {
+            id: nextJobId(), type: type, facility: facility, date: displayDate, sd: sd,
+            time: time, client: client,
+            status: asDraft ? 'Draft' : (asgnTxt.indexOf('Open') > -1 ? 'Open' : 'Open'),
+            mj: null, wl: 0, urgency: 'Standard',
+            sccStaff: (asgnTxt.indexOf('Staff') > -1) ? 'Assigned Staff' : null
+          };
+          JOB_DATA.push(newJob);
+          showToast('Job ' + newJob.id + ' posted · synced to MJ Portal');
+        }
+
+        applyFilters();
+        closeJobModal();
+      }
+
+      function cancelJob() {
+        if (!editingJobId) return;
+        const job = JOB_DATA.find(j => j.id === editingJobId);
+        job.status = 'Cancelled';
+        showToast('Job ' + job.id + ' cancelled · synced to MJ Portal');
+        applyFilters();
+        closeJobModal();
+      }
+
+      function nextJobId() {
+        let max = 0;
+        JOB_DATA.forEach(j => {
+          const n = parseInt(String(j.id).split('-').pop(), 10);
+          if (!isNaN(n) && n > max) max = n;
+        });
+        return 'MJ-2026-' + String(max + 1).padStart(3, '0');
+      }
+
+      function formatDisplayDate(sd) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const p = sd.split('-');
+        if (p.length !== 3) return sd;
+        return p[2] + ' ' + months[parseInt(p[1],10) - 1] + ' ' + p[0];
+      }
+
+      function showToast(msg) {
+        const t = document.getElementById('syncToast');
+        document.getElementById('syncToastMsg').textContent = msg;
+        t.classList.add('on');
+        setTimeout(() => t.classList.remove('on'), 2600);
+      }
+
+      /* ── Publish-form conditional logic (ported from proto1_v3_publish) ─ */
+      function setCplx(el, v) {
+        document.querySelectorAll('.cb').forEach(b => b.className = 'cb');
+        el.className = 'cb c' + v;
+      }
+
+      function onJobType() {
+        const t = document.getElementById('jobType').value;
+        const note = document.getElementById('ha-note');
+        const sc = document.getElementById('confirmedSlots');
+        const isBefriending = t === 'befriending';
+        const clientProfileBlock = document.getElementById('clientCardBlock');
+
+        clientProfileBlock.style.display = (t === 'centreassist') ? 'none' : '';
+
+        if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
+        else { note.style.display = 'none'; sc.textContent = '1'; }
+
+        document.getElementById('venueFrom').style.display = isBefriending ? 'none' : '';
+        document.getElementById('venueTo').style.display = isBefriending ? 'none' : '';
+
+        const staffOption = document.getElementById('staffOption');
+        const staffLabel = document.getElementById('staffLabel');
+        if (isBefriending) {
+          staffOption.textContent = 'To AAC Staff';
+          staffLabel.innerHTML = 'AAC Staff <span style="color:red">*</span>';
+        } else {
+          staffOption.textContent = 'To SCC Staff';
+          staffLabel.innerHTML = 'SCC Staff <span style="color:red">*</span>';
+        }
+
+        const assignSel = document.getElementById('assignmentSelect');
+        const selectedOpt = assignSel.options[assignSel.selectedIndex];
+        if (selectedOpt && selectedOpt.id === 'staffOption') {
+          // keep selection if it is the staff option
+        }
+      }
+
+      function toggleSearchStaff(select) {
+        const search = document.getElementById('searchStaff');
+        const selectedOption = select.options[select.selectedIndex];
+        search.style.display = (selectedOption && selectedOption.id === 'staffOption') ? '' : 'none';
+      }
+
+      /* ── CARES shell: sidebar toggle + collapse chevrons ──────────────── */
       const sidebar = document.getElementById('sidebar');
       document.getElementById('sidebarToggle').addEventListener('click', () => {
         sidebar.classList.toggle('sidebar-collapsed');
       });
+
       document.querySelectorAll('.sidebar-collapsible').forEach(toggle => {
         const targetId = toggle.getAttribute('data-bs-target');
         const collapseEl = document.querySelector(targetId);
         if (!collapseEl) return;
+        // set initial chevron for already-expanded menu
+        if (collapseEl.classList.contains('show')) {
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
+        }
         collapseEl.addEventListener('show.bs.collapse', () => {
-          const icon = toggle.querySelector('.collapse-icon');
-          if (icon) icon.style.transform = 'rotate(-90deg)';
-          toggle.classList.add('active');
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
         });
         collapseEl.addEventListener('hide.bs.collapse', () => {
-          const icon = toggle.querySelector('.collapse-icon');
-          if (icon) icon.style.transform = 'rotate(0deg)';
-          toggle.classList.remove('active');
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(0deg)';
         });
       });
+
+      /* Session countdown (matches CARES dashboard) */
       let seconds = 17520;
       const timerEl = document.getElementById('sessionTimer');
-      const countdown = setInterval(() => {
-        seconds--;
-        timerEl.textContent = seconds;
-        if (seconds <= 0) { clearInterval(countdown); timerEl.textContent = '0'; }
+      setInterval(() => {
+        if (seconds > 0) { seconds--; timerEl.textContent = seconds; }
       }, 1000);
-      document.getElementById('clientSearchInput').addEventListener('input', function () {
-        if (this.value.length >= 3) console.log('Searching for:', this.value);
-      });
-    </script>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script>
-/* ══ Data ══════════════════════════════════════════════════════════ */
-const JOB_DATA = [
-  {id:'MJ-2026-001',type:'Chaperone', facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian', status:'Published', mj:null, wl:0, urgency:'Urgent'  },
-  {id:'MJ-2026-002',type:'Chaperone', facility:'SCC — Bedok', date:'29 May 2026',sd:'2026-05-29',time:'14:00–16:00',client:'Md Afiq', status:'Published', mj:1, wl:0, urgency:'Standard'  }
-];
-
-const WAITLIST_DATA = {
-  'MJ-2026-002':[{n:'Ramesh Kumar',t:'17 May 08:12'},{n:'Joanna Lim',t:'17 May 09:44'}],
-  'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
-  'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
-  'MJ-2026-009':[{n:'Tan Siew Lian',t:'16 May 08:30'},{n:'Abdul Halim',t:'16 May 09:15'},{n:'Mei Ling Chua',t:'16 May 12:00'},{n:'Raj Gopal',t:'17 May 07:45'}],
-  'MJ-2026-010':[{n:'Wong Kah Meng',t:'16 May 10:00'},{n:'Lim Soo Bee',t:'16 May 13:30'},{n:'Ng Ah Cheh',t:'17 May 08:00'}],
-  'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
-  'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
-  'MJ-2026-014':[{n:'Sarah Tan',t:'18 May 07:45'},{n:'Vijay Kumar',t:'18 May 09:30'}],
-  'MJ-2026-017':[{n:'Grace Ho',t:'15 May 16:00'},{n:'Fatimah bte Salleh',t:'16 May 08:20'},{n:'Ravi Shankar',t:'16 May 11:45'},{n:'Yeo Bee Kheng',t:'17 May 07:30'}],
-  'MJ-2026-018':[{n:'Abdul Rahman',t:'17 May 15:00'},{n:'Lee Ah Kow Jr',t:'17 May 16:30'},{n:'Tan Sock Kiang',t:'18 May 08:00'},{n:'Gopalan s/o Rajan',t:'18 May 09:00'}],
-  'MJ-2026-019':[{n:'Lily Ng',t:'17 May 08:00'},{n:'Chen Wei Ling',t:'17 May 10:00'},{n:'Mohd Farid',t:'18 May 07:30'}],
-  'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
-  'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
-};
-
-const STATUS_HTML = {
-  'Published':   '<span class="badge b-pub"> Published</span>',
-  'Taken':       '<span class="badge b-tak"> Taken</span>',
-  'Completed':   '<span class="badge b-com"> Completed</span>',
-  'Cancelled':   '<span class="badge b-can"> Cancelled</span>',
-  'Waitlisted':  '<span class="badge b-wl"> Waitlisted</span>',
-  'At Risk':     '<span class="badge b-risk"> At Risk</span>',
-  'In Progress': '<span class="badge b-tak"> In Progress</span>',
-};
-
-/* ══ Helpers ════════════════════════════════════════════════════════ */
-function fmt12(t) {
-  var p = t.trim().split(':');
-  var h = parseInt(p[0]), m = p[1] || '00';
-  var ap = h >= 12 ? 'pm' : 'am';
-  h = h % 12 || 12;
-  return h + ':' + m + ap;
-}
-function fmtSlot(slot) {
-  var p = slot.split('–');
-  return p.length < 2 ? slot : fmt12(p[0]) + ' - ' + fmt12(p[1]);
-}
-function fmtDateFull(ds) {
-  var d = new Date(ds + 'T00:00:00');
-  var mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  return mo[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
-}
-function statusDotColor(s) {
-  var m = {'Published':'#2196F3','Taken':'#4CAF50','In Progress':'#2196F3','At Risk':'#FF5722','Completed':'#4CAF50','Cancelled':'#F44336','Waitlisted':'#FF9800'};
-  return m[s] || '#9E9E9E';
-}
-
-/* ══ Render task list ═══════════════════════════════════════════════ */
-var currentJobId = null;
-
-function renderTaskList() {
-  var statusFilter = document.getElementById('tmStatusFilter') ? document.getElementById('tmStatusFilter').value : '';
-
-  var filtered = JOB_DATA.filter(function(j) {
-    if (statusFilter && j.status !== statusFilter) return false;
-    return true;
-  });
-
-  var grouped = {};
-  filtered.forEach(function(j) {
-    if (!grouped[j.sd]) grouped[j.sd] = [];
-    grouped[j.sd].push(j);
-  });
-
-  var dates = Object.keys(grouped).sort();
-  var html = '';
-
-  if (!dates.length) {
-    html = '<div style="padding:30px 20px;color:#888;font-size:13px;">No tasks found.</div>';
-  }
-
-  dates.forEach(function(dk) {
-    var jobs = grouped[dk].slice().sort(function(a,b){ return a.time.localeCompare(b.time); });
-    html += '<div class="tm-date-group">';
-    html += '<div class="tm-date-header">' + fmtDateFull(dk) + '</div>';
-    jobs.forEach(function(j) {
-      var dot = statusDotColor(j.status);
-      var slot = fmtSlot(j.time);
-      var title = j.type + (j.client && j.client !== '—' ? ' - ' + j.client : '');
-      var mjLine = j.mj ? '<div class="tm-task-sub"><span class="tm-loc-label">Assigned MJ:</span><span class="tm-loc-val">' + j.mj + '</span></div>' : '';
-      html += '<div class="tm-task-row" style="cursor:pointer;" onclick="openTaskDetail(\'' + j.id + '\')">';
-      html += '<div class="tm-task-time">' + slot + '</div>';
-      html += '<div class="tm-task-dot" style="background:' + dot + ';"></div>';
-      html += '<div class="tm-task-detail">';
-      html += '<div class="tm-task-name">' + title + '</div>';
-      html += '<div class="tm-task-sub"><span class="tm-loc-label">Location:</span><span class="tm-loc-val">' + j.facility + '</span></div>';
-      html += mjLine;
-      html += (STATUS_HTML[j.status] || j.status);
-      html += '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  });
-
-  document.getElementById('tmListArea').innerHTML = html;
-}
-
-/* ══ Modal ══════════════════════════════════════════════════════════ */
-function openModal(jobId) {
-  currentJobId = jobId;
-  var j = JOB_DATA.find(function(x){return x.id === jobId;});
-  if (!j) return;
-  var wl = WAITLIST_DATA[jobId] || [];
-  var isHA = j.type === 'Home Assessment';
-  var isBef = j.type === 'Befriending';
-  var slots = isHA ? 2 : 1;
-  var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
-  var displayNoShow = j.status === 'Completed' || j.status === 'In Progress' || j.status === 'Cancelled';
-
-  document.getElementById('modal-title').textContent = j.id + ' — ' + j.type + ' · ' + j.facility;
-
-  var banner = '';
-  if (j.status === 'At Risk')
-    banner = '<div class="banner bn-r">⚠️ <div><strong>At Risk:</strong> No confirmed MJ. Auto-cancel triggers 1 BD before job date.</div></div>';
-  else if (j.status === 'Cancelled')
-    banner = '<div class="banner bn-r">✕ <div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
-  else if (j.status === 'Completed')
-    banner = '<div class="banner bn-g">✓ <div><strong>Completed:</strong> Job was successfully completed. Records are locked.</div></div>';
-  else if (isHA)
-    banner = '<div class="banner bn-a">ℹ️ <div><strong>Home Assessment:</strong> Minimum 2 confirmed MJs required.</div></div>';
-
-  var grid = '<div class="m-info-grid">' +
-    '<div class="m-info-box"><div class="m-info-label">Date &amp; time</div><div class="m-info-val">' + j.date + ', ' + j.time + '</div></div>' +
-    '<div class="m-info-box"><div class="m-info-label">Client</div><div class="m-info-val">' + j.client + '</div></div>' +
-    '<div class="m-info-box"><div class="m-info-label">Urgency</div><div class="m-info-val">' + (j.urgency === 'Urgent' ? '🔶 Urgent' : 'Standard') + '</div></div>' +
-    '</div>';
-
-  var slotHtml = '<div class="sect-title">Confirmed slot' + (slots > 1 ? 's' : '') + ' (' + slots + ' required)</div>';
-  for (var i = 0; i < slots; i++) {
-    var hasMJ = i === 0 && j.mj;
-    slotHtml += '<div class="slot-row" id="slot-' + i + '">' +
-      '<div class="slot-num ' + (hasMJ ? 'sn-filled' : 'sn-empty') + '">' + (hasMJ ? '✓' : (i + 1)) + '</div>' +
-      '<div style="flex:1"><div class="slot-name"' + (hasMJ ? '' : ' style="color:var(--ink4);font-style:italic"') + '>' + (hasMJ ? j.mj : 'Empty — awaiting MJ') + '</div>' +
-      '<div class="slot-meta">' + (hasMJ ? 'Confirmed · Grabbed 16 May 09:30' : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')) + '</div></div>';
-    if (!locked) {
-      if (hasMJ) slotHtml += '<button class="wl-btn wl-remove" onclick="removeSlot(this,\'' + jobId + '\',' + i + ')">Remove</button>';
-      else slotHtml += '<button class="btn-ghost" style="font-size:11px;padding:4px 10px" onclick="assignManually(\'' + jobId + '\',' + i + ')">+ Assign</button>';
-    }
-    if (displayNoShow && hasMJ) slotHtml += '<button class="btn-danger" style="font-size:11px;padding:4px 10px;margin-left:8px" onclick="openNoShowModal()">Record No-Show</button>';
-    slotHtml += '</div>';
-  }
-
-  var wlHtml = '';
-  if (!isBef) {
-    wlHtml = '<div class="sect-title">Waitlist (' + wl.length + ' / 4)</div>';
-    if (!wl.length) {
-      wlHtml += '<div style="font-size:12px;color:var(--ink4);padding:8px 0">No MJs on waitlist yet.</div>';
-    } else {
-      wl.forEach(function(w, idx) {
-        wlHtml += '<div class="wl-row" id="wl-' + idx + '">' +
-          '<div class="wl-pos">' + (idx + 1) + '</div>' +
-          '<div class="wl-name">' + w.n + '</div>' +
-          '<div class="wl-time">' + w.t + '</div>';
-        if (!locked) wlHtml += '<button class="wl-btn wl-confirm" onclick="confirmWL(this,\'' + jobId + '\',' + idx + ')">Confirm</button>' +
-          '<button class="wl-btn wl-remove" onclick="removeWL(this,' + idx + ')">Remove</button>';
-        wlHtml += '</div>';
-      });
-    }
-  } else {
-    wlHtml = '<div class="sect-title">Assignment</div>' +
-      '<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr)">' +
-      'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.' +
-      (!locked ? '<br><br><button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="assignManually(\'' + jobId + '\',0)">+ Assign MJ manually</button>' : '') + '</div>';
-  }
-
-  document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
-  document.getElementById('btn-complete').disabled = locked;
-  document.getElementById('btn-cancel-job').disabled = locked;
-  document.getElementById('assignModal').style.display = 'flex';
-}
-
-function closeModal() { document.getElementById('assignModal').style.display = 'none'; }
-function handleOverlayClick(e) { if (e.target.id === 'assignModal') closeModal(); }
-
-function confirmWL(btn, jobId, idx) {
-  var row = btn.closest('.wl-row');
-  row.style.background = 'var(--gl)'; row.style.borderColor = 'var(--gb)';
-  btn.textContent = '✓ Confirmed'; btn.disabled = true;
-  btn.style.background = 'var(--gm)'; btn.style.color = '#fff';
-}
-function removeWL(btn, idx) {
-  var row = btn.closest('.wl-row');
-  row.style.opacity = '.45';
-  row.querySelectorAll('button').forEach(function(b){b.disabled = true;});
-  btn.textContent = 'Removed';
-}
-function removeSlot(btn, jobId, idx) {
-  var row = document.getElementById('slot-' + idx);
-  row.querySelector('.slot-name').textContent = 'Empty — slot re-opened';
-  row.querySelector('.slot-name').style.cssText = 'color:var(--ink4);font-style:italic';
-  row.querySelector('.slot-meta').textContent = 'Open for grab · Slot re-opened';
-  row.querySelector('.slot-num').className = 'slot-num sn-empty';
-  row.querySelector('.slot-num').textContent = String(idx + 1);
-  btn.textContent = 'Removed'; btn.disabled = true;
-}
-function assignManually(jobId, idx) {
-  var name = prompt('Enter MJ name to assign manually:');
-  if (!name || !name.trim()) return;
-  var row = document.getElementById('slot-' + idx);
-  if (row) {
-    row.querySelector('.slot-name').textContent = name.trim();
-    row.querySelector('.slot-name').style.cssText = '';
-    row.querySelector('.slot-meta').textContent = 'Manually assigned · Just now';
-    row.querySelector('.slot-num').className = 'slot-num sn-filled';
-    row.querySelector('.slot-num').textContent = '✓';
-  }
-}
-
-/* ══ No Show ════════════════════════════════════════════════════════ */
-function openNoShowModal() {
-  document.getElementById('assignModal').style.display = 'none';
-  document.getElementById('noShowReason').value = '';
-  document.getElementById('noShowOthersWrap').style.display = 'none';
-  document.getElementById('noShowOthersText').value = '';
-  document.getElementById('noShowModal').style.display = 'flex';
-}
-function handleNoShowReasonChange() {
-  var val = document.getElementById('noShowReason').value;
-  document.getElementById('noShowOthersWrap').style.display = val === 'others' ? 'block' : 'none';
-}
-function submitNoShow() {
-  var reason = document.getElementById('noShowReason').value;
-  if (!reason) { alert('Please select a no-show reason.'); return; }
-  if (reason === 'others' && !document.getElementById('noShowOthersText').value.trim()) {
-    alert('Please specify the reason.'); return;
-  }
-  document.getElementById('noShowModal').style.display = 'none';
-  if (currentJobId) openModal(currentJobId);
-}
-function cancelNoShow() {
-  document.getElementById('noShowModal').style.display = 'none';
-  if (currentJobId) openModal(currentJobId);
-}
-function handleNoShowOverlayClick(e) {
-  if (e.target.id === 'noShowModal') cancelNoShow();
-}
-
-/* ══ Portal ═════════════════════════════════════════════════════════ */
-function openPortal() {
-  if (confirm('Heading over to MJ Chap Portal')) {
-    window.open('./portal/index.html', '_blank').focus();
-  }
-}
-
-/* ══ New Task Form ══════════════════════════════════════════════════ */
-function handleTaskTypeChange() {
-  var isPatient = document.querySelector('input[name="taskType"]:checked');
-  document.getElementById('patientInputWrap').style.display = (isPatient && isPatient.value === 'Patient') ? 'block' : 'none';
-}
-function handleAssignedToChange() {
-  var sel = document.querySelector('input[name="assignedTo"]:checked');
-  var isInd = sel && sel.value === 'Individual';
-  document.getElementById('individualAssigneeWrap').style.display = isInd ? 'block' : 'none';
-  document.getElementById('groupAssigneeWrap').style.display = isInd ? 'none' : 'block';
-}
-function toggleOtherLocation() {
-  document.getElementById('otherLocationWrap').style.display = document.getElementById('locOthers').checked ? 'block' : 'none';
-}
-function togglePushNotif() {
-  document.getElementById('pushNotifSection').style.display = document.getElementById('isPushNotif').checked ? 'block' : 'none';
-}
-function toggleBillable() {
-  document.getElementById('serviceToBillWrap').style.display = document.getElementById('isBillable').checked ? 'block' : 'none';
-}
-function handleRecurrenceChange(val) {
-  var isNever = val === '1';
-  document.getElementById('neverDateSection').style.display = isNever ? 'block' : 'none';
-  document.getElementById('recurringDateSection').style.display = isNever ? 'none' : 'block';
-  document.getElementById('weekendSection').style.display = val === '2' ? 'block' : 'none';
-  document.getElementById('weeklySection').style.display = val === '3' ? 'block' : 'none';
-  document.getElementById('monthlySection').style.display = val === '4' ? 'block' : 'none';
-  document.getElementById('specificDatesSection').style.display = val === '5' ? 'block' : 'none';
-  document.getElementById('endDateRecurSection').style.display = (val === '2' || val === '3' || val === '4') ? 'block' : 'none';
-}
-function addTimePeriodRow() {
-  var list = document.getElementById('timePeriodList');
-  var tpl = '<div class="time-period-item mb-2 pb-2 pt-2" style="border-top:1px solid #eee">' +
-    '<label class="form-label fw-semibold mb-1"><span class="text-danger me-1">*</span>Start</label>' +
-    '<div class="row g-2 mb-2"><div class="col-5"><div class="input-group input-group-sm"><input type="date" class="form-control"><span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span></div></div>' +
-    '<div class="col-5"><div class="input-group input-group-sm"><input type="time" class="form-control"><span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span></div></div>' +
-    '<div class="col-2 d-flex align-items-center gap-1"><button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;" onclick="addTimePeriodRow()"><i class="fa fa-plus"></i></button><button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;" onclick="this.closest(\'.time-period-item\').remove()"><i class="fa fa-minus"></i></button></div></div>' +
-    '<label class="form-label fw-semibold mb-1"><span class="text-danger me-1">*</span>End</label>' +
-    '<div class="row g-2"><div class="col-5"><div class="input-group input-group-sm"><input type="date" class="form-control"><span class="input-group-text"><i class="fa fa-calendar fa-xs"></i></span></div></div>' +
-    '<div class="col-5"><div class="input-group input-group-sm"><input type="time" class="form-control"><span class="input-group-text"><i class="fa fa-clock-o fa-xs"></i></span></div></div></div></div>';
-  list.insertAdjacentHTML('beforeend', tpl);
-}
-function addRecipientRow() {
-  var list = document.getElementById('recipientList');
-  var tpl = '<div class="row g-2 mb-1"><div class="col-10"><input type="text" class="form-control form-control-sm" placeholder="Search recipient…"></div>' +
-    '<div class="col-2 d-flex align-items-center gap-1"><button type="button" class="btn btn-info btn-sm px-1 py-0" style="font-size:10px;" onclick="addRecipientRow()"><i class="fa fa-plus"></i></button><button type="button" class="btn btn-danger btn-sm px-1 py-0" style="font-size:10px;" onclick="this.closest(\'.row\').remove()"><i class="fa fa-minus"></i></button></div></div>';
-  list.insertAdjacentHTML('beforeend', tpl);
-}
-
-/* ══ Task Detail Modal ══════════════════════════════════════════════ */
-function openTaskDetail(jobId) {
-  var j = JOB_DATA.find(function(x){ return x.id === jobId; });
-  if (!j) return;
-
-  var assignedHtml = j.mj
-    ? '<div style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#666;overflow:hidden;"></div><div style="font-size:13px;margin-top:4px;">MJobber {Name}</div>'
-    : '<div style="width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:18px;color:#aaa;"><i class="bi bi-person-fill"></i></div>';
-
-  var taskDate = '';
-  if (j.sd && j.time) {
-    var d = new Date(j.sd + 'T00:00:00');
-    var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var parts = j.time.split('–');
-    var startFmt = parts.length >= 1 ? fmt12(parts[0].trim()) : j.time;
-    var endFmt = parts.length >= 2 ? fmt12(parts[1].trim()) : '';
-    taskDate = mo[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + startFmt + (endFmt ? ' - ' + endFmt : '');
-  }
-
-  var locationText = j.facility || '';
-
-  var html = '<div style="display:flex;gap:40px;">';
-
-  html += '<div style="flex:1;">';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Facility</div><div style="font-size:13px;color:#444;">' + (j.facility || '') + '</div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Patients</div><div style="font-size:13px;"><a href="#" style="color:#1a9e80;text-decoration:none;">' + (j.client || '') + '</a></div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Action Type</div><div style="font-size:13px;color:#444;">' + (j.type || '') + '</div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Services Required</div><div style="font-size:13px;color:#888;font-style:italic;"></div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Task Series Remarks</div><div style="font-size:13px;color:#888;"></div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Individual Tasks Remarks</div><div style="font-size:13px;color:#888;"></div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Task Date</div><div style="font-size:13px;color:#444;">' + taskDate + '</div></div>';
-  html += '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;margin-bottom:2px;">Location</div><div style="font-size:13px;color:#444;line-height:1.6;">' + locationText + '</div></div>';
-  html += '</div>';
-
-  html += '<div style="min-width:100px;text-align:center;">';
-  html += '<div style="font-weight:600;font-size:13px;margin-bottom:8px;">Assigned To</div>';
-  html += assignedHtml;
-  html += '</div>';
-
-  if(j.mj){
-  html += '<div style="font-weight:500; font-size:13px; min-width:100px;text-align:center;">WaitListed Mjobbers</div>';
-  }
-  html += '</div>';
-
-  document.getElementById('taskDetailBody').innerHTML = html;
-  document.getElementById('taskDetailModal').style.display = 'flex';
-}
-function closeTaskDetail() {
-  document.getElementById('taskDetailModal').style.display = 'none';
-}
-function handleTaskDetailOverlayClick(e) {
-  if (e.target.id === 'taskDetailModal') closeTaskDetail();
-}
-function taskDetailAction(action) {
-  closeTaskDetail();
-}
-
-/* ══ 3rd Party Services ═════════════════════════════════════════════ */
-function handleThirdPartyChange(sel) {
-  var val = sel.value;
-  if (!val) return;
-  var confirmed = confirm('Selecting "' + val + '" requires filling up a separate form. Would you like to proceed?');
-  if (confirmed) {
-    document.getElementById('thirdPartyModalTitle').textContent = val + ' — 3rd Party Service Form';
-    var bsModal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
-    if (bsModal) bsModal.hide();
-    document.getElementById('thirdPartyModal').style.display = 'flex';
-  } else {
-    sel.value = '';
-  }
-}
-function closeThirdPartyModal() {
-  document.getElementById('thirdPartyModal').style.display = 'none';
-}
-function handleThirdPartyOverlayClick(e) {
-  if (e.target.id === 'thirdPartyModal') closeThirdPartyModal();
-}
-
-/* ══ Init ═══════════════════════════════════════════════════════════ */
-$(document).ready(function() {
-  renderTaskList();
-});
+      function openPortal() {
+        if (confirm('Heading over to MJ Chap Portal')) {
+          window.open('./portal/index.html', '_blank').focus();
+        }
+      }
     </script>
   </body>
 </html>
