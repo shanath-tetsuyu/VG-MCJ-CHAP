@@ -98,6 +98,8 @@
       .fc .fc-button-primary:focus { box-shadow: none; }
       .fc-event { cursor: pointer; font-size: 11px; }
       .fc-event .fc-event-title { font-weight: 600; }
+      .fc-event-assigned { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 500; opacity: .92; margin-top: 1px; }
+      .fc-event-assigned-none { font-style: italic; opacity: .7; }
 
       /* ── Publish-form component styles (ported from publish.css) ────── */
       .modal-overlay {
@@ -447,6 +449,14 @@
                   <option>Draft</option>
                 </select>
               </div>
+              <div class="ff">
+                <span class="ff-lbl">Assigned to</span>
+                <select id="fAssigned" onchange="applyFilters()">
+                  <option value="">All</option>
+                  <option value="mj">MicroJobber</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
               <button class="tm-clear" style="background-color: #1D9E75; color: white;" onclick="clearFilters()">Submit</button>
               <button class="tm-clear" onclick="clearFilters()"><i class="bi bi-x-circle me-1"></i>Clear</button>
               <span class="tm-count" id="fCount"></span>
@@ -717,6 +727,13 @@
         'Draft':       '#AAA'
       };
 
+      /* ── Who a job is assigned to (MicroJobber vs staff) ──────────────── */
+      function assignmentInfo(job) {
+        if (job.mj)       return { kind: 'mj',    label: 'MJ: ' + job.mj };
+        if (job.sccStaff) return { kind: 'staff', label: 'Staff: ' + job.sccStaff };
+        return { kind: 'none', label: 'Unassigned' };
+      }
+
       /* ── Build a FullCalendar event from a job record ─────────────────── */
       function jobToEvent(job) {
         const parts = String(job.time).split(/[–-]/).map(s => s.trim());
@@ -724,6 +741,7 @@
         const end   = job.sd + 'T' + (parts[1] || parts[0] || '10:00');
         const color = STATUS_COLOR[job.status] || '#6c757d';
         const label = job.client ? (job.type + ' · ' + job.client) : job.type;
+        const assigned = assignmentInfo(job);
         return {
           id: job.id,
           title: label,
@@ -731,7 +749,7 @@
           end: end,
           backgroundColor: color,
           borderColor: color,
-          extendedProps: { jobId: job.id, status: job.status }
+          extendedProps: { jobId: job.id, status: job.status, assignedKind: assigned.kind, assignedLabel: assigned.label }
         };
       }
 
@@ -741,7 +759,8 @@
           client:   (document.getElementById('fClient')   || {}).value ? document.getElementById('fClient').value.trim().toLowerCase() : '',
           type:     (document.getElementById('fType')      || {}).value || '',
           facility: (document.getElementById('fFacility')  || {}).value || '',
-          status:   (document.getElementById('fStatus')    || {}).value || ''
+          status:   (document.getElementById('fStatus')    || {}).value || '',
+          assigned: (document.getElementById('fAssigned')  || {}).value || ''
         };
       }
 
@@ -752,6 +771,8 @@
           if (f.type     && j.type !== f.type)         return false;
           if (f.facility && j.facility !== f.facility) return false;
           if (f.status   && j.status !== f.status)     return false;
+          if (f.assigned === 'mj'    && !j.mj)          return false;
+          if (f.assigned === 'staff' && !j.sccStaff)    return false;
           return true;
         });
       }
@@ -766,7 +787,7 @@
       }
 
       function clearFilters() {
-        ['fClient','fType','fFacility','fStatus'].forEach(id => {
+        ['fClient','fType','fFacility','fStatus','fAssigned'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
         });
@@ -799,6 +820,21 @@
           businessHours: { daysOfWeek: [1,2,3,4,5], startTime: '09:00', endTime: '18:00' },
           expandRows: true,
           events: allEvents(),
+          eventContent: function (arg) {
+            const kind = arg.event.extendedProps.assignedKind;
+            const icon = kind === 'mj' ? 'bi-person-check-fill' : (kind === 'staff' ? 'bi-person-badge-fill' : 'bi-dash-circle');
+            const wrap = document.createElement('div');
+            wrap.className = 'fc-event-main-inner';
+            const title = document.createElement('div');
+            title.className = 'fc-event-title';
+            title.textContent = arg.event.title;
+            const assigned = document.createElement('div');
+            assigned.className = 'fc-event-assigned fc-event-assigned-' + kind;
+            assigned.innerHTML = '<i class="bi ' + icon + '"></i> ' + arg.event.extendedProps.assignedLabel;
+            wrap.appendChild(title);
+            wrap.appendChild(assigned);
+            return { domNodes: [wrap] };
+          },
           eventClick: function (info) {
             openViewModal(info.event.extendedProps.jobId);
           },
