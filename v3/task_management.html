@@ -286,6 +286,7 @@
             <div class="collapse show" id="scheduleMenu">
               <ul class="nav flex-column sidebar-submenu">
                 <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./task_management.html">MicroJobber</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./staff_attendance.html">Staff Attendance</a></li>
                 <li class="nav-item"><a class="nav-link sidebar-sublink" href="#" onclick="openPortal()">Link To Portal</a></li>
               </ul>
             </div>
@@ -661,6 +662,7 @@
         <div class="modal-body" id="viewBody"></div>
         <div class="modal-footer">
           <button class="btn-pub" id="viewEditBtn" style="display:none" onclick="editFromView()"><i class="bi bi-pencil me-1"></i>Edit job</button>
+          <a class="btn-ghost2" id="viewDetailsBtn" href="#" style="text-decoration:none;display:inline-flex;align-items:center;"><i class="bi bi-box-arrow-up-right me-1"></i>View full details</a>
           <button class="btn-ghost2" style="margin-left:auto" onclick="closeViewModal()">Close</button>
         </div>
       </div>
@@ -688,6 +690,7 @@
         {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan', status:'Waitlisted', mj:null,                      wl:4, urgency:'Standard', sccStaff:null          },
         {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',      status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:null          },
         {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',    date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',       status:'Draft',      mj:null,                      wl:2, urgency:'Standard', sccStaff:'Rajan Kumar' },
+        {id:'MJ-2026-027',type:'Chaperone',       facility:'VG — Clementi',    date:'20 May 2026',sd:'2026-05-20',time:'15:00–16:00',client:'Foo Chook Tok',     status:'Completed',      mj:null,                      wl:0, urgency:'Standard', sccStaff:'Bob Lim' },
         {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',    date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',     status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null          },
         {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null          },
         {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'In Progress',mj:'Nigel Tan, Lawrence Tan', wl:0, urgency:'Standard', sccStaff:null          },
@@ -976,6 +979,8 @@
         // Edit button only for Draft or Cancelled jobs
         const canEdit = (j.status === 'Draft' || j.status === 'Cancelled');
         document.getElementById('viewEditBtn').style.display = canEdit ? 'inline-block' : 'none';
+
+        document.getElementById('viewDetailsBtn').href = './job_details.html?id=' + encodeURIComponent(j.id);
 
         document.getElementById('viewModal').classList.add('on');
       }

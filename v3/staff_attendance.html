@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CARES — Staff Attendance</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DM Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- CARES shell -->
+    <link rel="stylesheet" href="css/index.css">
+
+    <style>
+      /* ── Design tokens (mirrors task_management.html) ────────────────── */
+      :root {
+        --g:#13795B; --gm:#1D9E75; --gl:#E8F7F2; --gb:#9FE1CB;
+        --am:#C07A1A; --al:#FDF3E3; --ab:#F0C060;
+        --rm:#B03030; --rl:#FDF0F0; --rb:#F0AAAA;
+        --bm:#1A5FA8; --bl:#EBF3FD; --bb:#90BFED;
+        --pm:#6B21A8; --pl:#F5F0FF; --pb:#C4B5FD;
+        --ink:#1C1C1E; --ink2:#444; --ink3:#777; --ink4:#AAA;
+        --s:#fff; --bg:#F5F6F8; --bdr:#E4E4E4; --bdr2:#F0F0F0;
+        --r:10px; --rl2:16px;
+      }
+
+      .main-content { overflow-y: auto; }
+      .tm-wrap { padding: 20px 24px; font-family: 'DM Sans', sans-serif; }
+      .tm-header { margin-bottom: 14px; }
+      .tm-title { font-size: 22px; font-weight: 700; color: #1e3535; margin: 0; }
+      .tm-breadcrumb { font-size: 13px; color: #777; margin-top: 2px; }
+      .tm-breadcrumb a { color: #2a9d7f; text-decoration: none; }
+      .tm-breadcrumb a:hover { text-decoration: underline; }
+
+      .tm-sync-banner {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--gl); border: 1px solid var(--gb); color: #0A5C46;
+        border-radius: var(--r); padding: 10px 14px; font-size: 13px; margin-bottom: 14px;
+      }
+      .tm-sync-banner .bi { font-size: 16px; }
+
+      /* Filter bar */
+      .tm-filter {
+        display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+        background: #fff; border: 1px solid var(--bdr); border-radius: var(--rl2);
+        padding: 14px 16px; margin-bottom: 14px;
+      }
+      .tm-filter .ff { display: flex; flex-direction: column; gap: 4px; }
+      .tm-filter .ff-lbl {
+        font-size: 10px; font-weight: 700; color: var(--ink4);
+        text-transform: uppercase; letter-spacing: .04em;
+      }
+      .tm-filter input, .tm-filter select {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px;
+        border: 1px solid var(--bdr); border-radius: 8px; background: var(--bg);
+        color: var(--ink); outline: none; transition: border-color .15s; min-width: 170px;
+      }
+      .tm-filter input:focus, .tm-filter select:focus { border-color: var(--gm); background: #fff; }
+      .tm-filter .tm-clear {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 8px 14px;
+        border: 1px solid var(--bdr); border-radius: 8px; background: #fff; color: var(--ink3); cursor: pointer;
+      }
+      .tm-filter .tm-clear:hover { background: var(--bg); }
+      .tm-filter .tm-count { font-size: 12px; color: var(--ink3); margin-left: auto; align-self: center; }
+
+      /* Table card */
+      .tm-table-card { background: #fff; border: 1px solid var(--bdr); border-radius: var(--rl2); overflow: hidden; }
+      .tm-table-scroll { overflow-x: auto; }
+      table.at-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1080px; }
+      table.at-table thead th {
+        text-align: left; font-size: 10.5px; font-weight: 700; color: var(--ink4);
+        text-transform: uppercase; letter-spacing: .04em; padding: 11px 14px;
+        background: var(--bg); border-bottom: 1px solid var(--bdr); white-space: nowrap;
+      }
+      table.at-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--bdr2); vertical-align: middle; color: var(--ink2); }
+      table.at-table tbody tr:hover { background: #FAFBFC; }
+      table.at-table tbody tr:last-child td { border-bottom: none; }
+      .at-name { font-weight: 600; color: var(--ink); }
+      .at-sub { font-size: 11px; color: var(--ink4); }
+      .badge-status { display:inline-flex; align-items:center; gap:4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+      .bs-completed { background: #EEF0F2; color: #555; }
+      .bs-edited { background: var(--al); color: var(--am); }
+      .hrs-pill { display:inline-block; padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--gl); color: var(--g); }
+      .round-note { font-size: 10.5px; color: var(--am); }
+      .btn-edit-row {
+        background: #fff; border: 1px solid var(--bdr); border-radius: 7px; padding: 5px 11px;
+        font-size: 12px; color: var(--ink2); cursor: pointer; white-space: nowrap;
+      }
+      .btn-edit-row:hover { background: var(--bg); border-color: var(--gb); color: var(--g); }
+      .no-rows { padding: 40px 20px; text-align: center; color: var(--ink4); font-size: 13px; }
+
+      /* ── Modal (ported from task_management.html) ───────────────────── */
+      .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1200;
+        display: none; align-items: flex-start; justify-content: center; padding: 30px 16px; overflow-y: auto;
+      }
+      .modal-overlay.on { display: flex; }
+      .modal-box {
+        background: var(--s); border-radius: var(--rl2); width: 560px; max-width: 96vw;
+        box-shadow: 0 24px 70px rgba(0,0,0,.35); font-family: 'DM Sans', sans-serif;
+        display: flex; flex-direction: column; max-height: 92vh;
+      }
+      .modal-head {
+        padding: 16px 20px; border-bottom: 1px solid var(--bdr);
+        display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      }
+      .modal-head-title { font-size: 15px; font-weight: 700; color: var(--ink); flex: 1; }
+      .modal-close {
+        background: none; border: 1px solid var(--bdr); border-radius: 6px; padding: 4px 10px;
+        cursor: pointer; font-size: 12px; color: var(--ink3); font-family: 'DM Sans', sans-serif;
+      }
+      .modal-body { flex: 1; overflow-y: auto; padding: 18px 20px; background: var(--bg); }
+      .modal-footer {
+        padding: 12px 20px; border-top: 1px solid var(--bdr); display: flex; gap: 8px;
+        align-items: center; flex-shrink: 0;
+      }
+      .m-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+      .m-info-box { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r); padding: 10px 12px; }
+      .m-info-box.full { grid-column: 1 / -1; }
+      .m-info-label { font-size: 10px; font-weight: 700; color: var(--ink4); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+      .m-info-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+      .sect-title { font-size: 11px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; margin-top: 16px; }
+      .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .fg-full { grid-column: 1 / -1; }
+      .fl { display: flex; flex-direction: column; gap: 4px; }
+      .modal-body label { font-size: 11px; font-weight: 600; color: var(--ink3); letter-spacing: .03em; text-transform: uppercase; }
+      .modal-body input, .modal-body select, .modal-body textarea {
+        font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--bdr);
+        border-radius: var(--r); background: var(--s); color: var(--ink); outline: none; width: 100%; transition: border-color .15s;
+      }
+      .modal-body input:focus, .modal-body select:focus, .modal-body textarea:focus {
+        border-color: var(--gm); box-shadow: 0 0 0 3px rgba(29,158,117,.08);
+      }
+      .modal-body textarea { resize: vertical; min-height: 56px; }
+      .recalc-box {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        background: var(--gl); border: 1px solid var(--gb); border-radius: var(--r);
+        padding: 10px 14px; margin-top: 12px;
+      }
+      .recalc-label { font-size: 11px; font-weight: 700; color: #0A5C46; text-transform: uppercase; letter-spacing: .03em; }
+      .recalc-val { font-size: 16px; font-weight: 700; color: var(--g); }
+      .banner { border-radius: var(--r); padding: 10px 12px; font-size: 12px; display: flex; gap: 8px; line-height: 1.5; margin-bottom: 12px; }
+      .bn-a { background: var(--al); color: var(--am); border: 1px solid var(--ab); }
+      .bn-r { background: var(--rl); color: var(--rm); border: 1px solid var(--rb); }
+      .field-err { font-size: 11px; color: var(--rm); margin-top: 2px; display: none; }
+      .btn-pub { background: var(--g); color: #fff; border: none; border-radius: var(--r); padding: 9px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+      .btn-pub:hover { background: #0A5C46; }
+      .btn-pub:disabled { background: #B9C4C0; cursor: not-allowed; }
+      .btn-ghost2 { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r); padding: 9px 16px; font-size: 13px; color: var(--ink2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+      .tm-toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: #1e3535; color: #fff; padding: 10px 18px; border-radius: 24px;
+        font-size: 13px; display: none; align-items: center; gap: 8px; z-index: 1400;
+        box-shadow: 0 6px 20px rgba(0,0,0,.3);
+      }
+      .tm-toast.on { display: inline-flex; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Wrapper -->
+    <div class="d-flex" id="wrapper">
+
+      <!-- Sidebar (CARES shell) -->
+      <nav id="sidebar" class="sidebar d-flex flex-column">
+
+        <div class="sidebar-profile p-3 text-center">
+          <div class="sidebar-avatar mx-auto mb-2">
+            <i class="bi bi-person-fill fs-3 text-white"></i>
+          </div>
+          <div class="sidebar-username text-white fw-semibold small">Cares Admin TETSUYU</div>
+          <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+            Enterprise Administrators
+            <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+          </div>
+        </div>
+
+        <ul class="nav flex-column sidebar-nav mt-1">
+
+          <li class="nav-item">
+            <a class="nav-link sidebar-link" href="./index.html">
+              <i class="bi bi-grid-fill me-2"></i>
+              Dashboard
+            </a>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#prospectsMenu" aria-expanded="false">
+              <i class="bi bi-person-circle me-2"></i>
+              Prospects
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="prospectsMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">New Prospect</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Prospect List</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- Schedule (expanded, Staff Attendance active) -->
+          <li class="nav-item">
+            <a class="nav-link sidebar-link sidebar-collapsible active" href="#" data-bs-toggle="collapse" data-bs-target="#scheduleMenu" aria-expanded="true">
+              <i class="bi bi-calendar-event me-2"></i>
+              Schedule
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse show" id="scheduleMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./task_management.html">MicroJobber</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./staff_attendance.html">Staff Attendance</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#" onclick="openPortal()">Link To Portal</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#feeMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              AIC Fee Management
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="feeMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Services</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Consumable Logs</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              Pre-Admission
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="preAdmissionMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Applications</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Assessments</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#clientMenu" aria-expanded="false">
+              <i class="bi bi-person-badge me-2"></i>
+              Client
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="clientMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client List</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Profile</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <!-- End Sidebar -->
+
+      <!-- Page Content -->
+      <div id="page-content" class="d-flex flex-column flex-grow-1">
+
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-light bg-white topbar px-3 border-bottom shadow-sm">
+          <button id="sidebarToggle" class="btn btn-sm btn-success me-3" type="button">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+
+          <span class="navbar-brand fw-bold text-dark fs-5 me-2">
+            <span class="brand-dot"></span>
+            VANGUARD
+          </span>
+
+          <small class="text-muted me-auto">Session logout in <span id="sessionTimer">17520</span> seconds</small>
+
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="text-muted small">Welcome to CARES</span>
+
+            <div class="input-group input-group-sm" style="width: 220px;">
+              <span class="input-group-text border-0 bg-light text-muted" style="font-size:0.75rem;">Client Search</span>
+              <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Type 3+ characters to search..." id="clientSearchInput">
+            </div>
+
+            <select class="form-select form-select-sm" style="width: 220px;">
+              <option selected>VANGUARD 1</option>
+              <option>VANGUARD 2</option>
+              <option>VANGUARD 3</option>
+            </select>
+
+            <button class="btn btn-sm btn-light position-relative border">
+              <i class="bi bi-bell-fill text-muted"></i>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.6rem;">10</span>
+            </button>
+
+            <button class="btn btn-sm btn-light border text-muted">
+              <i class="bi bi-box-arrow-right me-1"></i> Log out
+            </button>
+          </div>
+        </nav>
+        <!-- End Topbar -->
+
+        <!-- Main Content -->
+        <main class="main-content flex-grow-1">
+          <div class="tm-wrap">
+
+            <div class="tm-header">
+              <h1 class="tm-title">Staff Attendance</h1>
+              <div class="tm-breadcrumb">
+                <a href="./index.html">CARES</a> &rsaquo; Schedule &rsaquo; Staff Attendance
+              </div>
+            </div>
+
+            <div class="tm-filter">
+              <div class="ff">
+                <span class="ff-lbl">Staff name</span>
+                <input type="text" id="fStaffName" placeholder="Search MJ or staff name…" oninput="applyFilters()">
+              </div>
+              <div class="ff">
+                <span class="ff-lbl">Date</span>
+                <input type="date" id="fDate" onchange="applyFilters()">
+              </div>
+              <button class="tm-clear" onclick="clearFilters()"><i class="bi bi-x-circle me-1"></i>Clear filters</button>
+              <span class="tm-count" id="fCount"></span>
+            </div>
+
+            <div class="tm-table-card">
+              <div class="tm-table-scroll">
+                <table class="at-table">
+                  <thead>
+                    <tr>
+                      <th>Staff</th>
+                      <th>Job Type</th>
+                      <th>Client / Facility</th>
+                      <th>Date</th>
+                      <th>Scheduled</th>
+                      <th>Check-in</th>
+                      <th>Check-out</th>
+                      <th>Billable Hrs</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="atBody"></tbody>
+                </table>
+              </div>
+              <div class="no-rows" id="noRows" style="display:none;">No completed jobs match the current filters.</div>
+            </div>
+
+          </div>
+        </main>
+
+        <!-- Need Help Button -->
+        <button class="btn btn-teal need-help-btn position-fixed" style="bottom: 20px; right: 20px; border-radius: 50px; z-index: 999;">
+          <i class="bi bi-question-circle me-1"></i> Need Help?
+        </button>
+
+      </div>
+      <!-- End Page Content -->
+
+    </div>
+    <!-- End Wrapper -->
+
+    <!-- ── Edit Timing Modal ─────────────────────────────────────────────── -->
+    <div class="modal-overlay" id="editModal" onclick="handleOverlayClick(event)">
+      <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-head">
+          <span class="modal-head-title">Edit attendance timing</span>
+          <button class="modal-close" onclick="closeEditModal()">Close</button>
+        </div>
+
+        <div class="modal-body" id="editBody">
+          <div class="m-info-grid">
+            <div class="m-info-box"><div class="m-info-label">Staff</div><div class="m-info-val" id="e-staff">—</div></div>
+            <div class="m-info-box"><div class="m-info-label">Job type</div><div class="m-info-val" id="e-type">—</div></div>
+            <div class="m-info-box"><div class="m-info-label">Date</div><div class="m-info-val" id="e-date">—</div></div>
+            <div class="m-info-box full"><div class="m-info-label">Scheduled window</div><div class="m-info-val" id="e-sched">—</div></div>
+          </div>
+
+          <div class="sect-title">Actual timing</div>
+          <div class="fg">
+            <div class="fl">
+              <label>Check-in</label>
+              <input type="time" id="e-checkin" oninput="recalc()">
+            </div>
+            <div class="fl">
+              <label>Check-out</label>
+              <input type="time" id="e-checkout" oninput="recalc()">
+            </div>
+          </div>
+          <div class="field-err" id="e-timeErr">Check-out must be later than check-in.</div>
+
+          <div class="recalc-box">
+            <div>
+              <div class="recalc-label">Recalculated duration</div>
+              <div id="e-duration" style="font-size:12px;color:var(--ink3);margin-top:2px;">—</div>
+            </div>
+            <div class="recalc-val" id="e-billable">— hrs</div>
+          </div>
+
+          <div class="sect-title">Audit reason</div>
+          <div class="fl fg-full">
+            <label>Reason for amendment <span style="color:var(--rm)">*</span></label>
+            <textarea id="e-reason" placeholder="e.g. MJ forgot to check out via C4Me — confirmed with facility staff on-site."></textarea>
+          </div>
+          <div class="field-err" id="e-reasonErr">A reason is required to save this change.</div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-pub" id="e-saveBtn" onclick="saveEdit()">Save changes</button>
+          <button class="btn-ghost2" style="margin-left:auto" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="tm-toast" id="toast"><i class="bi bi-check-circle"></i><span id="toastMsg">Attendance updated</span></div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // ── Sidebar Toggle ──────────────────────────────────────────────────
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
+
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-collapsed');
+      });
+
+      // ── Active nav link highlight ───────────────────────────────────────
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+          if (!this.classList.contains('sidebar-collapsible')) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+          }
+        });
+      });
+
+      // ── Collapse chevron rotation ───────────────────────────────────────
+      document.querySelectorAll('.sidebar-collapsible').forEach(toggle => {
+        const targetId = toggle.getAttribute('data-bs-target');
+        const collapseEl = document.querySelector(targetId);
+
+        collapseEl.addEventListener('show.bs.collapse', () => {
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
+          toggle.classList.add('active');
+        });
+
+        collapseEl.addEventListener('hide.bs.collapse', () => {
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(0deg)';
+          toggle.classList.remove('active');
+        });
+      });
+
+      // ── Session countdown timer ─────────────────────────────────────────
+      let seconds = 17520;
+      const timerEl = document.getElementById('sessionTimer');
+      const countdown = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          timerEl.textContent = '0';
+        }
+      }, 1000);
+
+      // ── Client search (3+ chars) ────────────────────────────────────────
+      document.getElementById('clientSearchInput').addEventListener('input', function () {
+        if (this.value.length >= 3) {
+          console.log('Searching for:', this.value);
+        }
+      });
+
+      function openPortal() {
+        if (confirm('Heading over to MJ Chap Portal')) {
+          const url = './portal/index.html';
+          window.open(url, '_blank').focus();
+        }
+      }
+
+      /* ══════════════════════════════════════════════════════════════════
+         Staff Attendance — completed jobs, filter + manual timing edit
+      ═══════════════════════════════════════════════════════════════════ */
+
+      /* Mock attendance data — completed jobs staffed by SCC/AAC staff
+         (duplicated here per project convention; no MicroJobber records) */
+      const ATTENDANCE_DATA = [
+        { staff:'Bob Lim',         type:'Chaperone',       client:'Foo Chook Tok',    facility:'VG — Clementi',    date:'2026-05-20', schedStart:'15:00', schedEnd:'16:00', checkIn:'15:04', checkOut:'15:40', isEdited:false },
+        { staff:'Noor Azizah',     type:'Home Assessment', client:'Lim Kim Hong',     facility:'SCC — Toa Payoh',  date:'2026-05-17', schedStart:'09:00', schedEnd:'11:00', checkIn:'08:58', checkOut:'10:50', isEdited:false },
+        { staff:'Chen Li Ling',    type:'Home Assessment', client:'Teo Ah Seng',      facility:'SCC — Bishan',     date:'2026-05-28', schedStart:'09:00', schedEnd:'11:00', checkIn:'09:10', checkOut:'11:02', isEdited:false },
+        { staff:'Rajan Kumar',     type:'Befriending',     client:'Lim Ah Lian',      facility:'VG — Clementi',    date:'2026-05-16', schedStart:'09:00', schedEnd:'12:00', checkIn:'09:00', checkOut:'11:15', isEdited:false },
+        { staff:'Noor Azizah',     type:'Chaperone',       client:'Lim Bee Hoon',     facility:'SCC — Toa Payoh',  date:'2026-05-21', schedStart:'15:00', schedEnd:'17:00', checkIn:'14:58', checkOut:'17:26', isEdited:false },
+        { staff:'Chen Li Ling',    type:'Home Assessment', client:'Goh Poh Choo',     facility:'SCC — Queenstown', date:'2026-05-22', schedStart:'09:00', schedEnd:'11:00', checkIn:'09:00', checkOut:'09:40', isEdited:false },
+        { staff:'Bob Lim',         type:'Chaperone',       client:'Yeo Ah Muoi',      facility:'SCC — Bishan',     date:'2026-05-26', schedStart:'13:00', schedEnd:'15:00', checkIn:'12:58', checkOut:'15:33', isEdited:false },
+        { staff:'Rajan Kumar',     type:'Befriending',     client:'Ong Kim Guan',     facility:'VG — Clementi',    date:'2026-05-19', schedStart:'10:00', schedEnd:'12:00', checkIn:'09:55', checkOut:'12:20', isEdited:false }
+      ];
+
+      /* ══ Rounding logic (mirrors finance.html calcBillableHours) ═══════
+         Minimum 1 hour always applies. First hour always billed as 1 hr.
+         After first hour: remainder >= 30 min rounds up, else stays. ═══ */
+      function calcBillableHours(actualMinutes) {
+        if (actualMinutes <= 0) return 1;
+        const hours = actualMinutes / 60;
+        const wholeHours = Math.floor(hours);
+        const remainder = hours - wholeHours;
+        let billable;
+        if (wholeHours === 0) {
+          billable = 1;
+        } else if (remainder >= 0.5) {
+          billable = wholeHours + 1;
+        } else {
+          billable = wholeHours;
+        }
+        return Math.max(1, billable);
+      }
+
+      function toMinutes(hhmm) {
+        const [h, m] = hhmm.split(':').map(Number);
+        return h * 60 + m;
+      }
+
+      function diffMinutes(checkIn, checkOut) {
+        return toMinutes(checkOut) - toMinutes(checkIn);
+      }
+
+      function fmtDuration(mins) {
+        if (mins <= 0) return '—';
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+      }
+
+      function fmtDate(iso) {
+        const d = new Date(iso + 'T00:00:00');
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      }
+
+      /* ══ Filtering ═══════════════════════════════════════════════════ */
+      function getFilters() {
+        return {
+          name: (document.getElementById('fStaffName').value || '').trim().toLowerCase(),
+          date: document.getElementById('fDate').value || ''
+        };
+      }
+
+      function filteredRows() {
+        const f = getFilters();
+        return ATTENDANCE_DATA
+          .map((r, idx) => ({ r, idx }))
+          .filter(({ r }) => {
+            if (f.name && !r.staff.toLowerCase().includes(f.name)) return false;
+            if (f.date && r.date !== f.date) return false;
+            return true;
+          })
+          .sort((a, b) => b.r.date.localeCompare(a.r.date));
+      }
+
+      function applyFilters() {
+        renderTable();
+      }
+
+      function clearFilters() {
+        document.getElementById('fStaffName').value = '';
+        document.getElementById('fDate').value = '';
+        applyFilters();
+      }
+
+      /* ══ Render ══════════════════════════════════════════════════════ */
+      function renderTable() {
+        const rows = filteredRows();
+        const tbody = document.getElementById('atBody');
+        tbody.innerHTML = '';
+
+        document.getElementById('noRows').style.display = rows.length ? 'none' : 'block';
+        document.getElementById('fCount').textContent = `Showing ${rows.length} of ${ATTENDANCE_DATA.length} completed jobs`;
+
+        rows.forEach(({ r, idx }) => {
+          const mins = diffMinutes(r.checkIn, r.checkOut);
+          const billable = calcBillableHours(mins);
+          const roundedUp = mins > 0 && billable > Math.floor(mins / 60) && Math.floor(mins / 60) > 0;
+
+          const statusBadge = r.isEdited
+            ? `<span class="badge-status bs-edited"><i class="bi bi-pencil-fill"></i> Completed · Edited</span>`
+            : `<span class="badge-status bs-completed"><i class="bi bi-check-circle"></i> Completed</span>`;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><div class="at-name">${r.staff}</div></td>
+            <td>${r.type}</td>
+            <td>${r.client}<div class="at-sub">${r.facility}</div></td>
+            <td>${fmtDate(r.date)}</td>
+            <td>${r.schedStart}–${r.schedEnd}</td>
+            <td>${r.checkIn}</td>
+            <td>${r.checkOut}</td>
+            <td><span class="hrs-pill">${billable} hr${billable === 1 ? '' : 's'}</span>${roundedUp ? '<div class="round-note">↑ rounded</div>' : ''}</td>
+            <td>${statusBadge}</td>
+            <td><button class="btn-edit-row" onclick="openEditModal(${idx})"><i class="bi bi-pencil me-1"></i>Edit</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* ══ Edit modal ══════════════════════════════════════════════════ */
+      let editingIdx = null;
+
+      function openEditModal(idx) {
+        const r = ATTENDANCE_DATA[idx];
+        if (!r) return;
+        editingIdx = idx;
+
+        document.getElementById('e-staff').textContent = r.staff;
+        document.getElementById('e-type').textContent = r.type;
+        document.getElementById('e-date').textContent = fmtDate(r.date);
+        document.getElementById('e-sched').textContent = `${r.schedStart} – ${r.schedEnd}`;
+        document.getElementById('e-checkin').value = r.checkIn;
+        document.getElementById('e-checkout').value = r.checkOut;
+        document.getElementById('e-reason').value = '';
+        document.getElementById('e-timeErr').style.display = 'none';
+        document.getElementById('e-reasonErr').style.display = 'none';
+
+        recalc();
+        document.getElementById('editModal').classList.add('on');
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').classList.remove('on');
+        editingIdx = null;
+      }
+
+      function handleOverlayClick(e) {
+        if (e.target.id === 'editModal') closeEditModal();
+      }
+
+      function recalc() {
+        const checkIn = document.getElementById('e-checkin').value;
+        const checkOut = document.getElementById('e-checkout').value;
+        const timeErr = document.getElementById('e-timeErr');
+
+        if (!checkIn || !checkOut || toMinutes(checkOut) <= toMinutes(checkIn)) {
+          timeErr.style.display = 'block';
+          document.getElementById('e-duration').textContent = '—';
+          document.getElementById('e-billable').textContent = '— hrs';
+          return;
+        }
+        timeErr.style.display = 'none';
+
+        const mins = diffMinutes(checkIn, checkOut);
+        const billable = calcBillableHours(mins);
+        document.getElementById('e-duration').textContent = `${checkIn} – ${checkOut} (${fmtDuration(mins)} actual)`;
+        document.getElementById('e-billable').textContent = `${billable} hr${billable === 1 ? '' : 's'}`;
+      }
+
+      function saveEdit() {
+        const r = ATTENDANCE_DATA[editingIdx];
+        if (!r) return;
+
+        const checkIn = document.getElementById('e-checkin').value;
+        const checkOut = document.getElementById('e-checkout').value;
+        const reason = document.getElementById('e-reason').value.trim();
+
+        const timeErr = document.getElementById('e-timeErr');
+        const reasonErr = document.getElementById('e-reasonErr');
+        let valid = true;
+
+        if (!checkIn || !checkOut || toMinutes(checkOut) <= toMinutes(checkIn)) {
+          timeErr.style.display = 'block';
+          valid = false;
+        } else {
+          timeErr.style.display = 'none';
+        }
+
+        if (!reason) {
+          reasonErr.style.display = 'block';
+          valid = false;
+        } else {
+          reasonErr.style.display = 'none';
+        }
+
+        if (!valid) return;
+
+        r.checkIn = checkIn;
+        r.checkOut = checkOut;
+        r.isEdited = true;
+        r.editLog = { by: 'Cares Admin TETSUYU', at: new Date().toISOString(), reason: reason };
+
+        closeEditModal();
+        renderTable();
+        showToast(`Attendance for ${r.staff} updated`);
+      }
+
+      /* ══ Toast ═══════════════════════════════════════════════════════ */
+      let toastTimer = null;
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        toast.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('on'), 2600);
+      }
+
+      /* ══ Init ════════════════════════════════════════════════════════ */
+      document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
+  </body>
+</html>

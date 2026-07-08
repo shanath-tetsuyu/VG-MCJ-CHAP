@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CARES — Job Details</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DM Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- CARES shell -->
+    <link rel="stylesheet" href="css/index.css">
+
+    <style>
+      /* ── Design tokens (mirrors task_management.html / portal/job_detail.html) ── */
+      :root {
+        --g:#13795B; --gm:#1D9E75; --gl:#E8F7F2; --gb:#9FE1CB;
+        --am:#C07A1A; --al:#FDF3E3; --ab:#F0C060;
+        --rm:#B03030; --rl:#FDF0F0; --rb:#F0AAAA;
+        --bm:#1A5FA8; --bl:#EBF3FD; --bb:#90BFED;
+        --pm:#6B21A8; --pl:#F5F0FF; --pb:#C4B5FD;
+        --ink:#1C1C1E; --ink2:#444; --ink3:#777; --ink4:#AAA;
+        --s:#fff; --bg:#F5F6F8; --bdr:#E4E4E4; --bdr2:#F0F0F0;
+        --r:10px; --rl2:16px;
+      }
+
+      .main-content { overflow: hidden; display: flex; flex-direction: column; }
+
+      /* ── Job details shell (nested inside CARES main-content) ────────── */
+      .jd-crumbbar { height: 48px; background: var(--s); border-bottom: 1px solid var(--bdr); display: flex; align-items: center; padding: 0 20px; gap: 6px; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
+      .crumb { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+      .crumb a { color: var(--g); text-decoration: none; font-weight: 500; }
+      .crumb a:hover { text-decoration: underline; }
+      .crumb-sep { color: var(--ink4); font-size: 12px; }
+
+      .jd-layout { flex: 1; display: flex; overflow: hidden; font-family: 'DM Sans', sans-serif; }
+      .left-scroll { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+      .right-panel { width: 290px; border-left: 1px solid var(--bdr); background: var(--s); overflow-y: auto; flex-shrink: 0; }
+
+      /* Cards (mirrors task_management.html card2) */
+      .card2 { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--rl2); padding: 18px; }
+      .card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+      .card-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+      .ci-g { background: var(--gl); } .ci-b { background: var(--bl); } .ci-a { background: var(--al); } .ci-p { background: var(--pl); }
+      .card-label { font-size: 12px; font-weight: 600; color: var(--ink2); flex: 1; }
+
+      /* Job header */
+      .job-header { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--rl2); padding: 20px 22px; display: flex; align-items: flex-start; gap: 16px; }
+      .job-header-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+      .ji-chap { background: var(--bl); } .ji-befr { background: var(--gl); } .ji-home { background: var(--al); } .ji-cent { background: var(--pl); }
+      .job-header-main { flex: 1; }
+      .job-title { font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+      .job-subtitle { font-size: 13px; color: var(--ink3); margin-top: 3px; }
+      .job-header-badges { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+      .job-header-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+      /* Info grid */
+      .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+      .info-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+      .info-box { background: var(--bg); border-radius: var(--r); padding: 10px 12px; }
+      .info-label { font-size: 10px; font-weight: 700; color: var(--ink4); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+      .info-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+      .info-val.hi-g { color: var(--g); font-weight: 700; }
+      .info-val.hi-p { color: var(--pm); font-weight: 700; }
+      .info-val.hi-a { color: var(--am); font-weight: 700; }
+      .info-val.hi-r { color: var(--rm); font-weight: 700; }
+
+      /* Status / meta pills — namespaced jd- to avoid clobbering the shared .badge (topbar bell count) */
+      .jd-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+      .b-pub { background: var(--bl); color: var(--bm); }
+      .b-tak { background: var(--gl); color: var(--g); padding: 12px; font-size: 13px; }
+      .b-com { background: var(--gl); color: var(--g); padding: 12px; font-size: 13px; }
+      .b-can { background: var(--rl); color: var(--rm); padding: 12px; font-size: 13px; }
+      .b-wl { background: var(--al); color: var(--am); padding: 12px; font-size: 13px; }
+      .b-risk { background: var(--rl); color: var(--rm); padding: 12px; font-size: 13px; }
+      .b-reopen { background: var(--pl); color: var(--pm); padding: 12px; font-size: 13px; }
+      .b-prog { background: var(--bl); color: var(--bm); padding: 12px; font-size: 13px; }
+      .b-urg { background: #FFF3EC; color: #C04A00; border: 1px solid #FFCFB2; padding: 12px; font-size: 13px; }
+      .b-std { background: var(--bg); color: var(--ink4); border: 1px solid var(--bdr); padding: 12px; font-size: 13px; }
+      .b-draft { background: #E8E8ED; color: #555; padding: 12px; font-size: 13px; }
+      .b-submitted { background: var(--bl); color: var(--bm); padding: 12px; font-size: 13px; }
+      .b-processed { background: var(--gl); color: var(--g); padding: 12px; font-size: 13px; }
+      .b-amended { background: var(--al); color: var(--am); padding: 12px; font-size: 13px; }
+
+      /* Sect title (mirrors task_management.html) */
+      .sect-title { font-size: 11px; font-weight: 700; color: var(--ink3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; margin-top: 16px; }
+      .sect-title:first-child { margin-top: 0; }
+
+      /* Banners */
+      .banner { border-radius: var(--r); padding: 10px 12px; font-size: 12px; display: flex; gap: 8px; line-height: 1.5; margin-bottom: 12px; }
+      .bn-g { background: var(--gl); color: #0A5C46; border: 1px solid var(--gb); }
+      .bn-a { background: var(--al); color: var(--am); border: 1px solid var(--ab); }
+      .bn-r { background: var(--rl); color: var(--rm); border: 1px solid var(--rb); }
+      .bn-p { background: var(--pl); color: var(--pm); border: 1px solid var(--pb); }
+      .bn-b { background: var(--bl); color: var(--bm); border: 1px solid var(--bb); }
+
+      /* Assignment slots (mirrors task_management.html) */
+      .slot-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--bg); border-radius: var(--r); margin-bottom: 8px; border: 1px solid var(--bdr); }
+      .slot-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+      .sn-filled { background: var(--gm); color: #fff; }
+      .sn-empty { background: var(--bdr); color: var(--ink4); }
+      .slot-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+      .slot-meta { font-size: 11px; color: var(--ink4); margin-top: 2px; }
+
+      /* Waitlist (mirrors task_management.html) */
+      .wl-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--bdr2); font-size: 12px; }
+      .wl-row:last-child { border-bottom: none; }
+      .wl-pos { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--ink4); flex-shrink: 0; }
+      .wl-name { flex: 1; font-weight: 500; color: var(--ink2); }
+      .wl-time { font-size: 11px; color: var(--ink4); }
+
+      /* Right panel */
+      .rp { padding: 14px 15px; }
+      .rp-title { font-size: 10px; font-weight: 700; color: var(--ink4); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; margin-top: 16px; }
+      .rp-title:first-child { margin-top: 4px; }
+      .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--bdr2); font-size: 12px; }
+      .summary-row:last-child { border-bottom: none; }
+      .summary-label { color: var(--ink3); }
+      .summary-val { font-weight: 600; color: var(--ink); }
+      .summary-val.sv-g { color: var(--g); }
+      .summary-val.sv-p { color: var(--pm); }
+
+      /* Finance block */
+      .fin-block { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 12px 14px; }
+      .fin-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--bdr2); }
+      .fin-row:last-child { border-bottom: none; }
+      .fin-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 2px solid var(--bdr); }
+      .fin-total-label { font-size: 13px; font-weight: 700; }
+      .fin-total-val { font-size: 18px; font-weight: 800; color: var(--pm); }
+
+      /* Skill tags */
+      .skill-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--gl); color: var(--g); margin-right: 5px; margin-bottom: 5px; }
+
+      /* Complexity pill */
+      .cplx-H { background: var(--rl); color: var(--rm); border: 1px solid var(--rb); }
+      .cplx-M { background: var(--al); color: var(--am); border: 1px solid var(--ab); }
+      .cplx-L { background: var(--gl); color: var(--g); border: 1px solid var(--gb); }
+
+      /* Action buttons */
+      .btn-primary2 { background: var(--g); color: #fff; border: none; border-radius: var(--r); padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+      .btn-primary2:hover { background: #0A5C46; }
+      .btn-ghost2 { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r); padding: 8px 14px; font-size: 13px; color: var(--ink2); cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+      .btn-ghost2:hover { background: var(--bg); }
+
+      /* Draft footer */
+      .page-footer { height: 56px; background: var(--s); border-top: 1px solid var(--bdr); display: flex; align-items: center; padding: 0 20px; gap: 8px; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
+      .btn-pub { background: var(--g); color: #fff; border: none; border-radius: var(--r); padding: 9px 22px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+      .btn-pub:hover { background: #0A5C46; }
+      .btn-save-draft { background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r); padding: 9px 18px; font-size: 13px; color: var(--ink3); cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+      .btn-save-draft:hover { background: var(--bg); }
+
+      /* Not found state */
+      .not-found { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--ink4); }
+      .not-found i { font-size: 48px; margin-bottom: 12px; opacity: .3; }
+      .not-found h3 { font-size: 16px; font-weight: 600; color: var(--ink3); margin-bottom: 6px; }
+      .not-found p { font-size: 13px; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Wrapper -->
+    <div class="d-flex" id="wrapper">
+
+      <!-- Sidebar (CARES shell) -->
+      <nav id="sidebar" class="sidebar d-flex flex-column">
+
+        <div class="sidebar-profile p-3 text-center">
+          <div class="sidebar-avatar mx-auto mb-2">
+            <i class="bi bi-person-fill fs-3 text-white"></i>
+          </div>
+          <div class="sidebar-username text-white fw-semibold small">Cares Admin TETSUYU</div>
+          <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+            Enterprise Administrators
+            <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+          </div>
+        </div>
+
+        <ul class="nav flex-column sidebar-nav mt-1">
+
+          <li class="nav-item">
+            <a class="nav-link sidebar-link" href="./index.html">
+              <i class="bi bi-grid-fill me-2"></i>
+              Dashboard
+            </a>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#prospectsMenu" aria-expanded="false">
+              <i class="bi bi-person-circle me-2"></i>
+              Prospects
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="prospectsMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">New Prospect</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Prospect List</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- Schedule (expanded, MicroJobber active) -->
+          <li class="nav-item">
+            <a class="nav-link sidebar-link sidebar-collapsible active" href="#" data-bs-toggle="collapse" data-bs-target="#scheduleMenu" aria-expanded="true">
+              <i class="bi bi-calendar-event me-2"></i>
+              Schedule
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse show" id="scheduleMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./task_management.html">MicroJobber</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="./staff_attendance.html">Staff Attendance</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#" onclick="openPortal()">Link To Portal</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#feeMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              AIC Fee Management
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="feeMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Services</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Consumable Logs</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#preAdmissionMenu" aria-expanded="false">
+              <i class="bi bi-file-earmark-check me-2"></i>
+              Pre-Admission
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="preAdmissionMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Applications</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Assessments</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item" style="opacity: 0.3;">
+            <a class="nav-link sidebar-link sidebar-collapsible collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#clientMenu" aria-expanded="false">
+              <i class="bi bi-person-badge me-2"></i>
+              Client
+              <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
+            </a>
+            <div class="collapse" id="clientMenu">
+              <ul class="nav flex-column sidebar-submenu">
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client List</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink" href="#">Client Profile</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <!-- End Sidebar -->
+
+      <!-- Page Content -->
+      <div id="page-content" class="d-flex flex-column flex-grow-1">
+
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-light bg-white topbar px-3 border-bottom shadow-sm">
+          <button id="sidebarToggle" class="btn btn-sm btn-success me-3" type="button">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+
+          <span class="navbar-brand fw-bold text-dark fs-5 me-2">
+            <span class="brand-dot"></span>
+            VANGUARD
+          </span>
+
+          <small class="text-muted me-auto">Session logout in <span id="sessionTimer">17520</span> seconds</small>
+
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="text-muted small">Welcome to CARES</span>
+
+            <div class="input-group input-group-sm" style="width: 220px;">
+              <span class="input-group-text border-0 bg-light text-muted" style="font-size:0.75rem;">Client Search</span>
+              <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Type 3+ characters to search..." id="clientSearchInput">
+            </div>
+
+            <select class="form-select form-select-sm" style="width: 220px;">
+              <option selected>VANGUARD 1</option>
+              <option>VANGUARD 2</option>
+              <option>VANGUARD 3</option>
+            </select>
+
+            <button class="btn btn-sm btn-light position-relative border">
+              <i class="bi bi-bell-fill text-muted"></i>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle" style="font-size:0.6rem;">10</span>
+            </button>
+
+            <button class="btn btn-sm btn-light border text-muted">
+              <i class="bi bi-box-arrow-right me-1"></i> Log out
+            </button>
+          </div>
+        </nav>
+        <!-- End Topbar -->
+
+        <!-- Main Content -->
+        <main class="main-content flex-grow-1">
+
+          <div class="jd-crumbbar">
+            <div class="crumb">
+              <a href="./task_management.html">CARES</a>
+              <span class="crumb-sep">&rsaquo;</span>
+              <a href="./task_management.html">Schedule</a>
+              <span class="crumb-sep">&rsaquo;</span>
+              <span id="crumb-label" style="color:var(--ink3);font-size:13px;">Job Details</span>
+            </div>
+          </div>
+
+          <div class="jd-layout">
+            <div class="left-scroll" id="main-content">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div id="page-footer" class="page-footer" style="display:none;">
+            <button id="footer-duplicate" class="btn-save-draft" style="background-color:rgb(251, 255, 0); color:black" onclick="handleDuplicate()"><i class="bi bi-copy"></i> Duplicate Job</button>
+            <button id="footer-save-draft" class="btn-save-draft" onclick="handleSaveDraft()"><i class="bi bi-floppy"></i> Save as Draft</button>
+            <button id="footer-publish" class="btn-pub" onclick="handlePublish()"><i class="bi bi-send"></i> Publish</button>
+          </div>
+
+        </main>
+
+        <!-- Need Help Button -->
+        <button class="btn btn-teal need-help-btn position-fixed" style="bottom: 20px; right: 20px; border-radius: 50px; z-index: 999;">
+          <i class="bi bi-question-circle me-1"></i> Need Help?
+        </button>
+
+      </div>
+      <!-- End Page Content -->
+
+    </div>
+    <!-- End Wrapper -->
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // ── Sidebar Toggle ──────────────────────────────────────────────────
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
+
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-collapsed');
+      });
+
+      // ── Active nav link highlight ───────────────────────────────────────
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+          if (!this.classList.contains('sidebar-collapsible')) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+          }
+        });
+      });
+
+      // ── Collapse chevron rotation ───────────────────────────────────────
+      document.querySelectorAll('.sidebar-collapsible').forEach(toggle => {
+        const targetId = toggle.getAttribute('data-bs-target');
+        const collapseEl = document.querySelector(targetId);
+
+        collapseEl.addEventListener('show.bs.collapse', () => {
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(-90deg)';
+          toggle.classList.add('active');
+        });
+
+        collapseEl.addEventListener('hide.bs.collapse', () => {
+          toggle.querySelector('.collapse-icon').style.transform = 'rotate(0deg)';
+          toggle.classList.remove('active');
+        });
+      });
+
+      // ── Session countdown timer ─────────────────────────────────────────
+      let seconds = 17520;
+      const timerEl = document.getElementById('sessionTimer');
+      const countdown = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          timerEl.textContent = '0';
+        }
+      }, 1000);
+
+      // ── Client search (3+ chars) ────────────────────────────────────────
+      document.getElementById('clientSearchInput').addEventListener('input', function () {
+        if (this.value.length >= 3) {
+          console.log('Searching for:', this.value);
+        }
+      });
+
+      function openPortal() {
+        if (confirm('Heading over to MJ Chap Portal')) {
+          const url = './portal/index.html';
+          window.open(url, '_blank').focus();
+        }
+      }
+
+      /* ══════════════════════════════════════════════════════════════════
+         Job Details — mirrors v3/portal/job_detail.html, wired into the
+         CARES shell (sidebar/topbar) instead of the portal shell.
+      ═══════════════════════════════════════════════════════════════════ */
+
+      /* ══ Combined job data (duplicated from portal/job_detail.html per
+         project convention — see CLAUDE.md "Mock Data Pattern") ═══════ */
+      const JOB_DATA = [
+        {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',    status:'At Risk',     mj:null,                       wl:0, urgency:'Urgent',   venueFrom:'Blk 12 Queenstown Rd #04-11',venueTo:'NUH, Block 1 Specialist Centre',clientAge:78,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:48,clientRemarks:'Uses walking frame. Speaks Mandarin. Anxious in crowds.',complexity:'H',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT']},
+        {id:'MJ-2026-002',type:'Chaperone',       facility:'VG — Buona Vista', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Lee Ah Kow',       status:'Taken',       mj:'Ahmad Razif',              wl:2, urgency:'Standard', venueFrom:'Blk 56 Buona Vista Dr #10-03',venueTo:'SGH, Block 1 A&E',clientAge:72,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:65,clientRemarks:'Speaks Hokkien and Mandarin. Has mild hearing loss — speak clearly.',complexity:'L',genderPref:'Any gender',language:'Hokkien',skills:['Chaperone OJT']},
+        {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',   date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',     status:'Completed',   mj:'Lily Tan',                 wl:0, urgency:'Standard', venueFrom:'VG — Clementi, Activity Room',venueTo:'',clientAge:80,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:52,clientRemarks:'Enjoys talking about gardening and cooking.',complexity:'L',genderPref:'Any gender',language:'Mandarin',skills:['Befriending OJT']},
+        {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh', date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',      status:'Open',        mj:null,                       wl:4, urgency:'Standard', venueFrom:'Blk 187 Toa Payoh Central #09-330',venueTo:'',clientAge:68,clientGender:'Female',clientRace:'Malay',funcLevel:'Needs assistance',dementia:'None',weight:55,clientRemarks:'Speaks Malay and English. Family informed of visit.',complexity:'M',genderPref:'Female MJ only',language:'Malay',skills:['Home Assessment OJT','Safe Steps Certified']},
+        {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown',date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',     status:'Completed',   mj:'Fatimah bte Ali',          wl:0, urgency:'Urgent',   venueFrom:'Blk 55 Queenstown Rd #06-22',venueTo:'TTSH, Block 9 Medical',clientAge:75,clientGender:'Female',clientRace:'Chinese',funcLevel:'Dependent',dementia:'Moderate',weight:50,clientRemarks:'Requires wheelchair. Cannot be left alone. Has sundowning tendencies.',complexity:'H',genderPref:'Any gender',language:'Mandarin',skills:['Chaperone OJT','Wheelchair Transfer']},
+        {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',        status:'Open',        mj:null,                       wl:1, urgency:'Standard', venueFrom:'Blk 20 Buona Vista Ave 6 #03-06',venueTo:'',clientAge:70,clientGender:'Male',clientRace:'Indian',funcLevel:'Independent',dementia:'None',weight:68,clientRemarks:'Speaks Tamil and English. Cooperative and punctual.',complexity:'L',genderPref:'Any gender',language:'English',skills:['Home Assessment OJT']},
+        {id:'MJ-2026-008',type:'Befriending',     facility:'SCC — Queenstown',date:'20 May 2026',sd:'2026-05-20',time:'09:00–10:00',client:'Chen Wei Ming',    status:'Taken',       mj:'Susan Lim',                wl:0, urgency:'Standard', venueFrom:'SCC — Queenstown, Meeting Room',venueTo:'',clientAge:74,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:60,clientRemarks:'Hearing aid user. Prefers to speak Cantonese.',complexity:'L',genderPref:'Any gender',language:'Cantonese',skills:['Befriending OJT']},
+        {id:'MJ-2026-010',type:'Chaperone',       facility:'SCC — Toa Payoh', date:'21 May 2026',sd:'2026-05-21',time:'15:00–17:00',client:'Lim Bee Hoon',     status:'Draft',        mj:null,                       wl:3, urgency:'Urgent',   venueFrom:'Blk 91 Toa Payoh Lor 4 #12-55',venueTo:'Tan Tock Seng Hospital, Clinic C',clientAge:82,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:45,clientRemarks:'Frail. Slow walker. Please allow extra time.',complexity:'H',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT','First Aid Certified']},
+        {id:'MJ-2026-011',type:'Befriending',     facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'14:00–15:00',client:'Aminah bte Yusof', status:'Open',        mj:null,                       wl:2, urgency:'Standard', venueFrom:'VG — Buona Vista, Common Room',venueTo:'',clientAge:66,clientGender:'Female',clientRace:'Malay',funcLevel:'Independent',dementia:'None',weight:58,clientRemarks:'Active and social. Enjoys music sessions.',complexity:'L',genderPref:'Any gender',language:'Malay',skills:['Befriending OJT']},
+        {id:'MJ-2026-012',type:'Home Assessment', facility:'SCC — Bishan',    date:'28 May 2026',sd:'2026-05-28',time:'09:00–11:00',client:'Teo Ah Seng',      status:'Open',        mj:null,                       wl:3, urgency:'Standard', venueFrom:'Blk 261 Bishan St 22 #05-02',venueTo:'',clientAge:79,clientGender:'Male',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:70,clientRemarks:'Mobility issues. Lives alone. Family overseas.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
+        {id:'MJ-2026-013',type:'Chaperone',       facility:'VG — Clementi',   date:'18 May 2026',sd:'2026-05-18',time:'11:00–13:00',client:'Gan Sock Kheng',   status:'Completed',   mj:'Ravi Kumar',               wl:0, urgency:'Standard', venueFrom:'Blk 411 Clementi Ave 1 #07-44',venueTo:'NUH Eye Centre',clientAge:71,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:54,clientRemarks:'Eye condition. Bright light sensitive — sunglasses may help.',complexity:'L',genderPref:'Any gender',language:'English',skills:['Chaperone OJT']},
+        {id:'MJ-2026-015',type:'Chaperone',       facility:'SCC — Bishan',    date:'20 May 2026',sd:'2026-05-20',time:'13:00–15:00',client:'Yeo Ah Muoi',      status:'Cancelled',   mj:null,                       wl:0, urgency:'Urgent',   venueFrom:'Blk 150 Bishan St 11 #08-30',venueTo:'KKH, Women & Children',clientAge:85,clientGender:'Female',clientRace:'Chinese',funcLevel:'Dependent',dementia:'Severe',weight:42,clientRemarks:'Client hospitalised. Job cancelled by SCC coordinator.',complexity:'H',genderPref:'Any gender',language:'Hokkien',skills:['Chaperone OJT','Wheelchair Transfer']},
+        {id:'MJ-2026-016',type:'Befriending',     facility:'SCC — Toa Payoh', date:'22 May 2026',sd:'2026-05-22',time:'10:00–11:00',client:'Tan Kim Seng',     status:'Taken',       mj:'Grace Chua',               wl:0, urgency:'Standard', venueFrom:'SCC — Toa Payoh, Activity Hall',venueTo:'',clientAge:73,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:66,clientRemarks:'Enjoys chess and card games. Very friendly.',complexity:'L',genderPref:'Any gender',language:'Mandarin',skills:['Befriending OJT']},
+        {id:'MJ-2026-017',type:'Home Assessment', facility:'VG — Buona Vista', date:'26 May 2026',sd:'2026-05-26',time:'10:00–12:00',client:'Ismail bin Hassan',status:'Waitlisted',  mj:null,                       wl:4, urgency:'Standard', venueFrom:'Blk 6 Buona Vista Rd #02-10',venueTo:'',clientAge:69,clientGender:'Male',clientRace:'Malay',funcLevel:'Needs assistance',dementia:'None',weight:72,clientRemarks:'Diabetic. Check on medication compliance during visit.',complexity:'M',genderPref:'Any gender',language:'Malay',skills:['Home Assessment OJT']},
+        {id:'MJ-2026-018',type:'Chaperone',       facility:'VG — Buona Vista', date:'30 May 2026',sd:'2026-05-30',time:'09:00–11:00',client:'Koh Bee Chin',     status:'Open',        mj:null,                       wl:4, urgency:'Standard', venueFrom:'Blk 22 Buona Vista Ave 1 #11-06',venueTo:'NUHCS, Cardiac Centre',clientAge:76,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:53,clientRemarks:'Heart condition. No heavy lifting. Please walk slowly.',complexity:'M',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT']},
+        {id:'MJ-2026-020',type:'Befriending',     facility:'VG — Clementi',   date:'28 May 2026',sd:'2026-05-28',time:'15:00–16:00',client:'Lim Ah Lian',      status:'Draft',        mj:null,                       wl:2, urgency:'Standard', venueFrom:'VG — Clementi, Common Room',venueTo:'',clientAge:77,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:50,clientRemarks:'Withdrawn personality. Patience required to engage.',complexity:'M',genderPref:'Female MJ only',language:'Cantonese',skills:['Befriending OJT']},
+        {id:'MJ-2026-021',type:'Chaperone',       facility:'VG — Clementi',   date:'02 Jun 2026',sd:'2026-06-02',time:'13:00–15:00',client:'Chua Soo Khim',    status:'Open',        mj:null,                       wl:1, urgency:'Standard', venueFrom:'Blk 303 Clementi Ave 3 #09-12',venueTo:'NUH, Oncology Centre',clientAge:67,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:49,clientRemarks:'Chemotherapy patient. May feel tired. Bring light snacks if possible.',complexity:'M',genderPref:'Female MJ only',language:'Mandarin',skills:['Chaperone OJT']},
+        {id:'MJ-2026-022',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'Open',        mj:null,                       wl:0, urgency:'Standard', venueFrom:'Blk 54 Queenstown Rd #07-17',venueTo:'',clientAge:81,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:47,clientRemarks:'Lives with daughter. Assess kitchen safety and bathroom rails.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
+        {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown',date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',      status:'In Progress', mj:'Nigel Tan, Lawrence Tan',  wl:0, urgency:'Standard', venueFrom:'Blk 54 Queenstown Rd #07-17',venueTo:'',clientAge:81,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'Mild',weight:47,clientRemarks:'Currently in progress — MJs on site.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Home Assessment OJT','Safe Steps Certified']},
+        {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown',date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',     status:'Re-opened',   mj:null,                       wl:2, urgency:'Standard', venueFrom:'Blk 38 Queenstown Rd #03-66',venueTo:'Sengkang General Hospital, SOC',clientAge:73,clientGender:'Female',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:56,clientRemarks:'Previous MJ cancelled same-day. Please ensure timely confirmation.',complexity:'M',genderPref:'Any gender',language:'Mandarin',skills:['Chaperone OJT'], cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
+        {id:'MJ-2026-025',type:'Chaperone',       facility:'SCC — Queenstown',date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Goh Poh Choo',     status:'Taken',       mj:'Melissa Chua',             wl:1, urgency:'Standard', venueFrom:'Blk 47 Queenstown Rd #05-19',venueTo:'SGH, Block 1 A&E',clientAge:74,clientGender:'Female',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:57,clientRemarks:'Speaks Cantonese and English. Punctual and cooperative.',complexity:'L',genderPref:'Any gender',language:'Cantonese',skills:['Chaperone OJT']},
+        {id:'MJ-2026-026',type:'Befriending',     facility:'VG — Clementi',   date:'22 May 2026',sd:'2026-05-22',time:'14:00–15:00',client:'Ong Kim Guan',     status:'Open',        mj:null,                       wl:0, urgency:'Standard', venueFrom:'VG — Clementi, Common Room',venueTo:'',clientAge:75,clientGender:'Male',clientRace:'Chinese',funcLevel:'Independent',dementia:'None',weight:62,clientRemarks:'Enjoys reading newspapers. Prefers Teochew but understands Mandarin.',complexity:'L',genderPref:'Any gender',language:'Mandarin',skills:['Befriending OJT']},
+        {id:'MJ-2026-027',type:'Chaperone',       facility:'VG — Clementi',   date:'20 May 2026',sd:'2026-05-20',time:'15:00–16:00',client:'Foo Chook Tok',    status:'Completed',   mj:null,                       wl:0, urgency:'Standard', venueFrom:'Blk 432 Clementi Ave 3 #06-15',venueTo:'NUH, Rehabilitation Centre',clientAge:80,clientGender:'Male',clientRace:'Chinese',funcLevel:'Needs assistance',dementia:'None',weight:64,clientRemarks:'Job assigned directly to AAC staff (Bob Lim) rather than a MicroJobber.',complexity:'M',genderPref:'Any gender',language:'Hokkien',skills:['Chaperone OJT']},
+      ];
+
+      const WAITLIST_DATA = {
+        'MJ-2026-002':[{n:'Ramesh Kumar',t:'17 May 08:12'},{n:'Joanna Lim',t:'17 May 09:44'}],
+        'MJ-2026-004':[{n:'Fatimah Zainal',t:'15 May 14:03'},{n:'David Teo',t:'15 May 15:21'},{n:'Susan Yeo',t:'16 May 07:55'},{n:'Ahmad Sulaiman',t:'16 May 10:30'}],
+        'MJ-2026-007':[{n:'Priya Nair',t:'17 May 11:00'}],
+        'MJ-2026-010':[{n:'Wong Kah Meng',t:'16 May 10:00'},{n:'Lim Soo Bee',t:'16 May 13:30'},{n:'Ng Ah Cheh',t:'17 May 08:00'}],
+        'MJ-2026-011':[{n:'Selvam s/o Raju',t:'17 May 09:00'},{n:'Chan Wai Leng',t:'17 May 11:15'}],
+        'MJ-2026-012':[{n:'Aminah Abdullah',t:'17 May 10:30'},{n:'Tan Hock Kee',t:'17 May 12:00'},{n:'Lim Kim Hong',t:'17 May 14:00'}],
+        'MJ-2026-017':[{n:'Grace Ho',t:'15 May 16:00'},{n:'Fatimah bte Salleh',t:'16 May 08:20'},{n:'Ravi Shankar',t:'16 May 11:45'},{n:'Yeo Bee Kheng',t:'17 May 07:30'}],
+        'MJ-2026-018':[{n:'Abdul Rahman',t:'17 May 15:00'},{n:'Lee Ah Kow Jr',t:'17 May 16:30'},{n:'Tan Sock Kiang',t:'18 May 08:00'},{n:'Gopalan s/o Rajan',t:'18 May 09:00'}],
+        'MJ-2026-020':[{n:'Ng Bee Hoon',t:'17 May 14:00'},{n:'Tan Ah Bah',t:'18 May 08:30'}],
+        'MJ-2026-021':[{n:'Suriani bte Ali',t:'17 May 16:00'}],
+        'MJ-2026-024':[{n:'Ramesh Kumar',t:'20 May 10:15'},{n:'Joanna Lim',t:'20 May 11:02'}],
+        'MJ-2026-025':[{n:'David Teo',t:'19 May 09:30'}],
+      };
+
+      const INTERESTED_DATA = {
+        'MJ-2026-003': [{n:'Ahmad Razif',     t:'20 May 09:15'}, {n:'Susan Lim',        t:'20 May 10:02'}],
+        'MJ-2026-008': [{n:'Ravi Kumar',      t:'19 May 14:30'}, {n:'Grace Chua',       t:'19 May 15:00'}, {n:'Fatimah Zainal', t:'19 May 16:45'}],
+        'MJ-2026-011': [{n:'Lily Tan',        t:'17 May 08:00'}, {n:'David Teo',        t:'17 May 09:30'}],
+        'MJ-2026-016': [{n:'Ahmad Razif',     t:'21 May 11:00'}],
+        'MJ-2026-020': [{n:'Susan Yeo',       t:'17 May 14:00'}, {n:'Ng Bee Hoon',      t:'18 May 08:30'}],
+      };
+
+      const AP_DATA_MAP = {
+        'MJ-2026-048': {schedMins:120, actualMins:128, isNoShow:false, isAmended:false, status:'Draft', billRate:12},
+        'MJ-2026-002': {schedMins:120, actualMins:118, isNoShow:false, isAmended:false, status:'Draft', billRate:12},
+        'MJ-2026-003': {schedMins:60,  actualMins:63,  isNoShow:false, isAmended:false, status:'Processed', billRate:10},
+        'MJ-2026-006': {schedMins:120, actualMins:116, isNoShow:false, isAmended:false, status:'Processed', billRate:12},
+        'MJ-2026-013': {schedMins:120, actualMins:122, isNoShow:false, isAmended:false, status:'Processed', billRate:12},
+      };
+
+      const RATES = { 'Chaperone':12, 'Befriending':10, 'Home Assessment':14, 'Centre Assistant':11 };
+
+      const TYPE_ICON  = {'Chaperone':'<i class="bi bi-person-check"></i>','Befriending':'<i class="bi bi-chat-dots"></i>','Home Assessment':'<i class="bi bi-house"></i>','Centre Assistant':'<i class="bi bi-building"></i>'};
+      const TYPE_CLASS = {'Chaperone':'ji-chap','Befriending':'ji-befr','Home Assessment':'ji-home','Centre Assistant':'ji-cent'};
+
+      const STATUS_BADGE = {
+        'Open':        '<span class="jd-badge b-pub">Open</span>',
+        'Taken':       '<span class="jd-badge b-tak">Taken</span>',
+        'Completed':   '<span class="jd-badge b-com">✓ Completed</span>',
+        'Cancelled':   '<span class="jd-badge b-can">✕ Cancelled</span>',
+        'Waitlisted':  '<span class="jd-badge b-wl">Waitlisted</span>',
+        'At Risk':     '<span class="jd-badge b-risk">⚠ At Risk</span>',
+        'Re-opened':   '<span class="jd-badge b-reopen">↺ Re-opened</span>',
+        'In Progress': '<span class="jd-badge b-prog">In Progress</span>',
+        'Draft':       '<span class="jd-badge b-prog">Draft</span>',
+      };
+
+      function calcBillableHours(mins) {
+        if (mins <= 0) return 1;
+        const h = Math.floor(mins / 60);
+        const r = (mins / 60) - h;
+        if (h === 0) return 1;
+        return r >= 0.5 ? h + 1 : Math.max(1, h);
+      }
+
+      function fmtDuration(mins) {
+        if (!mins || mins <= 0) return '—';
+        const h = Math.floor(mins / 60), m = mins % 60;
+        return h > 0 ? `${h}h ${m > 0 ? m + 'm' : ''}`.trim() : `${m}m`;
+      }
+
+      /* ══ Render ══════════════════════════════════════════════════════════ */
+      function render() {
+        const params = new URLSearchParams(window.location.search);
+        const jobId  = params.get('id');
+        const main   = document.getElementById('main-content');
+        const rp     = document.getElementById('right-panel');
+
+        if (!jobId) { showNotFound(main, rp, 'No job ID specified.'); return; }
+
+        const j = JOB_DATA.find(x => x.id === jobId);
+        if (!j) { showNotFound(main, rp, `Job "${jobId}" not found.`); return; }
+
+        document.title = `CARES — ${j.type}`;
+        document.getElementById('crumb-label').textContent = j.type + ' · ' + j.facility;
+
+        const wl  = WAITLIST_DATA[jobId] || [];
+        const fin = AP_DATA_MAP[jobId];
+        const isHA  = j.type === 'Home Assessment';
+        const isBef = j.type === 'Befriending';
+        const slots = isHA ? 2 : 1;
+        const rate  = RATES[j.type] || 12;
+        const locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
+
+        /* ── Banner ── */
+        let banner = '';
+        if (j.status === 'At Risk')
+          banner = `<div class="banner bn-r"><i class="bi bi-exclamation-triangle-fill"></i><div><strong>At Risk:</strong> No confirmed MJ. Auto-cancel triggers 1 BD before job date. Escalate to SCC Nurse.</div></div>`;
+        else if (j.status === 'Cancelled')
+          banner = `<div class="banner bn-r"><i class="bi bi-x-circle-fill"></i><div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>`;
+        else if (j.status === 'Completed')
+          banner = `<div class="banner bn-g"><i class="bi bi-check-circle-fill"></i><div><strong>Completed:</strong> Job was successfully completed.</div></div>`;
+        else if (j.status === 'In Progress')
+          banner = `<div class="banner bn-b"><i class="bi bi-arrow-repeat"></i><div><strong>In Progress:</strong> MJ is currently at the client location.</div></div>`;
+        else if (j.status === 'Re-opened')
+          banner = `<div class="banner bn-p"><i class="bi bi-arrow-clockwise"></i><div><strong>Re-opened:</strong> Previous MJ cancelled. Slot is open for a new MJ to grab.</div></div>`;
+        else if (isHA)
+          banner = `<div class="banner bn-a"><i class="bi bi-info-circle-fill"></i><div><strong>Home Assessment:</strong> Minimum 2 confirmed MJs required. Confirmed MJ names are visible to eligible MJs on the listing.</div></div>`;
+
+        /* ── Job header ── */
+        const urgBadge = j.urgency === 'Urgent'
+          ? `<span class="jd-badge b-urg"><i class="bi bi-exclamation-diamond-fill"></i> Urgent</span>`
+          : `<span class="jd-badge b-std">Standard</span>`;
+
+        const header = `
+        <div class="job-header">
+          <div class="job-header-icon ${TYPE_CLASS[j.type] || 'ci-p'}">${TYPE_ICON[j.type] || '<i class="bi bi-briefcase"></i>'}</div>
+          <div class="job-header-main">
+            <div class="job-title">${j.type}</div>
+            <div class="job-subtitle">${j.facility} · ${j.date} · ${j.time}</div>
+            <div class="job-header-badges">
+              ${STATUS_BADGE[j.status] || `<span class="jd-badge b-draft">${j.status}</span>`}
+              ${urgBadge}
+              ${j.mj ? `<span style="font-size:11px;color:var(--ink3)"><i class="bi bi-person-check" style="color:var(--g)"></i> ${j.mj}</span>` : ''}
+            </div>
+          </div>
+          <div class="job-header-actions">
+            ${(j.status === 'Draft' || j.status === 'Cancelled') ? `<a onclick="editJobAlert()" class="btn-ghost2" style="font-size:12px;padding:6px 12px;"><i class="bi bi-pencil"></i> Edit Job</a>` : ''}
+            <a href="./task_management.html" class="btn-ghost2" style="font-size:12px;padding:6px 12px;"><i class="bi bi-arrow-left"></i> Back</a>
+          </div>
+        </div>`;
+
+        /* ── Job details ── */
+        const venueSection = (j.type === 'Chaperone')
+          ? `<div class="info-box"><div class="info-label">Venue — From</div><div class="info-val">${j.venueFrom || '—'}</div></div>
+             <div class="info-box"><div class="info-label">Venue — To</div><div class="info-val">${j.venueTo || '—'}</div></div>`
+          : `<div class="info-box"><div class="info-label">Location</div><div class="info-val">${j.venueFrom || j.facility}</div></div>`;
+
+        const jobCard = `
+        <div class="card2">
+          <div class="card-head">
+            <div class="card-icon ci-g"><i class="bi bi-calendar-event" style="font-size:13px;color:var(--g)"></i></div>
+            <div class="card-label">Job Details</div>
+          </div>
+          <div class="info-grid">
+            <div class="info-box"><div class="info-label">Date</div><div class="info-val">${j.date}</div></div>
+            <div class="info-box"><div class="info-label">Time Slot</div><div class="info-val">${j.time}</div></div>
+            <div class="info-box"><div class="info-label">Duration (Scheduled)</div><div class="info-val">${fmtDuration((j.time.split('–').length===2)?((parseInt(j.time.split('–')[1])-parseInt(j.time.split('–')[0]))*60):120)}</div></div>
+            <div class="info-box"><div class="info-label">Facility</div><div class="info-val">${j.facility}</div></div>
+            ${venueSection}
+          </div>
+        </div>`;
+
+        /* ── Client profile ── */
+        const dementiaColor = j.dementia === 'None' ? '' : j.dementia === 'Mild' ? 'hi-a' : 'hi-r';
+        const clientCard = `
+        <div class="card2">
+          <div class="card-head">
+            <div class="card-icon ci-b"><i class="bi bi-person" style="font-size:13px;color:var(--bm)"></i></div>
+            <div class="card-label">Client Profile <span style="font-size:11px;color:var(--ink4);font-weight:400">(shown to eligible MJs)</span></div>
+          </div>
+          <div class="info-grid" style="margin-bottom:10px;">
+            <div class="info-box"><div class="info-label">Client Name</div><div class="info-val">${j.client}</div></div>
+            <div class="info-box"><div class="info-label">Age</div><div class="info-val">${j.clientAge}</div></div>
+            <div class="info-box"><div class="info-label">Gender</div><div class="info-val">${j.clientGender}</div></div>
+            <div class="info-box"><div class="info-label">Race</div><div class="info-val">${j.clientRace}</div></div>
+            <div class="info-box"><div class="info-label">Weight (kg)</div><div class="info-val">${j.weight}</div></div>
+            <div class="info-box"><div class="info-label">Functionality</div><div class="info-val">${j.funcLevel}</div></div>
+          </div>
+          <div class="info-grid-2" style="margin-bottom:10px;">
+            <div class="info-box"><div class="info-label">Dementia</div><div class="info-val ${dementiaColor}">${j.dementia}</div></div>
+          </div>
+          <div class="sect-title">Remarks for MJ</div>
+          <div style="background:var(--bg);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--ink2);line-height:1.6;border:1px solid var(--bdr2);">${j.clientRemarks}</div>
+        </div>`;
+
+        /* ── Matching criteria ── */
+        const cplxClass = {'H':'cplx-H','M':'cplx-M','L':'cplx-L'}[j.complexity] || '';
+        const cplxLabel = {'H':'High','M':'Medium','L':'Low'}[j.complexity] || j.complexity;
+        const skillTags = (j.skills || []).map(s => `<span class="skill-tag">${s}</span>`).join('');
+        const matchCard = `
+        <div class="card2">
+          <div class="card-head">
+            <div class="card-icon ci-a"><i class="bi bi-funnel" style="font-size:13px;color:var(--am)"></i></div>
+            <div class="card-label">Matching Criteria</div>
+          </div>
+          <div class="info-grid" style="margin-bottom:10px;">
+            <div class="info-box"><div class="info-label">Complexity</div><div class="info-val"><span class="jd-badge ${cplxClass}">${cplxLabel}</span></div></div>
+            <div class="info-box"><div class="info-label">Gender Preference</div><div class="info-val">${j.genderPref}</div></div>
+            <div class="info-box"><div class="info-label">Language Required</div><div class="info-val">${j.language}</div></div>
+            <div class="info-box" style="display:${j.status === 'Draft' ? 'block' : 'none'};"><div class="info-label">Potential MJobber(s)</div><div class="info-val">2</div></div>
+          </div>
+          <div class="sect-title">Skills / OJT Required</div>
+          <div style="margin-top:4px;">${skillTags || '<span style="font-size:12px;color:var(--ink4)">None specified</span>'}</div>
+        </div>`;
+
+        /* ── Assignment & Waitlist ── */
+        let slotsHtml = '';
+        const mjNames = j.mj ? j.mj.split(',').map(n => n.trim()) : [];
+        for (let i = 0; i < slots; i++) {
+          const hasMJ = i < mjNames.length && mjNames[i];
+          slotsHtml += `
+          <div class="slot-row" id="slot-${i}">
+            <div class="slot-num ${hasMJ ? 'sn-filled' : 'sn-empty'}" id="slot-num-${i}">${hasMJ ? '✓' : (i+1)}</div>
+            <div style="flex:1">
+              <div class="slot-name" id="slot-name-${i}" style="${hasMJ ? '' : 'color:var(--ink4);font-style:italic'}">${hasMJ ? mjNames[i] : 'Empty — awaiting MJ'}</div>
+              <div class="slot-meta" id="slot-meta-${i}">${hasMJ ? 'Confirmed · Grabbed ' + j.date : 'Open for grab' + (wl.length ? ' · ' + wl.length + ' on waitlist' : '')}</div>
+            </div>
+            ${hasMJ
+              ? `<a onclick="viewMjProfile('${mjNames[i]}')" class="btn-ghost2" style="font-size:11px;padding:4px 10px;"><i class="bi bi-person-lines-fill"></i> View MJ</a>`
+              : (!locked ? `<button class="btn-ghost2" style="font-size:11px;padding:4px 10px" onclick="assignManually(${i})">+ Assign</button>` : '')}
+          </div>`;
+        }
+
+        if (j.status === 'Re-opened' && j.cancelledBy) {
+          slotsHtml += `
+          <div class="sect-title" style="margin-top:14px;">Cancelled By</div>
+          <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--rm);background:var(--rl);border-radius:var(--r);padding:10px 12px;border:1px solid var(--rb);">
+            <div style="flex:1"><strong>${j.cancelledBy}</strong> &nbsp;·&nbsp; ${j.cancelledAt}</div>
+            <a onclick="viewMjProfile('${j.cancelledBy}')" class="btn-ghost2" style="font-size:11px;padding:4px 10px;color:var(--rm);">View profile →</a>
+          </div>`;
+        }
+
+        let wlHtml = '';
+        if (!isBef) {
+          wlHtml = `<div class="sect-title" style="margin-top:14px;">Waitlist (${wl.length} / 4)</div>`;
+          if (!wl.length) {
+            wlHtml += `<div style="font-size:12px;color:var(--ink4);padding:8px 0;">No MJs on waitlist yet.</div>`;
+          } else {
+            wlHtml += `<div style="background:var(--bg);border-radius:var(--r);overflow:hidden;border:1px solid var(--bdr);">`;
+            wl.forEach((w, idx) => {
+              wlHtml += `
+              <div class="wl-row">
+                <div class="wl-pos">${idx+1}</div>
+                <div class="wl-name">${w.n}</div>
+                <div class="wl-time">${w.t}</div>
+              </div>`;
+            });
+            wlHtml += `</div>`;
+          }
+        } else {
+          const interested = INTERESTED_DATA[jobId] || [];
+          const alreadyFilled = mjNames.length > 0;
+          const canAssign = !locked && !alreadyFilled;
+
+          wlHtml = `<div class="sect-title" style="margin-top:14px;">Interested Applicants</div>`;
+
+          if (!interested.length) {
+            wlHtml += `<div style="font-size:12px;color:var(--ink4);background:var(--bg);border-radius:var(--r);padding:10px 12px;border:1px solid var(--bdr);">No MJs have expressed interest yet.</div>`;
+          } else {
+            wlHtml += `<div id="interested-list">`;
+            interested.forEach((w, idx) => {
+              wlHtml += `
+              <div class="slot-row" id="int-row-${idx}" style="margin-bottom:6px;">
+                <div class="slot-num sn-empty" id="int-num-${idx}">${idx + 1}</div>
+                <div style="flex:1;">
+                  <div class="slot-name" id="int-name-${idx}">${w.n}</div>
+                  <div class="slot-meta">Expressed interest · ${w.t}</div>
+                </div>
+                ${canAssign
+                  ? `<button class="btn-ghost2" id="int-btn-${idx}" style="font-size:11px;padding:4px 10px;" onclick="assignFromInterested('${w.n}', ${idx})">Assign</button>`
+                  : alreadyFilled
+                    ? `<span style="font-size:11px;color:var(--ink4);">Slot filled</span>`
+                    : ''}
+              </div>`;
+            });
+            wlHtml += `</div>`;
+          }
+
+          if (canAssign) {
+            wlHtml += `<button class="btn-ghost2" style="font-size:12px;margin-top:8px;" onclick="assignManually(0)">+ Assign other MJ</button>`;
+          }
+        }
+
+        const assignCard = `
+        <div class="card2">
+          <div class="card-head">
+            <div class="card-icon ci-p"><i class="bi bi-people" style="font-size:13px;color:var(--pm)"></i></div>
+            <div class="card-label">Assignment &amp; Waitlist</div>
+          </div>
+          <div class="sect-title">Confirmed Slot${slots > 1 ? 's' : ''} (${slots} required)</div>
+          ${slotsHtml}
+          ${wlHtml}
+        </div>`;
+
+        main.innerHTML = banner + header + jobCard + clientCard + matchCard + assignCard;
+
+        /* ══ Right panel ════════════════════════════════════════════════ */
+        let finBlock = '';
+        if (fin) {
+          const billable = calcBillableHours(fin.isNoShow ? 60 : fin.actualMins);
+          const amount   = (billable * (fin.billRate || rate)).toFixed(2);
+          const statusBadge = {
+            'Draft':     `<span class="jd-badge b-draft">Draft</span>`,
+            'Submitted': `<span class="jd-badge b-submitted">Submitted</span>`,
+            'Processed': `<span class="jd-badge b-processed">✓ Processed</span>`,
+            'Amended':   `<span class="jd-badge b-amended">⚠ Amended</span>`,
+          }[fin.status] || `<span class="jd-badge b-draft">${fin.status}</span>`;
+
+          finBlock = `
+          <div class="rp-title"><i class="bi bi-cash-stack"></i> Finance Summary</div>
+          <div class="fin-block">
+            <div class="fin-row"><span style="color:var(--ink3)">Scheduled</span><span>${fmtDuration(fin.schedMins)}</span></div>
+            <div class="fin-row"><span style="color:var(--ink3)">Actual (MJ)</span><span>${fin.isNoShow ? 'No-show (min 1h)' : fmtDuration(fin.actualMins)}</span></div>
+            <div class="fin-row"><span style="color:var(--ink3)">Billable hrs</span><span style="font-weight:600;color:var(--pm)">${billable} hr${billable!==1?'s':''}</span></div>
+            <div class="fin-row"><span style="color:var(--ink3)">Rate</span><span>$${(fin.billRate || rate).toFixed(2)} / hr</span></div>
+            <div class="fin-row"><span style="color:var(--ink3)">AP Status</span><span>${statusBadge}</span></div>
+            <div class="fin-total"><span class="fin-total-label">Total payable</span><span class="fin-total-val">$${amount}</span></div>
+          </div>
+          <a href="./portal/finance.html" class="btn-ghost2" style="width:100%;justify-content:center;margin-top:8px;font-size:12px;"><i class="bi bi-receipt"></i> View in Finance</a>`;
+        } else {
+          finBlock = `
+          <div class="rp-title"><i class="bi bi-cash-stack"></i> Finance</div>
+          <div style="font-size:12px;color:var(--ink4);padding:8px 0;line-height:1.5;">
+            ${j.status === 'Completed' || j.status === 'In Progress'
+              ? 'Payment record available in <a href="./portal/finance.html" style="color:var(--pm);">Finance</a>.'
+              : 'Payment record will be created after job completion.'}
+          </div>`;
+        }
+
+        /* Slot count summary */
+        const slotsInfo = `
+        <div class="rp-title">Slot Summary</div>
+        <div class="summary-row"><span class="summary-label">Required slots</span><span class="summary-val">${slots}</span></div>
+        <div class="summary-row"><span class="summary-label">Confirmed</span><span class="summary-val sv-g">${mjNames.length}</span></div>
+        <div class="summary-row"><span class="summary-label">Waitlist</span><span class="summary-val">${wl.length}</span></div>
+        <div class="summary-row"><span class="summary-label">Auto-cancel</span><span class="summary-val">1 BD before</span></div>`;
+
+        /* Quick links */
+        const links = `
+        <div class="rp-title">Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="./task_management.html" class="btn-ghost2" style="font-size:12px;justify-content:center;"><i class="bi bi-calendar-event"></i> Job Schedule</a>
+          <a href="./portal/v1_mj_listing.html" class="btn-ghost2" style="font-size:12px;justify-content:center;"><i class="bi bi-people"></i> MJ Registry</a>
+        </div>`;
+
+        rp.innerHTML = `<div class="rp">${finBlock}${slotsInfo}${links}</div>`;
+
+        var isDraft = j.status === 'Draft';
+        var isCancelled = j.status === 'Cancelled';
+        var isCompleted = j.status === 'Completed';
+        document.getElementById('page-footer').style.display = (isDraft || isCancelled || isCompleted) ? 'flex' : 'none';
+        document.getElementById('footer-save-draft').style.display = isDraft ? '' : 'none';
+        document.getElementById('footer-publish').style.display = isDraft ? '' : 'none';
+      }
+
+      function showNotFound(main, rp, msg) {
+        main.innerHTML = `
+        <div class="not-found">
+          <i class="bi bi-file-earmark-x"></i>
+          <h3>Job Not Found</h3>
+          <p>${msg}</p>
+          <a href="./task_management.html" class="btn-ghost2" style="margin-top:16px;"><i class="bi bi-arrow-left"></i> Back to Job Schedule</a>
+        </div>`;
+        rp.innerHTML = '';
+      }
+
+      render();
+
+      function assignManually(idx) {
+        var name = prompt('Enter MJ name to assign manually:');
+        if (!name || !name.trim()) return;
+        var row = document.getElementById('slot-' + idx);
+        if (!row) return;
+        document.getElementById('slot-name-' + idx).textContent = name.trim();
+        document.getElementById('slot-name-' + idx).style.cssText = '';
+        document.getElementById('slot-meta-' + idx).textContent = 'Manually assigned · Just now';
+        document.getElementById('slot-num-' + idx).className = 'slot-num sn-filled';
+        document.getElementById('slot-num-' + idx).textContent = '✓';
+        var btn = row.querySelector('button');
+        if (btn) btn.remove();
+      }
+
+      function assignFromInterested(name, selectedIdx) {
+        /* Fill the confirmed slot */
+        var slotName = document.getElementById('slot-name-0');
+        var slotMeta = document.getElementById('slot-meta-0');
+        var slotNum  = document.getElementById('slot-num-0');
+        var slotRow  = document.getElementById('slot-0');
+        if (slotName) { slotName.textContent = name; slotName.style.cssText = ''; }
+        if (slotMeta) slotMeta.textContent = 'Assigned · Just now';
+        if (slotNum)  { slotNum.className = 'slot-num sn-filled'; slotNum.textContent = '✓'; }
+        if (slotRow)  { var btn = slotRow.querySelector('button'); if (btn) btn.remove(); }
+
+        /* Update interested list — mark selected, disable all buttons */
+        document.querySelectorAll('[id^="int-row-"]').forEach(function(row, idx) {
+          var btn = document.getElementById('int-btn-' + idx);
+          if (btn) btn.remove();
+          var num = document.getElementById('int-num-' + idx);
+          if (idx === selectedIdx) {
+            if (num) { num.className = 'slot-num sn-filled'; num.textContent = '✓'; }
+            row.style.background = 'var(--gl)';
+            row.style.borderColor = 'var(--gb)';
+            var nameEl = document.getElementById('int-name-' + idx);
+            if (nameEl) nameEl.style.color = 'var(--g)';
+            var tag = document.createElement('span');
+            tag.style.cssText = 'font-size:11px;color:var(--g);font-weight:600;';
+            tag.textContent = 'Assigned';
+            row.appendChild(tag);
+          }
+        });
+
+        /* Remove "Assign other MJ" button if present */
+        var otherBtn = document.querySelector('#interested-list ~ button');
+        if (otherBtn) otherBtn.remove();
+      }
+
+      function editJobAlert() {
+        alert('This would open the job editing interface where user can modify job details.');
+      }
+
+      function viewMjProfile(name) {
+        alert(`This would open the MicroJobber profile for ${name}.`);
+      }
+
+      function handleDuplicate() {
+        alert('Job duplicated as a new Draft. Redirecting to the new job...');
+      }
+
+      function handleSaveDraft() {
+        alert('Draft saved. Redirecting to job detail page...');
+      }
+
+      function handlePublish() {
+        alert('Job published successfully. Redirecting to job detail page...');
+      }
+    </script>
+  </body>
+</html>
