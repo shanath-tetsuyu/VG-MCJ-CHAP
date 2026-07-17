@@ -91,6 +91,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
 .b-submitted{background:var(--bl);color:var(--bm);}
 .b-processed{background:var(--gl);color:var(--g);}
 .b-amended{background:var(--al);color:var(--am);}
+/* Payment status */
+.b-pending{background:var(--al);color:var(--am);}
+.b-approved{background:var(--bl);color:var(--bm);}
+.b-paid{background:var(--gl);color:var(--g);}
+
+/* ── Bulk action bar ── */
+.bulk-bar{display:none;align-items:center;gap:10px;background:var(--pl);border:1px solid var(--pb);border-radius:var(--r);padding:8px 12px;margin-bottom:12px;flex-wrap:wrap;}
+.bulk-bar.on{display:flex;}
+.bulk-count{font-size:12px;font-weight:700;color:var(--pm);}
+.btn-bulk{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.btn-bulk-approve{background:var(--bm);color:#fff;}.btn-bulk-approve:hover{background:#144d8a;}
+.btn-bulk-paid{background:var(--g);color:#fff;}.btn-bulk-paid:hover{background:#0A5C46;}
+.btn-bulk-clear{background:var(--s);border:1px solid var(--bdr);color:var(--ink3);}.btn-bulk-clear:hover{background:var(--bg);}
+.ap-check{width:15px;height:15px;accent-color:var(--pm);cursor:pointer;vertical-align:middle;}
+.signoff-tag{font-size:10px;background:var(--rl);color:var(--rm);border:1px solid var(--rb);border-radius:4px;padding:1px 5px;font-weight:600;margin-left:5px;white-space:nowrap;}
 
 /* ── Amount cell ── */
 .amount-cell{font-size:13px;font-weight:600;color:var(--g);text-align:right;}
@@ -276,10 +291,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
             <label>Status</label>
             <select id="fStatus" onchange="applyFilters()">
               <option value="all">All</option>
-              <option value="Draft">Draft</option>
-              <option value="Submitted">Submitted</option>
-              <option value="Processed">Processed</option>
-              <option value="Amended">Amended</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Paid">Paid</option>
+              <option value="signoff">Needs sign-off</option>
             </select>
             <button class="btn-clear" onclick="clearFilters()">Clear</button>
             <div style="margin-left:auto;display:flex;gap:8px;">
@@ -289,11 +304,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
             </div>
           </div>
 
+          <!-- Bulk action bar -->
+          <div class="bulk-bar" id="bulk-bar">
+            <span class="bulk-count" id="bulk-count">0 selected</span>
+            <span style="font-size:11px;color:var(--ink3);">Bulk update payment status:</span>
+            <button class="btn-bulk btn-bulk-approve" onclick="bulkApprove()"><i class="bi bi-check2-circle"></i> Mark Approved</button>
+            <button class="btn-bulk btn-bulk-paid" onclick="bulkPaid()"><i class="bi bi-cash-coin"></i> Mark Paid</button>
+            <button class="btn-bulk btn-bulk-clear" style="margin-left:auto;" onclick="clearSelection()">Clear selection</button>
+          </div>
+
           <!-- AP Table -->
           <div style="overflow-x:auto;">
             <table class="tbl" id="apTbl">
               <thead>
                 <tr>
+                  <th style="width:28px;"><input type="checkbox" class="ap-check" id="selectAll" onclick="toggleSelectAll(this)"></th>
                   <th>MJ Name</th>
                   <th>Service</th>
                   <th>Facility</th>
@@ -439,9 +464,39 @@ const AP_DATA = [
   {id:'MJ-2026-018', name:'Lim Wei Jie',             mjId:'MJ-0012', service:'Center Assistant', facility:'Clementi AAC',   date:'23 May 2026', schedMins:60, actualMins:57, isNoShow:false, isAmended:false, status:'Draft', notes:''},
 ];
 
+/* ══ Payment status migration + history seeding ══════════════════════
+   Payment status lifecycle: Pending → Approved → Paid.
+   'isAmended' is a separate flag rendered as a "needs sign-off" tag.
+   Legacy statuses (Draft/Submitted/Processed/Amended) are mapped once.
+════════════════════════════════════════════════════════════════════ */
+const STATUS_MIGRATE = { Draft: 'Pending', Submitted: 'Approved', Processed: 'Paid', Amended: 'Pending' };
+function seedHistory(r) {
+  const hist = [{ status: 'Pending', ts: r.date + ', 00:00', by: '(auto on completion)' }];
+  if (r.status === 'Approved' || r.status === 'Paid') hist.push({ status: 'Approved', ts: '09 Jun 2026, 10:05', by: 'John David' });
+  if (r.status === 'Paid') { hist.push({ status: 'Paid', ts: '11 Jun 2026, 14:32', by: 'John David' }); r.paidAt = '11 Jun 2026, 14:32'; }
+  return hist;
+}
+AP_DATA.forEach(r => {
+  r.status = STATUS_MIGRATE[r.status] || r.status;
+  r.history = seedHistory(r);
+});
+
 let currentData = [...AP_DATA];
 let activeFilters = { month: '2026-05', service: 'all', name: '', status: 'all' };
 let currentRow = null;
+let selected = new Set();
+
+/* ══ Helpers: status badge + timestamp ═══════════════════════════════ */
+function statusBadgeHtml(status) {
+  const cls = { Pending: 'b-pending', Approved: 'b-approved', Paid: 'b-paid' }[status] || 'b-pending';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+function nowStamp() {
+  const d = new Date();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const hh = String(d.getHours()).padStart(2, '0'), mm = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}, ${hh}:${mm}`;
+}
 
 /* ══ Month filter helper ═════════════════════════════════════════════
    fMonth value format: "YYYY-MM" (e.g. "2026-05")
@@ -461,7 +516,8 @@ function renderTable(data) {
 
   if (data.length === 0) {
     document.getElementById('no-data-msg').style.display = 'block';
-    document.getElementById('tbl-total').textContent = '$0.00';
+    const t0 = document.getElementById('tbl-total'); if (t0) t0.textContent = '$0.00';
+    syncSelectAll();
     return;
   }
   document.getElementById('no-data-msg').style.display = 'none';
@@ -483,12 +539,8 @@ function renderTable(data) {
       'Center Assistant': `<span class="badge b-cent">Center Asst.</span>`
     }[row.service] || row.service;
 
-    const statusBadge = {
-      'Draft': `<span class="badge b-draft">Draft</span>`,
-      'Submitted': `<span class="badge b-submitted">Submitted</span>`,
-      'Processed': `<span class="badge b-processed">✓ Processed</span>`,
-      'Amended': `<span class="badge b-amended">⚠ Amended</span>`
-    }[row.status] || `<span class="badge b-draft">${row.status}</span>`;
+    const statusBadge = statusBadgeHtml(row.status) +
+      (row.isAmended ? `<span class="signoff-tag">needs sign-off</span>` : '');
 
     const actualDisplay = row.isNoShow
       ? `<span style="font-size:11px;color:var(--g);font-weight:600;">No-show<br><span class="round-explain">min 1 hr</span></span>`
@@ -501,6 +553,7 @@ function renderTable(data) {
     tr.dataset.idx = idx;
     tr.style.background = hasDiscrepancy ? 'rgba(192,122,26,0.05)' : '';
     tr.innerHTML = `
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="ap-check" data-id="${row.id}" ${selected.has(row.id) ? 'checked' : ''} onchange="toggleRow(this)"></td>
       <td>
         <div style="font-size:12px;font-weight:500;">${row.name}</div>
       </td>
@@ -518,7 +571,64 @@ function renderTable(data) {
     tbody.appendChild(tr);
   });
 
-  document.getElementById('tbl-total').textContent = `$${total.toFixed(2)}`;
+  const totalEl = document.getElementById('tbl-total');
+  if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+  syncSelectAll();
+}
+
+/* ══ Multi-select + bulk payment status ══════════════════════════════ */
+function toggleRow(cb) {
+  if (cb.checked) selected.add(cb.dataset.id); else selected.delete(cb.dataset.id);
+  updateBulkBar();
+  syncSelectAll();
+}
+function toggleSelectAll(cb) {
+  document.querySelectorAll('#apBody .ap-check').forEach(b => {
+    b.checked = cb.checked;
+    if (cb.checked) selected.add(b.dataset.id); else selected.delete(b.dataset.id);
+  });
+  updateBulkBar();
+}
+function syncSelectAll() {
+  const boxes = [...document.querySelectorAll('#apBody .ap-check')];
+  const sa = document.getElementById('selectAll');
+  if (sa) sa.checked = boxes.length > 0 && boxes.every(b => b.checked);
+}
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const n = selected.size;
+  document.getElementById('bulk-count').textContent = n + ' selected';
+  bar.classList.toggle('on', n > 0);
+}
+function clearSelection() {
+  selected.clear();
+  document.querySelectorAll('.ap-check').forEach(b => b.checked = false);
+  updateBulkBar();
+}
+function bulkApprove() {
+  const rows = AP_DATA.filter(r => selected.has(r.id));
+  const blocked = rows.filter(r => r.isAmended);
+  if (blocked.length) {
+    alert(`${blocked.length} selected record(s) have amendments pending sign-off.\n\nApprove the amendment inside each record before marking it Approved.`);
+    return;
+  }
+  const eligible = rows.filter(r => r.status === 'Pending');
+  if (!eligible.length) { alert('No Pending records selected. Only Pending records can be marked Approved.'); return; }
+  const ts = nowStamp();
+  eligible.forEach(r => { r.status = 'Approved'; r.history.push({ status: 'Approved', ts: ts, by: 'John David' }); });
+  clearSelection();
+  applyFilters();
+  alert(`${eligible.length} record(s) marked Approved and submitted to Finance.`);
+}
+function bulkPaid() {
+  const rows = AP_DATA.filter(r => selected.has(r.id));
+  const eligible = rows.filter(r => r.status === 'Approved');
+  if (!eligible.length) { alert('No Approved records selected. Only Approved records can be marked Paid.'); return; }
+  const ts = nowStamp();
+  eligible.forEach(r => { r.status = 'Paid'; r.paidAt = ts; r.history.push({ status: 'Paid', ts: ts, by: 'John David' }); });
+  clearSelection();
+  applyFilters();
+  alert(`${eligible.length} record(s) marked Paid on ${ts}.`);
 }
 
 /* ══ Filters ════════════════════════════════════════════════════════ */
@@ -532,7 +642,8 @@ function applyFilters() {
     if (!rowMatchesMonth(r, activeFilters.month)) return false;
     if (activeFilters.service !== 'all' && r.service !== activeFilters.service) return false;
     if (activeFilters.name && !r.name.toLowerCase().includes(activeFilters.name)) return false;
-    if (activeFilters.status !== 'all' && r.status !== activeFilters.status) return false;
+    if (activeFilters.status === 'signoff') { if (!r.isAmended) return false; }
+    else if (activeFilters.status !== 'all' && r.status !== activeFilters.status) return false;
     return true;
   });
 
@@ -655,6 +766,26 @@ function openModal(row) {
           : `Actual ${fmtDuration(row.actualMins)} → remainder < 30 min (or exactly whole hours) → <strong>stays at ${billable} hr${billable !== 1 ? 's' : ''}</strong>.`
       }
     </div>
+
+    <div class="sect-title">Payment Status</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      ${statusBadgeHtml(row.status)}
+      ${row.isAmended ? '<span class="signoff-tag">needs sign-off</span>' : ''}
+      ${row.status === 'Paid' && row.paidAt ? `<span style="font-size:11px;color:var(--ink3);">Paid on ${row.paidAt}</span>` : ''}
+    </div>
+
+    <div class="sect-title">Payment History</div>
+    <table class="hist-tbl">
+      <thead><tr><th>Status</th><th>Timestamp</th><th>Updated by</th></tr></thead>
+      <tbody>
+        ${(row.history || []).slice().reverse().map(h => `
+          <tr>
+            <td>${statusBadgeHtml(h.status)}</td>
+            <td style="font-size:11px;color:var(--ink3);white-space:nowrap;">${h.ts}</td>
+            <td style="font-size:11px;color:var(--ink3);">${h.by}</td>
+          </tr>`).join('') || '<tr><td colspan="3" style="color:var(--ink4);">No history yet.</td></tr>'}
+      </tbody>
+    </table>
   `;
 
   document.getElementById('btn-view-job').href = './job_detail.html?id=' + row.id;
@@ -673,16 +804,12 @@ function handleOverlayClick(e) {
 function approveAmendment() {
   if (!currentRow) return;
   currentRow.isAmended = false;
-  currentRow.status = 'Draft';
-  closeModal();
+  currentRow.status = 'Pending';
+  currentRow.history.push({ status: 'Pending', ts: nowStamp(), by: 'John David (amendment signed off)' });
+  const row = currentRow;
   applyFilters();
-  // Update amendment count
-  const pendingAmends = AP_DATA.filter(r => r.isAmended).length;
-  document.getElementById('kpi-amend').textContent = pendingAmends;
-  if (pendingAmends === 0) {
-    document.getElementById('amend-banner').style.display = 'none';
-  }
-  alert('Amendment approved. Record updated to Draft and included in next AP export.');
+  openModal(row); // refresh modal to reflect signed-off state
+  alert('Amendment signed off. Record is now Pending and can be approved for payment.');
 }
 
 /* ══ Export / Submit ════════════════════════════════════════════════ */

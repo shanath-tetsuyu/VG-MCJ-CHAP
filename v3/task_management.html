@@ -56,9 +56,21 @@
         font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer; white-space: nowrap;
       }
       .tm-btn-post:hover { background: #238c6f; }
-      .tm-legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-      .tm-leg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink2); }
-      .tm-leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+      .tm-legend {
+        display: inline-flex; flex-wrap: wrap; gap: 6px 12px; padding: 7px 10px;
+        max-width: 100%; margin-bottom: 14px;
+        background: var(--s); border: 1px solid var(--bdr); border-radius: var(--r);
+      }
+      .tm-leg { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ink2); }
+      .tm-leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+      .bef-report { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+      .bef-group { display: flex; flex-direction: column; gap: 6px; }
+      .bef-glabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink3); }
+      .bef-opts { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+      .bef-opt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink2); margin: 0; }
+      .bef-opt input { accent-color: #6B21A8; width: 15px; height: 15px; margin: 0; }
+      .bef-other { font-size: 13px; color: var(--ink3); font-style: italic; }
+      .bef-remarks { font-size: 13px; color: var(--ink); background: var(--s); border: 1px solid var(--bdr); border-radius: 8px; padding: 8px 10px; }
 
       /* Filter bar */
       .tm-filter {
@@ -280,12 +292,12 @@
           <li class="nav-item">
             <a class="nav-link sidebar-link sidebar-collapsible active" href="#" data-bs-toggle="collapse" data-bs-target="#scheduleMenu" aria-expanded="true">
               <i class="bi bi-calendar-event me-2"></i>
-              Schedule
+              MicroJobber Job Portal
               <i class="bi bi-chevron-left collapse-icon ms-auto"></i>
             </a>
             <div class="collapse show" id="scheduleMenu">
               <ul class="nav flex-column sidebar-submenu">
-                <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./task_management.html">MicroJobber</a></li>
+                <li class="nav-item"><a class="nav-link sidebar-sublink active" href="./task_management.html">Job Schedule</a></li>
                 <li class="nav-item"><a class="nav-link sidebar-sublink" href="./staff_attendance.html">Staff Attendance</a></li>
                 <li class="nav-item"><a class="nav-link sidebar-sublink" href="#" onclick="openPortal()">Link To Portal</a></li>
               </ul>
@@ -398,16 +410,17 @@
             <div class="tm-toolbar">
               <button class="tm-btn-post" onclick="openAddModal()"><i class="bi bi-plus-lg me-1"></i>Post Job</button>
               <button class="tm-btn-post" style="background-color: #6B21A8;" onclick="openPortal()">To MicroJobber Portal</button>
-              <div class="tm-legend">
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#1A5FA8"></span>Open</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#FF6B35"></span>Urgent</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#C07A1A"></span>Waitlisted</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#6B21A8"></span>In Progress / Re-opened</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#13795B"></span>Taken / Confirmed</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#6c757d"></span>Completed</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#B03030"></span>Cancelled</span>
-                <span class="tm-leg"><span class="tm-leg-dot" style="background:#AAA"></span>Draft</span>
-              </div>
+            </div>
+
+            <div class="tm-legend">
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#11A8DF"></span>Open / Re-opened</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#D92D20"></span>Urgent</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#F97316"></span>Waitlisted</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#C7FFB2"></span>In Progress</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#F9DCF2"></span>Taken / Confirmed</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#13795B"></span>Completed</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#878787"></span>Cancelled</span>
+                <span class="tm-leg"><span class="tm-leg-dot" style="background:#EAB308"></span>Draft</span>
             </div>
 
             <div class="tm-filter">
@@ -678,7 +691,7 @@
       /* ── Shared mock data (mirrors v3/portal/index.html JOB_DATA) ─────── */
       const JOB_DATA = [
         {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'Urgent',     mj:null,                      wl:0, urgency:'Urgent',   sccStaff:null          },
-        {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null,         befriendingReport:{mood:['Happy'],moodOther:'',condition:['Clean & Neat'],remarks:'Client was in good spirits and chatted at length about her grandchildren. Requested a follow-up visit next week.'} },
         {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh',  date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',       status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:'Noor Azizah' },
         {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown', date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',      status:'Completed',  mj:'Fatimah bte Ali',         wl:0, urgency:'Urgent',   sccStaff:null          },
         {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',         status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null          },
@@ -718,17 +731,25 @@
 
       /* Status -> event colour (matches portal badge palette) */
       const STATUS_COLOR = {
-        'Open':        '#1A5FA8',
-        'Urgent':      '#FF6B35',
-        'Waitlisted':  '#C07A1A',
-        'In Progress': '#6B21A8',
-        'Re-opened':   '#6B21A8',
-        'Taken':       '#13795B',
-        'Confirmed':   '#13795B',
-        'Completed':   '#6c757d',
-        'Cancelled':   '#B03030',
-        'Draft':       '#AAA'
+        'Open':        '#11A8DF',
+        'Re-opened':   '#11A8DF',
+        'Urgent':      '#D92D20',
+        'Waitlisted':  '#F97316',
+        'In Progress': '#C7FFB2',
+        'Taken':       '#F9DCF2',
+        'Confirmed':   '#F9DCF2',
+        'Completed':   '#13795B',
+        'Cancelled':   '#878787',
+        'Draft':       '#EAB308'
       };
+
+      /* Pick readable text colour (dark on light fills, white on dark) */
+      function textOn(bg) {
+        const h = bg.replace('#', '');
+        const r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16);
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return lum > 0.6 ? '#1a1a1a' : '#ffffff';
+      }
 
       /* ── Who a job is assigned to (MicroJobber vs staff) ──────────────── */
       function assignmentInfo(job) {
@@ -752,6 +773,7 @@
           end: end,
           backgroundColor: color,
           borderColor: color,
+          textColor: textOn(color),
           extendedProps: { jobId: job.id, status: job.status, assignedKind: assigned.kind, assignedLabel: assigned.label }
         };
       }
@@ -889,6 +911,27 @@
         openModal();
       }
 
+      /* ── Befriending session feedback (shown for completed befriending jobs) ── */
+      const BEF_MOODS = ['Happy', 'Neutral', 'Angry', 'Depressed'];
+      const BEF_CONDITIONS = ['Clean & Neat', 'Messy', 'Needs assistance'];
+      function befReportHtml(j) {
+        if (j.type !== 'Befriending' || j.status !== 'Completed') return '';
+        const r = j.befriendingReport || {};
+        const mood = r.mood || [], cond = r.condition || [];
+        const opt = (label, checked) =>
+          '<label class="bef-opt"><input type="checkbox" disabled' + (checked ? ' checked' : '') + '><span>' + label + '</span></label>';
+        let moodOpts = BEF_MOODS.map(m => opt(m, mood.indexOf(m) !== -1)).join('');
+        moodOpts += '<label class="bef-opt"><input type="checkbox" disabled' + (r.moodOther ? ' checked' : '') + '><span>Others:</span></label>' +
+          '<span class="bef-other">' + (r.moodOther || '—') + '</span>';
+        const condOpts = BEF_CONDITIONS.map(c => opt(c, cond.indexOf(c) !== -1)).join('');
+        return '<div class="sect-title">Befriending session feedback</div>' +
+          '<div class="bef-report">' +
+            '<div class="bef-group"><div class="bef-glabel">Client mood</div><div class="bef-opts">' + moodOpts + '</div></div>' +
+            '<div class="bef-group"><div class="bef-glabel">Home / appearance</div><div class="bef-opts">' + condOpts + '</div></div>' +
+            '<div class="bef-group"><div class="bef-glabel">Other remarks</div><div class="bef-remarks">' + (r.remarks || '—') + '</div></div>' +
+          '</div>';
+      }
+
       /* ── View / detail modal (succinct, mirrors portal manage modal) ──── */
       let viewingJobId = null;
 
@@ -906,7 +949,9 @@
         document.getElementById('viewTitle').textContent = j.type + ' · ' + j.facility;
         const pill = document.getElementById('viewStatus');
         pill.textContent = j.status;
-        pill.style.background = STATUS_COLOR[j.status] || '#6c757d';
+        const pillBg = STATUS_COLOR[j.status] || '#6c757d';
+        pill.style.background = pillBg;
+        pill.style.color = textOn(pillBg);
 
         // Status banner
         let banner = '';
@@ -974,7 +1019,7 @@
           }
         }
 
-        document.getElementById('viewBody').innerHTML = banner + grid + mjHtml + wlHtml;
+        document.getElementById('viewBody').innerHTML = banner + grid + mjHtml + wlHtml + befReportHtml(j);
 
         // Edit button only for Draft or Cancelled jobs
         const canEdit = (j.status === 'Draft' || j.status === 'Cancelled');

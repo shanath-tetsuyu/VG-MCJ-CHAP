@@ -16,6 +16,14 @@
     #wrapper { display: flex; height: 100vh; }
     #sidebar { background-color: #6B21A8 !important; flex-shrink: 0; }
     #page-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .bef-report { background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+    .bef-group { display: flex; flex-direction: column; gap: 6px; }
+    .bef-glabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink3); }
+    .bef-opts { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+    .bef-opt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink2); margin: 0; }
+    .bef-opt input { accent-color: #6B21A8; width: 15px; height: 15px; margin: 0; }
+    .bef-other { font-size: 13px; color: var(--ink3); font-style: italic; }
+    .bef-remarks { font-size: 13px; color: var(--ink); background: var(--s); border: 1px solid var(--bdr); border-radius: 8px; padding: 8px 10px; }
   </style>
 </head>
 <body>
@@ -322,7 +330,7 @@
 /* ══ Mock data ══════════════════════════════════════════════════════ */
 const JOB_DATA = [
   {id:'MJ-2026-001',type:'Chaperone',       facility:'SCC — Queenstown', date:'20 May 2026',sd:'2026-05-20',time:'14:00–16:00',client:'Tan Bee Lian',     status:'Urgent',     mj:null,                      wl:0, urgency:'Urgent',   sccStaff:null              },
-  {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null              },
+  {id:'MJ-2026-003',type:'Befriending',     facility:'VG — Clementi',    date:'21 May 2026',sd:'2026-05-21',time:'10:00–11:00',client:'Ng Geok Lian',      status:'Completed',  mj:'Lily Tan',                wl:0, urgency:'Standard', sccStaff:null,             befriendingReport:{mood:['Happy'],moodOther:'',condition:['Clean & Neat'],remarks:'Client was in good spirits and chatted at length about her grandchildren. Requested a follow-up visit next week.'} },
   {id:'MJ-2026-004',type:'Home Assessment', facility:'SCC — Toa Payoh',  date:'25 May 2026',sd:'2026-05-25',time:'11:00–13:00',client:'Siti Rohani',       status:'Open',       mj:null,                      wl:4, urgency:'Standard', sccStaff:'Noor Azizah'     },
   {id:'MJ-2026-006',type:'Chaperone',       facility:'SCC — Queenstown', date:'19 May 2026',sd:'2026-05-19',time:'10:00–12:00',client:'Wong Mei Lin',      status:'Completed',  mj:'Fatimah bte Ali',         wl:0, urgency:'Urgent',   sccStaff:null              },
   {id:'MJ-2026-007',type:'Home Assessment', facility:'VG — Buona Vista', date:'27 May 2026',sd:'2026-05-27',time:'14:00–16:00',client:'Raj Kumar',         status:'Open',       mj:null,                      wl:1, urgency:'Standard', sccStaff:null              },
@@ -471,6 +479,28 @@ document.addEventListener('click', function (e) {
   }
 });
 
+/* ══ Befriending session feedback (shown for completed befriending jobs) ══ */
+const BEF_MOODS = ['Happy', 'Neutral', 'Angry', 'Depressed'];
+const BEF_CONDITIONS = ['Clean & Neat', 'Messy', 'Needs assistance'];
+function befReportHtml(j) {
+  if (j.type !== 'Befriending' || j.status !== 'Completed') return '';
+  var r = j.befriendingReport || {};
+  var mood = r.mood || [], cond = r.condition || [];
+  function opt(label, checked) {
+    return '<label class="bef-opt"><input type="checkbox" disabled' + (checked ? ' checked' : '') + '><span>' + label + '</span></label>';
+  }
+  var moodOpts = BEF_MOODS.map(function (m) { return opt(m, mood.indexOf(m) !== -1); }).join('');
+  moodOpts += '<label class="bef-opt"><input type="checkbox" disabled' + (r.moodOther ? ' checked' : '') + '><span>Others:</span></label>' +
+    '<span class="bef-other">' + (r.moodOther || '—') + '</span>';
+  var condOpts = BEF_CONDITIONS.map(function (c) { return opt(c, cond.indexOf(c) !== -1); }).join('');
+  return '<div class="sect-title">Befriending session feedback</div>' +
+    '<div class="bef-report">' +
+      '<div class="bef-group"><div class="bef-glabel">Client mood</div><div class="bef-opts">' + moodOpts + '</div></div>' +
+      '<div class="bef-group"><div class="bef-glabel">Home / appearance</div><div class="bef-opts">' + condOpts + '</div></div>' +
+      '<div class="bef-group"><div class="bef-glabel">Other remarks</div><div class="bef-remarks">' + (r.remarks || '—') + '</div></div>' +
+    '</div>';
+}
+
 /* ══ Modal ══════════════════════════════════════════════════════════ */
 function openModal(jobId) {
   currentJobId = jobId;
@@ -549,7 +579,7 @@ function openModal(jobId) {
       'Befriending jobs are <strong>staff-assigned only</strong>. No self-grab or waitlist available.</div>';
   }
 
-  document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml;
+  document.getElementById('modal-body').innerHTML = banner + grid + slotHtml + wlHtml + befReportHtml(j);
   document.getElementById('btn-complete').disabled = locked;
   document.getElementById('btn-cancel-job').disabled = locked;
   document.getElementById('btn-view-detail').href = './job_detail.html?id=' + jobId;
