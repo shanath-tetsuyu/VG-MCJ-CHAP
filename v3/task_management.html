@@ -244,6 +244,39 @@
         box-shadow: 0 6px 20px rgba(0,0,0,.3);
       }
       .tm-toast.on { display: inline-flex; }
+
+      /* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+      .sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+      .sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
+      .btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
+      .btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
+      .btn-sop-submit:hover{background:#0A5C46;}
+      .btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
+      .btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
+      .btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
+      .btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
+      .btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+      .btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
+      .btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
+      /* List view */
+      .btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+      .btn-sop-add:hover{background:var(--bl,#EBF3FD);}
+      .row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
+      .row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
+      .row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
+      .row-act.ra-del{color:var(--rm,#B03030);}
+      .row-act:hover{opacity:.7;}
+      /* Approval row */
+      .appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
+      .appr-row:last-child{border-bottom:none;}
+      .appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+      .appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
+      .appr-badge.approved{background:var(--g,#13795B);color:#fff;}
+      .appr-spacer{margin-left:auto;}
+      .btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+      .btn-sop-approve:hover{background:#0A5C46;}
+      .link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
+      .link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
     </style>
   </head>
   <body>
@@ -408,8 +441,8 @@
             </div>
 
             <div class="tm-toolbar">
-              <button class="tm-btn-post" onclick="openAddModal()"><i class="bi bi-plus-lg me-1"></i>Post Job</button>
-              <button class="tm-btn-post" style="background-color: #6B21A8;" onclick="openPortal()">To MicroJobber Portal</button>
+              <button class="btn-sop btn-sop-submit" onclick="openAddModal()"><i class="bi bi-plus-lg"></i> Post Job</button>
+              <button class="btn-sop btn-sop-draft" onclick="openPortal()"><i class="bi bi-box-arrow-up-right"></i> To MicroJobber Portal</button>
             </div>
 
             <div class="tm-legend">
@@ -656,10 +689,10 @@
 
         </div>
 
-        <div class="modal-footer">
-          <button class="btn-pub" onclick="saveJob()" id="saveBtn">Publish listing</button>
-          <button class="btn-ghost2" onclick="saveJob(true)">Save draft</button>
-          <button class="btn-cancel-job" id="cancelJobBtn" style="display:none;margin-left:auto" onclick="cancelJob()">Cancel job</button>
+        <div class="modal-footer sop-footer">
+          <button class="btn-sop btn-sop-delete" id="cancelJobBtn" style="display:none" onclick="cancelJob()"><i class="bi bi-x-circle"></i> Cancel job</button>
+          <button class="btn-sop btn-sop-draft" onclick="saveJob(true)"><i class="bi bi-save"></i> Save draft</button>
+          <button class="btn-sop btn-sop-submit" onclick="saveJob()" id="saveBtn"><i class="bi bi-check-lg"></i> Publish listing</button>
         </div>
       </div>
     </div>
@@ -673,10 +706,10 @@
           <button class="modal-close" onclick="closeViewModal()">Close</button>
         </div>
         <div class="modal-body" id="viewBody"></div>
-        <div class="modal-footer">
-          <button class="btn-pub" id="viewEditBtn" style="display:none" onclick="editFromView()"><i class="bi bi-pencil me-1"></i>Edit job</button>
-          <a class="btn-ghost2" id="viewDetailsBtn" href="#" style="text-decoration:none;display:inline-flex;align-items:center;"><i class="bi bi-box-arrow-up-right me-1"></i>View full details</a>
-          <button class="btn-ghost2" style="margin-left:auto" onclick="closeViewModal()">Close</button>
+        <div class="modal-footer sop-footer">
+          <button class="btn-sop btn-sop-cancel" onclick="closeViewModal()">Close</button>
+          <a class="btn-sop btn-sop-draft" id="viewDetailsBtn" href="#"><i class="bi bi-box-arrow-up-right"></i> View full details</a>
+          <button class="btn-sop btn-sop-submit" id="viewEditBtn" style="display:none" onclick="editFromView()"><i class="bi bi-pencil"></i> Edit job</button>
         </div>
       </div>
     </div>
@@ -882,7 +915,7 @@
         document.getElementById('modalTitle').textContent = 'Post new job';
         document.getElementById('modalJobId').style.display = 'none';
         document.getElementById('cancelJobBtn').style.display = 'none';
-        document.getElementById('saveBtn').textContent = 'Publish listing';
+        document.getElementById('saveBtn').innerHTML = '<i class="bi bi-check-lg"></i> Publish listing';
 
         // reset to sensible defaults
         document.getElementById('jobType').value = 'chaperone';
@@ -1048,7 +1081,7 @@
         chip.style.display = 'inline-block';
         chip.textContent = job.id + ' · ' + job.status;
         document.getElementById('cancelJobBtn').style.display = (job.status === 'Cancelled') ? 'none' : 'inline-block';
-        document.getElementById('saveBtn').textContent = 'Save changes';
+        document.getElementById('saveBtn').innerHTML = '<i class="bi bi-check-lg"></i> Save changes';
 
         document.getElementById('jobType').value = TYPE_TO_VAL[job.type] || 'chaperone';
         setSelectByText(document.getElementById('facility'), job.facility);

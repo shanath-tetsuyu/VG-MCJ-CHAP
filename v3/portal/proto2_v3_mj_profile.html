@@ -174,6 +174,39 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
 .att-field input{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%}
 .att-field input:focus{border-color:var(--gm);background:var(--s)}
 .att-warning{background:var(--al);border:1px solid var(--ab);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--am);line-height:1.55;display:flex;gap:8px;align-items:flex-start}
+
+/* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+.sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
+.btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
+.btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
+.btn-sop-submit:hover{background:#0A5C46;}
+.btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
+.btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
+.btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
+.btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
+.btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+.btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
+.btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
+/* List view */
+.btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+.btn-sop-add:hover{background:var(--bl,#EBF3FD);}
+.row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
+.row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
+.row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
+.row-act.ra-del{color:var(--rm,#B03030);}
+.row-act:hover{opacity:.7;}
+/* Approval row */
+.appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
+.appr-row:last-child{border-bottom:none;}
+.appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
+.appr-badge.approved{background:var(--g,#13795B);color:#fff;}
+.appr-spacer{margin-left:auto;}
+.btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-sop-approve:hover{background:#0A5C46;}
+.link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
+.link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
 </style>
   <!-- Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
@@ -322,7 +355,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
     <div class="card" style="position:relative">
       <div class="card-t">
         Training & OJT by service role
-        <button class="btn btn-sm btn-success" style="margin-left:auto">Enroll</button>
+        <button class="btn-sop-add" style="margin-left:auto"><i class="bi bi-plus-lg"></i> Enroll</button>
       </div>
       <table class="tbl">
         <thead><tr><th>Role</th><th>Training</th><th>OJT</th><th>Job eligible</th><th>Certificate / Notes</th></tr></thead>
@@ -371,7 +404,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
               <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
               <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
               <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
-              <td><button class="btn-att-edit" onclick="openAttEdit(this,'3 May 2026','MJ-2026-037','14:02','16:10')">Edit</button></td>
+              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'3 May 2026','MJ-2026-037','14:02','16:10')"><i class="bi bi-pencil"></i></button></span></td>
             </tr>
             <tr data-date="2026-04-22" data-jobid="mj-2026-029">
               <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
@@ -380,7 +413,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
               <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
               <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
               <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
-              <td><button class="btn-att-edit" onclick="openAttEdit(this,'22 Apr 2026','MJ-2026-029','10:05','11:08')">Edit</button></td>
+              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'22 Apr 2026','MJ-2026-029','10:05','11:08')"><i class="bi bi-pencil"></i></button></span></td>
             </tr>
             <tr data-date="2026-04-02" data-jobid="mj-2026-018">
               <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
@@ -389,7 +422,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
               <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
               <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
               <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
-              <td><button class="btn-att-edit" onclick="openAttEdit(this,'2 Apr 2026','MJ-2026-018','09:58','10:55')">Edit</button></td>
+              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'2 Apr 2026','MJ-2026-018','09:58','10:55')"><i class="bi bi-pencil"></i></button></span></td>
             </tr>
             <tr data-date="2026-03-10" data-jobid="mj-2026-009">
               <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
@@ -398,7 +431,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
               <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
               <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
               <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
-              <td><button class="btn-att-edit" onclick="openAttEdit(this,'10 Mar 2026','MJ-2026-009','13:01','15:05')">Edit</button></td>
+              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'10 Mar 2026','MJ-2026-009','13:01','15:05')"><i class="bi bi-pencil"></i></button></span></td>
             </tr>
             <tr data-date="2026-02-14" data-jobid="mj-2026-004">
               <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
@@ -407,7 +440,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
               <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
               <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
               <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
-              <td><button class="btn-att-edit" onclick="openAttEdit(this,'14 Feb 2026','MJ-2026-004','09:55','11:10')">Edit</button></td>
+              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'14 Feb 2026','MJ-2026-004','09:55','11:10')"><i class="bi bi-pencil"></i></button></span></td>
             </tr>
           </tbody>
         </table>
@@ -463,7 +496,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
       <div class="pay-row">
         <span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span>Chaperone</span><span>2h</span><span style="font-weight:600">$28</span>
         <span class="pill p-a" style="font-size:10px">Pending</span>
-        <button style="border:1px solid var(--gb);background:var(--gl);color:var(--g);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Verify ✓</button>
+        <button class="btn-sop-approve"><i class="bi bi-check-lg"></i> Verify</button>
       </div>
       <div class="pay-row">
         <span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span>Befriending</span><span>1h</span><span style="font-weight:600">$14</span>
@@ -559,7 +592,7 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
         <div class="note-txt">Onboarding done. Service contract signed, GIRO set up. Chaperone + Befriending OJT completed. Home Assessment training done Jan 2026 — OJT to be scheduled separately.</div>
       </div>
       <textarea class="n-input" placeholder="Add a staff note…"></textarea>
-      <button class="btn-sm">Add note</button>
+      <div class="sop-footer" style="margin-top:8px"><button class="btn-sop btn-sop-submit"><i class="bi bi-plus-lg"></i> Add note</button></div>
     </div>
   </div>
 
@@ -714,9 +747,9 @@ function submitAttEdit() {
         </div>
       </div>
     </div>
-    <div class="att-modal-footer">
-      <button class="btn-sm" onclick="submitAttEdit()" style="margin-top:0">Save changes</button>
-      <button class="btn-act" onclick="closeAttEdit()">Cancel</button>
+    <div class="att-modal-footer sop-footer">
+      <button class="btn-sop btn-sop-cancel" onclick="closeAttEdit()">Cancel</button>
+      <button class="btn-sop btn-sop-submit" onclick="submitAttEdit()" style="margin-left:auto"><i class="bi bi-check-lg"></i> Save changes</button>
     </div>
   </div>
 </div>

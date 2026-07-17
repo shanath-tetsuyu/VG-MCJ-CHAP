@@ -103,8 +103,8 @@
                 <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
                 <input id="users-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search user...">
               </div>
-              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddUser">
-                <i class="bi bi-plus-lg me-1"></i>Add User
+              <button class="btn-sop-add ms-auto" data-bs-toggle="modal" data-bs-target="#modalAddUser">
+                <i class="bi bi-plus-lg"></i>Add User
               </button>
             </div>
 
@@ -132,8 +132,8 @@
                 <div style="font-size:13px;font-weight:600;color:var(--ink2);">Role Permissions</div>
                 <div style="font-size:11px;color:var(--ink4);margin-top:2px;">Roles control which navigation modules and settings tabs each user can access.</div>
               </div>
-              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddRole">
-                <i class="bi bi-plus-lg me-1"></i>Add Role
+              <button class="btn-sop-add ms-auto" data-bs-toggle="modal" data-bs-target="#modalAddRole">
+                <i class="bi bi-plus-lg"></i>Add Role
               </button>
 
             </div>
@@ -297,10 +297,10 @@
           </div>
 
           <!-- Save -->
-          <div class="d-flex justify-content-end gap-2 mb-2">
-            <button class="btn btn-sm btn-light border" style="font-size:13px;">Reset to Defaults</button>
-            <button class="btn btn-sm" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;" onclick="saveBizRules()">
-              <i class="bi bi-check2 me-1"></i>Save Changes
+          <div class="sop-footer justify-content-end mb-2">
+            <button class="btn-sop btn-sop-draft">Reset to Defaults</button>
+            <button class="btn-sop btn-sop-submit" onclick="saveBizRules()">
+              <i class="bi bi-check-lg"></i>Save Changes
             </button>
           </div>
 
@@ -314,8 +314,8 @@
                 <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
                 <input id="facilities-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search organisation/facility...">
               </div>
-              <button class="btn btn-sm ms-auto" style="background:#6B21A8;color:#fff;font-size:12px;padding:5px 14px;" data-bs-toggle="modal" data-bs-target="#modalAddFacility">
-                <i class="bi bi-plus-lg me-1"></i>Add Facility
+              <button class="btn-sop-add ms-auto" data-bs-toggle="modal" data-bs-target="#modalAddFacility">
+                <i class="bi bi-plus-lg"></i>Add Facility
               </button>
             </div>
 
@@ -377,7 +377,7 @@ function renderUsers() {
       '<td ' + cellStyle + '>' + u.facility + '</td>' +
       '<td><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox"' + (u.active ? ' checked' : '') + '></div></td>' +
       '<td ' + cellStyle + '>' + u.lastActive + '</td>' +
-      '<td><button class="btn btn-sm btn-light border" style="font-size:11px;"><i class="bi bi-pencil"></i></button></td>' +
+      '<td><div class="row-acts"><span class="row-act ra-edit" title="Edit"><i class="bi bi-pencil"></i></span></div></td>' +
     '</tr>';
   });
   $('#tbl-users tbody').html(rows.join(''));
@@ -409,11 +409,9 @@ $(document).ready(function () {
 /* ══ Business Rules Save ════════════════════════════════════════════ */
 function saveBizRules() {
   var btn = event.currentTarget;
-  btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Saved!';
-  btn.style.background = '#1D9E75';
+  btn.innerHTML = '<i class="bi bi-check-lg"></i>Saved!';
   setTimeout(function() {
-    btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Save Changes';
-    btn.style.background = '#6B21A8';
+    btn.innerHTML = '<i class="bi bi-check-lg"></i>Save Changes';
   }, 2000);
 }
 
@@ -549,10 +547,10 @@ document.addEventListener('click', function (e) {
 
         </form>
       </div>
-      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
-        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
-        <button type="button" class="btn btn-sm" id="btnAddUserSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
-          <i class="bi bi-person-plus me-1"></i>Add User
+      <div class="modal-footer sop-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;">
+        <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-sop btn-sop-submit" id="btnAddUserSave">
+          <i class="bi bi-check-lg"></i>Add User
         </button>
       </div>
     </div>
@@ -620,10 +618,10 @@ document.addEventListener('click', function (e) {
 
         </form>
       </div>
-      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
-        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
-        <button type="button" class="btn btn-sm" id="btnAddFacilitySave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
-          <i class="bi bi-building-add me-1"></i>Add Facility
+      <div class="modal-footer sop-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;">
+        <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-sop btn-sop-submit" id="btnAddFacilitySave">
+          <i class="bi bi-check-lg"></i>Add Facility
         </button>
       </div>
     </div>
@@ -723,7 +721,7 @@ function renderFacilitiesTable() {
       '<td style="color:var(--ink2);font-size:13px;">' + f.org + '</td>' +
       '<td style="color:var(--ink3);font-size:13px;">' + f.name + '</td>' +
       '<td>' + badge + '</td>' +
-      '<td><button class="btn btn-sm btn-light border" style="font-size:11px;"><i class="bi bi-pencil"></i></button></td>' +
+      '<td><div class="row-acts"><span class="row-act ra-edit" title="Edit"><i class="bi bi-pencil"></i></span></div></td>' +
     '</tr>';
   });
   $('#tbl-facilities tbody').html(rows.join(''));
@@ -1001,10 +999,10 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
           </div>
         </form>
       </div>
-      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;">
-        <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
-        <button type="button" class="btn btn-sm" id="btnAddRoleSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
-          <i class="bi bi-shield-plus me-1"></i>Create Role
+      <div class="modal-footer sop-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;">
+        <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-sop btn-sop-submit" id="btnAddRoleSave">
+          <i class="bi bi-check-lg"></i>Create Role
         </button>
       </div>
     </div>
@@ -1208,16 +1206,14 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
           </div>
         </form>
       </div>
-      <div class="modal-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;gap:8px;justify-content:space-between;">
-        <button type="button" id="btnDeleteRole" class="btn btn-sm btn-light border text-danger" style="font-size:13px;">
-          <i class="bi bi-trash me-1"></i>Delete Role
+      <div class="modal-footer sop-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;">
+        <button type="button" id="btnDeleteRole" class="btn-sop btn-sop-delete">
+          <i class="bi bi-trash"></i>Delete Role
         </button>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal" style="font-size:13px;">Cancel</button>
-          <button type="button" class="btn btn-sm" id="btnEditRoleSave" style="background:#6B21A8;color:#fff;font-size:13px;padding:6px 20px;">
-            <i class="bi bi-check2 me-1"></i>Save Changes
-          </button>
-        </div>
+        <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-sop btn-sop-submit" id="btnEditRoleSave">
+          <i class="bi bi-check-lg"></i>Save Changes
+        </button>
       </div>
     </div>
   </div>
@@ -1257,6 +1253,40 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
 .acc-pill-post_job    { background:#E6F4F4;color:#1e5f5f; }
 .acc-pill-reports     { background:#FDF3E3;color:#C07A1A; }
 .acc-pill-settings    { background:#FDF0F0;color:#B03030; }
+
+/* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+.sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
+.btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
+.btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
+.btn-sop-submit:hover{background:#0A5C46;}
+.btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
+.btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
+.btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
+.btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
+.btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+.btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
+.btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
+.btn-sop-delete:disabled{opacity:.4;cursor:not-allowed;}
+/* List view */
+.btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+.btn-sop-add:hover{background:var(--bl,#EBF3FD);}
+.row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
+.row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
+.row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
+.row-act.ra-del{color:var(--rm,#B03030);}
+.row-act:hover{opacity:.7;}
+/* Approval row */
+.appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
+.appr-row:last-child{border-bottom:none;}
+.appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
+.appr-badge.approved{background:var(--g,#13795B);color:#fff;}
+.appr-spacer{margin-left:auto;}
+.btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-sop-approve:hover{background:#0A5C46;}
+.link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
+.link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
 </style>
 
 <script>
@@ -1318,8 +1348,8 @@ function renderRolesTable() {
       '<td style="font-size:12px;color:var(--ink3);max-width:260px;">' + r.desc + '</td>' +
       '<td style="text-align:center;font-size:13px;font-weight:600;color:var(--ink2);">' + uCount + '</td>' +
       '<td style="max-width:280px;">' + pills + '</td>' +
-      '<td><button class="btn btn-sm btn-light border" style="font-size:11px;" onclick="openEditRole(\'' + r.key + '\')">' +
-        '<i class="bi bi-pencil"></i></button></td>' +
+      '<td><div class="row-acts"><span class="row-act ra-edit" title="Edit" onclick="openEditRole(\'' + r.key + '\')">' +
+        '<i class="bi bi-pencil"></i></span></div></td>' +
     '</tr>';
   });
   $('#tbl-roles tbody').html(rows.join(''));

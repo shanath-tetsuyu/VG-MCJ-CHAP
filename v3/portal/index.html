@@ -24,6 +24,39 @@
     .bef-opt input { accent-color: #6B21A8; width: 15px; height: 15px; margin: 0; }
     .bef-other { font-size: 13px; color: var(--ink3); font-style: italic; }
     .bef-remarks { font-size: 13px; color: var(--ink); background: var(--s); border: 1px solid var(--bdr); border-radius: 8px; padding: 8px 10px; }
+
+    /* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+    .sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
+    .btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
+    .btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
+    .btn-sop-submit:hover{background:#0A5C46;}
+    .btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
+    .btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
+    .btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
+    .btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
+    .btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+    .btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
+    .btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
+    /* List view */
+    .btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+    .btn-sop-add:hover{background:var(--bl,#EBF3FD);}
+    .row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
+    .row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
+    .row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
+    .row-act.ra-del{color:var(--rm,#B03030);}
+    .row-act:hover{opacity:.7;}
+    /* Approval row */
+    .appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
+    .appr-row:last-child{border-bottom:none;}
+    .appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+    .appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
+    .appr-badge.approved{background:var(--g,#13795B);color:#fff;}
+    .appr-spacer{margin-left:auto;}
+    .btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-sop-approve:hover{background:#0A5C46;}
+    .link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
+    .link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
   </style>
 </head>
 <body>
@@ -214,7 +247,7 @@
           <input type="date" id="fDateEnd" onchange="applyFilters()">
           <input type="text" id="fSearch" placeholder="Search…" oninput="applyFilters()" style="width:180px">
           <button class="btn-clear" onclick="clearFilters()">Clear</button>
-          <a href="./proto1_v3_publish.html" style="margin-left:auto"><button class="btn-pub-new">+ Publish new job</button></a>
+          <a href="./proto1_v3_publish.html" class="btn-sop-add" style="margin-left:auto"><i class="bi bi-plus-lg"></i> Publish new job</a>
         </div>
 
         <div style="overflow-x:auto">
@@ -259,12 +292,10 @@
       <button class="modal-close" onclick="closeModal()">✕ Close</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn-primary" onclick="closeModal()">Done</button>
-      <button class="btn-ghost" id="btn-complete">Mark Completed</button>
-      <div style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn-danger" id="btn-cancel-job" onclick="openCancelJobModal()">Cancel Job</button>
-      </div>
+    <div class="modal-footer sop-footer">
+      <button class="btn-sop btn-sop-delete" id="btn-cancel-job" onclick="openCancelJobModal()"><i class="bi bi-x-circle"></i> Cancel Job</button>
+      <button class="btn-sop btn-sop-cancel" onclick="closeModal()">Done</button>
+      <button class="btn-sop btn-sop-submit" id="btn-complete"><i class="bi bi-check-lg"></i> Mark Completed</button>
     </div>
   </div>
 </div>
@@ -284,9 +315,9 @@
         <textarea id="cancelJobReason" class="form-inp" rows="4" placeholder="Enter reason for cancellation…" style="resize:vertical;width:100%"></textarea>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-danger" onclick="submitCancelJob()">Submit</button>
-      <button class="btn-ghost" onclick="closeCancelJobModal()">Cancel</button>
+    <div class="modal-footer sop-footer">
+      <button class="btn-sop btn-sop-delete" onclick="submitCancelJob()"><i class="bi bi-x-circle"></i> Submit</button>
+      <button class="btn-sop btn-sop-cancel" onclick="closeCancelJobModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -317,9 +348,9 @@
         <input type="text" id="noShowOthersText" class="form-inp" placeholder="Describe the reason…">
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-danger" onclick="submitNoShow()">Record No-Show</button>
-      <button class="btn-ghost" onclick="cancelNoShow()">Cancel</button>
+    <div class="modal-footer sop-footer">
+      <button class="btn-sop btn-sop-delete" onclick="submitNoShow()"><i class="bi bi-person-x"></i> Record No-Show</button>
+      <button class="btn-sop btn-sop-cancel" onclick="cancelNoShow()">Cancel</button>
     </div>
   </div>
 </div>
@@ -390,7 +421,7 @@ $(document).ready(function () {
     j.sccStaff ? '<span class="mj-name">' + j.sccStaff + '</span>' : '<span class="mj-empty">—</span>',
     j.wl > 0 ? '<span class="wl-chip">' + j.wl + '</span>' : '<span class="wl-zero">—</span>',
     j.urgency === 'Urgent' ? '<span class="badge b-urg">🔶 Urgent</span>' : '<span class="badge b-std">Standard</span>',
-    '<button class="btn-manage" onclick="openModal(\'' + j.id + '\')">Manage →</button>',
+    '<span class="row-acts"><span class="row-act ra-view" title="Manage" onclick="openModal(\'' + j.id + '\')"><i class="bi bi-gear"></i></span></span>',
   ]);
 
   dt = $('#jobTable').DataTable({

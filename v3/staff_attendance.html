@@ -156,6 +156,39 @@
         box-shadow: 0 6px 20px rgba(0,0,0,.3);
       }
       .tm-toast.on { display: inline-flex; }
+
+      /* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+      .sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+      .sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
+      .btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
+      .btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
+      .btn-sop-submit:hover{background:#0A5C46;}
+      .btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
+      .btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
+      .btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
+      .btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
+      .btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+      .btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
+      .btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
+      /* List view */
+      .btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
+      .btn-sop-add:hover{background:var(--bl,#EBF3FD);}
+      .row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
+      .row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
+      .row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
+      .row-act.ra-del{color:var(--rm,#B03030);}
+      .row-act:hover{opacity:.7;}
+      /* Approval row */
+      .appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
+      .appr-row:last-child{border-bottom:none;}
+      .appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+      .appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
+      .appr-badge.approved{background:var(--g,#13795B);color:#fff;}
+      .appr-spacer{margin-left:auto;}
+      .btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+      .btn-sop-approve:hover{background:#0A5C46;}
+      .link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
+      .link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
     </style>
   </head>
   <body>
@@ -416,9 +449,9 @@
           <div class="field-err" id="e-reasonErr">A reason is required to save this change.</div>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn-pub" id="e-saveBtn" onclick="saveEdit()">Save changes</button>
-          <button class="btn-ghost2" style="margin-left:auto" onclick="closeEditModal()">Cancel</button>
+        <div class="modal-footer sop-footer">
+          <button class="btn-sop btn-sop-cancel" onclick="closeEditModal()">Cancel</button>
+          <button class="btn-sop btn-sop-submit" id="e-saveBtn" style="margin-left:auto" onclick="saveEdit()"><i class="bi bi-check-lg"></i> Save changes</button>
         </div>
       </div>
     </div>
@@ -604,7 +637,10 @@
             <td>${r.checkIn}</td>
             <td>${r.checkOut}</td>
             <td><span class="hrs-pill">${billable} hr${billable === 1 ? '' : 's'}</span>${roundedUp ? '<div class="round-note">↑ rounded</div>' : ''}</td>
-            <td><button class="btn-edit-row" onclick="openEditModal(${idx})"><i class="bi bi-pencil me-1"></i>Edit</button> <button class="btn-edit-row"><i class="bi bi-arrow-up-right me-1"></i>View Job</button></td>
+            <td><div class="row-acts">
+              <span class="row-act ra-view" title="View Job"><i class="bi bi-zoom-in"></i></span>
+              <span class="row-act ra-edit" title="Edit" onclick="openEditModal(${idx})"><i class="bi bi-pencil"></i></span>
+            </div></td>
           `;
           tbody.appendChild(tr);
         });
