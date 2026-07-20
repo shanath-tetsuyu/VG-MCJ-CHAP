@@ -705,11 +705,9 @@ document.getElementById('modalAddUser').addEventListener('hidden.bs.modal', func
 
 /* ══ FACILITIES DATA ══════════════════════════════════════════════ */
 var FACILITIES_DATA = [
-  { org:'vanguard Ltd', name:'AAC Toa Payoh', active:true },
-  { org:'vanguard Ltd', name:'AAC Jurong',    active:true },
-  { org:'vanguard Ltd', name:'SCC Buona Vista', active:true },
-  { org:'vanguard Ltd', name:'SCC Clementi',  active:true },
-  { org:'vanguard Ltd', name:'SCC Jurong',    active:true }
+  { org:'vanguard Ltd', name:'Bedok', active:true },
+  { org:'vanguard Ltd', name:'Clementi',    active:true },
+  { org:'vanguard Ltd', name:'Hougang', active:true }
 ];
 
 function renderFacilitiesTable() {
@@ -810,9 +808,16 @@ document.getElementById('modalAddFacility').addEventListener('hidden.bs.modal', 
               </div>
             </div>
           </div>
-          <div class="mb-4">
+          <div class="mb-3">
             <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Description</label>
             <textarea id="addRoleDesc" class="form-control form-control-sm" rows="2" placeholder="What does this role do?"></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facilities <span class="text-danger">*</span></label>
+            <select id="addRoleFacilities" multiple class="form-select form-select-sm" required></select>
+            <div style="font-size:11px;color:var(--ink4);margin-top:4px;">Select which facility (or facilities) this role belongs to.</div>
+            <div class="invalid-feedback" style="font-size:11px;">Select at least one facility.</div>
           </div>
 
           <div class="row g-4">
@@ -1369,6 +1374,23 @@ function initSwatches(containerId) {
 initSwatches('addRoleSwatches');
 initSwatches('editRoleSwatches');
 
+/* ══ ADD-ROLE FACILITIES MULTI-SELECT (Choices.js) ════════════════ */
+var roleFacilitiesChoices = new Choices('#addRoleFacilities', {
+  removeItemButton: true,
+  placeholderValue: 'Select facility',
+  searchEnabled: true
+});
+function populateRoleFacilities() {
+  roleFacilitiesChoices.clearStore();
+  roleFacilitiesChoices.setChoices(
+    FACILITIES_DATA
+      .filter(function(f){ return f.active; })
+      .map(function(f){ return { value: f.name, label: f.name }; }),
+    'value', 'label', true
+  );
+}
+document.getElementById('modalAddRole').addEventListener('show.bs.modal', populateRoleFacilities);
+
 /* ══ SETTINGS TOGGLE (enable/disable tabs section) ════════════════ */
 document.addEventListener('change', function(e) {
   if (!e.target.classList.contains('nav-settings-toggle')) return;
@@ -1403,12 +1425,15 @@ document.getElementById('btnAddRoleSave').addEventListener('click', function() {
   var tabs = [];
   document.querySelectorAll('#addRoleTabPerms input:checked').forEach(function(cb){ tabs.push(cb.value); });
 
+  var facilities = [];
+  document.querySelectorAll('#addRoleFacilities option:checked').forEach(function(o){ facilities.push(o.value); });
+
   var key = name.toLowerCase().replace(/[^a-z0-9]+/g,'_');
   /* ensure unique key */
   var existing = ROLES_DATA.find(function(r){ return r.key === key; });
   if (existing) key = key + '_' + Date.now();
 
-  ROLES_DATA.push({ key:key, label:name, desc:desc, avBg:avBg, avClr:avClr, system:false, nav:nav, tabs:tabs });
+  ROLES_DATA.push({ key:key, label:name, desc:desc, avBg:avBg, avClr:avClr, system:false, nav:nav, tabs:tabs, facilities:facilities });
 
   /* inject role-badge CSS for new role */
   injectRoleBadgeStyle(key, avBg, avClr);
