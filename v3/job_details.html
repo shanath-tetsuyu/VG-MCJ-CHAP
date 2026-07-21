@@ -112,6 +112,10 @@
       .wl-pos { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--ink4); flex-shrink: 0; }
       .wl-name { flex: 1; font-weight: 500; color: var(--ink2); }
       .wl-time { font-size: 11px; color: var(--ink4); }
+      .wl-btn { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 5px; cursor: pointer; border: 1px solid; flex-shrink: 0; }
+      .wl-btn:disabled { cursor: default; }
+      .wl-confirm { background: var(--gl); color: var(--g); border-color: var(--gb); }
+      .wl-remove { background: var(--rl); color: var(--rm); border-color: var(--rb); }
 
       /* Right panel */
       .rp { padding: 14px 15px; }
@@ -191,6 +195,30 @@
       .btn-sop-approve:hover{background:#0A5C46;}
       .link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
       .link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
+
+      /* Assign MJ modal */
+      .mj-modal-overlay{position:fixed;inset:0;background:rgba(20,18,30,.5);display:none;align-items:center;justify-content:center;z-index:1050;padding:20px;}
+      .mj-modal{background:var(--s);border-radius:var(--rl2,16px);width:100%;max-width:540px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;}
+      .mj-modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--bdr);}
+      .mj-modal-title{font-size:16px;font-weight:700;color:var(--ink);}
+      .mj-modal-sub{font-size:12px;color:var(--ink4);margin-top:2px;}
+      .mj-modal-x{background:none;border:none;font-size:16px;color:var(--ink4);cursor:pointer;padding:4px;line-height:1;}
+      .mj-modal-x:hover{color:var(--ink);}
+      .mj-modal-search{display:flex;align-items:center;gap:8px;margin:14px 20px 0;padding:9px 12px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink4);}
+      .mj-modal-search input{border:none;background:none;outline:none;flex:1;font-size:13px;color:var(--ink);font-family:'DM Sans',sans-serif;}
+      .mj-modal-body{padding:14px 20px;overflow-y:auto;flex:1;}
+      .mj-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--bdr);}
+      .mj-modal-foot button:disabled{opacity:.5;cursor:not-allowed;}
+      .elig-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:.12s;}
+      .elig-row:hover{border-color:var(--pb);background:var(--pl);}
+      .elig-row.sel{border-color:var(--pm);background:var(--pl);box-shadow:inset 0 0 0 1px var(--pm);}
+      .elig-avatar{width:38px;height:38px;border-radius:50%;background:var(--pl);color:var(--pm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+      .elig-info{flex:1;min-width:0;}
+      .elig-name{font-size:13px;font-weight:600;color:var(--ink);}
+      .elig-meta{font-size:11px;color:var(--ink4);margin-top:2px;}
+      .elig-tags{margin-top:5px;}
+      .elig-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:transparent;}
+      .elig-row.sel .elig-check{border-color:var(--pm);background:var(--pm);color:#fff;}
     </style>
   </head>
   <body>
@@ -695,10 +723,12 @@
             wlHtml += `<div style="background:var(--bg);border-radius:var(--r);overflow:hidden;border:1px solid var(--bdr);">`;
             wl.forEach((w, idx) => {
               wlHtml += `
-              <div class="wl-row">
+              <div class="wl-row" id="wl-${idx}">
                 <div class="wl-pos">${idx+1}</div>
                 <div class="wl-name">${w.n}</div>
                 <div class="wl-time">${w.t}</div>
+                ${!locked ? `<button class="wl-btn wl-confirm" onclick="confirmWL(this)">Confirm</button>
+                <button class="wl-btn wl-remove" onclick="removeWL(this)">Remove</button>` : ''}
               </div>`;
             });
             wlHtml += `</div>`;
@@ -732,9 +762,6 @@
             wlHtml += `</div>`;
           }
 
-          if (canAssign) {
-            wlHtml += `<button class="btn-ghost2" style="font-size:12px;margin-top:8px;" onclick="assignManually(0)">+ Assign other MJ</button>`;
-          }
         }
 
         const assignCard = `
@@ -820,20 +847,102 @@
         rp.innerHTML = '';
       }
 
+      /* Hardcoded eligible MJ pool (wireframe mock data) */
+      var ELIGIBLE_MJS = [
+        { n: 'Tan Wei Ming',    skills: ['Chaperone', 'Mandarin'] },
+        { n: 'Nurul Aisyah',    skills: ['Chaperone', 'Malay'] },
+        { n: 'Rajesh Kumar',    skills: ['Chaperone', 'Tamil', 'Wheelchair'] },
+        { n: 'Lim Siew Hong',   skills: ['Chaperone', 'Hokkien'] },
+        { n: 'Fatimah Ibrahim', skills: ['Chaperone', 'Malay'] }
+      ];
+      var assignTargetIdx = 0;
+      var assignSelected = null;
+
       render();
 
       function assignManually(idx) {
-        var name = prompt('Enter MJ name to assign manually:');
-        if (!name || !name.trim()) return;
+        assignTargetIdx = idx;
+        assignSelected = null;
+        var search = document.getElementById('eligibleSearch');
+        if (search) search.value = '';
+        renderEligibleList('');
+        document.getElementById('confirmAssignBtn').disabled = true;
+        document.getElementById('assignModal').style.display = 'flex';
+      }
+
+      function renderEligibleList(q) {
+        q = (q || '').trim().toLowerCase();
+        var list = document.getElementById('eligibleList');
+        var rows = ELIGIBLE_MJS.map(function (m, i) {
+          if (q && m.n.toLowerCase().indexOf(q) === -1) return '';
+          var initials = m.n.split(' ').map(function (p) { return p[0]; }).join('').slice(0, 2);
+          var tags = m.skills.map(function (s) { return '<span class="skill-tag">' + s + '</span>'; }).join('');
+          return '<div class="elig-row' + (assignSelected === i ? ' sel' : '') + '" id="elig-' + i + '" onclick="selectEligible(' + i + ')">'
+            + '<div class="elig-avatar">' + initials + '</div>'
+            + '<div class="elig-info">'
+            + '<div class="elig-name">' + m.n + '</div>'
+            + '<div class="elig-tags">' + tags + '</div>'
+            + '</div>'
+            + '<div class="elig-check"><i class="bi bi-check-lg" style="font-size:12px;"></i></div>'
+            + '</div>';
+        }).join('');
+        list.innerHTML = rows || '<div style="font-size:12px;color:var(--ink4);padding:12px;text-align:center;">No matching MJs found.</div>';
+      }
+
+      function filterEligible(q) {
+        renderEligibleList(q);
+      }
+
+      function selectEligible(i) {
+        assignSelected = i;
+        document.querySelectorAll('.elig-row').forEach(function (r) { r.classList.remove('sel'); });
+        var row = document.getElementById('elig-' + i);
+        if (row) row.classList.add('sel');
+        document.getElementById('confirmAssignBtn').disabled = false;
+      }
+
+      function closeAssignModal() {
+        document.getElementById('assignModal').style.display = 'none';
+      }
+
+      function confirmAssign() {
+        if (assignSelected === null) return;
+        var name = ELIGIBLE_MJS[assignSelected].n;
+        var idx = assignTargetIdx;
         var row = document.getElementById('slot-' + idx);
+        if (row) {
+          document.getElementById('slot-name-' + idx).textContent = name;
+          document.getElementById('slot-name-' + idx).style.cssText = '';
+          document.getElementById('slot-meta-' + idx).textContent = 'Manually assigned · Just now';
+          document.getElementById('slot-num-' + idx).className = 'slot-num sn-filled';
+          document.getElementById('slot-num-' + idx).textContent = '✓';
+          var btn = row.querySelector('button');
+          if (btn) btn.remove();
+        }
+        closeAssignModal();
+      }
+
+      function confirmWL(btn) {
+        var row = btn.closest('.wl-row');
         if (!row) return;
-        document.getElementById('slot-name-' + idx).textContent = name.trim();
-        document.getElementById('slot-name-' + idx).style.cssText = '';
-        document.getElementById('slot-meta-' + idx).textContent = 'Manually assigned · Just now';
-        document.getElementById('slot-num-' + idx).className = 'slot-num sn-filled';
-        document.getElementById('slot-num-' + idx).textContent = '✓';
-        var btn = row.querySelector('button');
-        if (btn) btn.remove();
+        row.style.background = 'var(--gl)';
+        var name = row.querySelector('.wl-name');
+        if (name) name.style.color = 'var(--g)';
+        btn.textContent = '✓ Confirmed';
+        btn.disabled = true;
+        btn.style.background = 'var(--gm)';
+        btn.style.color = '#fff';
+        btn.style.borderColor = 'var(--gm)';
+        var rm = row.querySelector('.wl-remove');
+        if (rm) rm.disabled = true;
+      }
+
+      function removeWL(btn) {
+        var row = btn.closest('.wl-row');
+        if (!row) return;
+        row.style.opacity = '.45';
+        row.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+        btn.textContent = 'Removed';
       }
 
       function assignFromInterested(name, selectedIdx) {
@@ -890,5 +999,27 @@
         alert('Job published successfully. Redirecting to job detail page...');
       }
     </script>
+
+    <!-- Assign MJ modal -->
+    <div class="mj-modal-overlay" id="assignModal">
+      <div class="mj-modal">
+        <div class="mj-modal-head">
+          <div>
+            <div class="mj-modal-title">Assign a MicroJobber</div>
+            <div class="mj-modal-sub">Select an eligible MJ to fill this slot</div>
+          </div>
+          <button class="mj-modal-x" onclick="closeAssignModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="mj-modal-search">
+          <i class="bi bi-search"></i>
+          <input type="text" id="eligibleSearch" placeholder="Search MicroJobbers by name..." oninput="filterEligible(this.value)" autocomplete="off">
+        </div>
+        <div class="mj-modal-body" id="eligibleList"></div>
+        <div class="mj-modal-foot">
+          <button class="btn-ghost2" onclick="closeAssignModal()">Cancel</button>
+          <button class="btn-primary2" id="confirmAssignBtn" onclick="confirmAssign()" disabled><i class="bi bi-person-check"></i> Assign selected MJ</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

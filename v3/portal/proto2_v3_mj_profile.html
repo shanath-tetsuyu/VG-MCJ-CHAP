@@ -71,6 +71,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 /* Grid helpers */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g4payment{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 
 /* Stat */
 .stat{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;text-align:center}
@@ -481,11 +482,13 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
 
   <!-- PAYMENT -->
   <div class="tc" id="tc-py">
-    <div class="g4" style="margin-bottom:14px">
+    <div class="g4payment" style="margin-bottom:14px">
       <div class="stat"><div class="sn">$392</div><div class="sl">YTD paid</div></div>
       <div class="stat warn"><div class="sn">$42</div><div class="sl">Pending verification</div></div>
-      <div class="stat"><div class="sn">$14/h</div><div class="sl">Chaperone rate*</div></div>
-      <div class="stat"><div class="sn">$14/h</div><div class="sl">Befriending rate*</div></div>
+      <div class="stat"><div class="sn">$15/h</div><div class="sl">Chaperone rate*</div></div>
+      <div class="stat"><div class="sn">$12/h</div><div class="sl">Safe Steps rate*</div></div>
+      <div class="stat"><div class="sn">$10/h</div><div class="sl">Befriending rate*</div></div>
+      <div class="stat"><div class="sn">$10/h</div><div class="sl">Centre Assistant rate*</div></div>
     </div>
     <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders</div>
     <div class="card" style="position:relative">
