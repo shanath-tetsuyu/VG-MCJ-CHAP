@@ -281,17 +281,46 @@
           </div>
 
           <!-- Attendance & Billing -->
-          <div class="set-card" style="display:none;">
-            <div class="set-card-title"><i class="bi bi-clock-history me-1"></i>Attendance &amp; Billing</div>
+          <div class="set-card" style="display:block;">
+            <div class="set-card-title"><i class="bi bi-currency-dollar me-1"></i>Job Base Rates</div>
 
             <div class="rule-row">
               <div class="rule-label">
-                Overtime Notification Buffer
-                <div class="rule-desc">Alert SCC staff to amend billing if job runs over scheduled end time by more than this buffer.</div>
+                Chaperone
               </div>
               <div class="rule-ctrl">
                 <input type="number" class="rule-input" value="15" min="5" max="120">
-                <span class="rule-unit">minutes</span>
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Safe Steps
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="12" min="5" max="120">
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Befriending
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="10" min="5" max="120">
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Centre Assistant
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input" value="10" min="5" max="120">
+                <span class="rule-unit">/hr</span>
               </div>
             </div>
           </div>

@@ -1,214 +1,1174 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CARES — MJ Profile v3</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./index.css">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --g:#13795B;--gm:#1D9E75;--gl:#E8F7F2;--gb:#9FE1CB;
-  --am:#C07A1A;--al:#FDF3E3;--ab:#F0C060;
-  --rm:#B03030;--rl:#FDF0F0;--rb:#F0AAAA;
-  --bm:#1A5FA8;--bl:#EBF3FD;--bb:#90BFED;
-  --pm:#6B21A8;--pl:#F5F0FF;--pb:#C4B5FD;
-  --ink:#1C1C1E;--ink2:#444;--ink3:#777;--ink4:#AAA;
-  --s:#fff;--bg:#F5F6F8;--bdr:#E4E4E4;--bdr2:#F0F0F0;
-  --r:10px;--rl2:16px;
-}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:48px;background:var(--s);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0}
-.crumb a{color:var(--g);text-decoration:none;font-size:13px;font-weight:500}
-.crumb span{color:var(--ink4);margin:0 5px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CARES — MJ Profile v3</title>
+  <link rel="stylesheet" href="../portal/settings.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./index.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ⓘ blue button */
-.br-btn{width:16px;height:16px;border-radius:50%;background:var(--bl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--bm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif}
-.br-btn:hover,.br-btn.active{background:var(--bm);color:#fff}
-/* ❓ red button */
-.q-btn{width:16px;height:16px;border-radius:50%;background:var(--rl);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--rm);font-size:10px;font-weight:700;flex-shrink:0;transition:background 0.15s;font-family:'DM Sans',sans-serif}
-.q-btn:hover,.q-btn.active{background:var(--rm);color:#fff}
+    :root {
+      --g: #13795B;
+      --gm: #1D9E75;
+      --gl: #E8F7F2;
+      --gb: #9FE1CB;
+      --am: #C07A1A;
+      --al: #FDF3E3;
+      --ab: #F0C060;
+      --rm: #B03030;
+      --rl: #FDF0F0;
+      --rb: #F0AAAA;
+      --bm: #1A5FA8;
+      --bl: #EBF3FD;
+      --bb: #90BFED;
+      --pm: #6B21A8;
+      --pl: #F5F0FF;
+      --pb: #C4B5FD;
+      --ink: #1C1C1E;
+      --ink2: #444;
+      --ink3: #777;
+      --ink4: #AAA;
+      --s: #fff;
+      --bg: #F5F6F8;
+      --bdr: #E4E4E4;
+      --bdr2: #F0F0F0;
+      --r: 10px;
+      --rl2: 16px;
+    }
 
-/* Popover */
-.pop{display:none;position:absolute;z-index:200;width:288px;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,0.22);font-size:12px;line-height:1.6}
-.pop.on{display:block}
-.pop.right{left:auto;right:0}
-.pop-info{background:var(--ink);color:#fff}
-.pop-info .pop-title{font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.pop-info .pop-title::before{content:'⚙';font-size:12px}
-.pop-info .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5}
-.pop-info .pr:last-child{margin-bottom:0}
-.pop-q{background:#1C0A0A;color:#FFE4E4;border:1px solid rgba(240,170,170,0.3)}
-.pop-q .pop-title{font-size:11px;font-weight:700;color:rgba(255,200,200,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.pop-q .pop-title::before{content:'?';font-size:12px;color:var(--rb)}
-.pop-q .pr{display:flex;gap:7px;margin-bottom:5px;line-height:1.5;color:#FFD0D0}
-.pop-q .pr:last-child{margin-bottom:0}
-.pop-q .note{font-size:10px;color:rgba(255,200,200,0.4);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,150,150,0.15)}
-.pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
-.pd-g{background:var(--gm)} .pd-a{background:#F0C060} .pd-r{background:#F0AAAA} .pd-q{background:#F0AAAA}
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      overflow: hidden;
+      display: flex
+    }
 
-/* Hero */
-.hero{background:var(--s);border-bottom:1px solid var(--bdr);padding:16px 24px;display:flex;gap:16px;align-items:flex-start;flex-shrink:0;position:relative}
-.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1D9E75,#0A5C46);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
-.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.p-g{background:var(--gl);color:var(--g);border:1px solid var(--gb)}
-.p-b{background:var(--bl);color:var(--bm)}
-.p-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
-.p-r{background:var(--rl);color:var(--rm)}
-.p-gr{background:#F1F1F0;color:#777}
-.p-p{background:var(--pl);color:var(--pm);border:1px solid var(--pb)}
-.upd-badge{display:inline-flex;align-items:center;gap:3px;background:var(--pl);color:var(--pm);border:1px solid var(--pb);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-left:6px}
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
 
-/* Tabs */
-.tabs{background:var(--s);border-bottom:1px solid var(--bdr);padding:0 24px;display:flex;flex-shrink:0;overflow-x:auto}
-.tab{padding:11px 14px;font-size:13px;cursor:pointer;color:var(--ink3);border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
-.tab.on{color:var(--g);border-bottom-color:var(--gm)}
-.tc{display:none;overflow-y:auto;padding:20px 24px;flex:1}
-.tc.on{display:block}
+    .topbar {
+      height: 48px;
+      background: var(--s);
+      border-bottom: 1px solid var(--bdr);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 8px;
+      flex-shrink: 0
+    }
 
-/* Grid helpers */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.g4payment{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .crumb a {
+      color: var(--g);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500
+    }
 
-/* Stat */
-.stat{background:var(--s);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;text-align:center}
-.sn{font-size:22px;font-weight:700;color:var(--g)}
-.sl{font-size:11px;color:var(--ink4);margin-top:3px}
-.stat.warn .sn{color:var(--am)}
+    .crumb span {
+      color: var(--ink4);
+      margin: 0 5px
+    }
 
-/* Card */
-.card{background:var(--s);border:1px solid var(--bdr);border-radius:var(--rl2);padding:16px;margin-bottom:14px;position:relative}
-.card-t{font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.dl{display:grid;grid-template-columns:112px 1fr;gap:5px 12px;font-size:13px}
-.dl dt{color:var(--ink4)}
-.dl dd{color:var(--ink2);font-weight:500}
+    /* ⓘ blue button */
+    .br-btn {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bl);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bm);
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      font-family: 'DM Sans', sans-serif
+    }
 
-/* ── Filter bar ── */
-.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.filter-bar label{font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-.filter-bar select,.filter-bar input{font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg);color:var(--ink2);outline:none;transition:border-color .15s}
-.filter-bar select:focus,.filter-bar input:focus{border-color:var(--gm);background:var(--s)}
+    .br-btn:hover,
+    .br-btn.active {
+      background: var(--bm);
+      color: #fff
+    }
 
-/* Engagement */
-.eng-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:6px 0 8px}
-.eng{height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
-.eng-y{background:var(--gl);color:var(--g)}
-.eng-n{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
-.eng-p{background:#EBEBEB;color:#CCC}
+    /* ❓ red button */
+    .q-btn {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--rl);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--rm);
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      font-family: 'DM Sans', sans-serif
+    }
 
-/* Table */
-.tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tbl th{font-size:11px;font-weight:600;color:var(--ink4);text-align:left;padding:6px 10px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.03em}
-.tbl td{padding:10px 10px;border-bottom:1px solid var(--bdr2);vertical-align:middle}
-.tbl tr:last-child td{border:none}
-.st{display:flex;align-items:center;gap:5px}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.d-g{background:var(--gm)} .d-a{background:#EF9F27} .d-n{background:#DDD}
+    .q-btn:hover,
+    .q-btn.active {
+      background: var(--rm);
+      color: #fff
+    }
 
-/* Status table (MJ app statuses) */
-.status-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
-.status-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.04em;background:var(--bg)}
-.status-tbl td{padding:7px 8px;border-bottom:1px solid var(--bdr2);vertical-align:top;line-height:1.4;font-size:12px}
-.status-tbl tr:last-child td{border:none}
+    /* Popover */
+    .pop {
+      display: none;
+      position: absolute;
+      z-index: 200;
+      width: 288px;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+      font-size: 12px;
+      line-height: 1.6
+    }
 
-/* Job rows */
-.jrow{display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr2);font-size:13px}
-.jrow:last-child{border:none}
+    .pop.on {
+      display: block
+    }
 
-/* Cancellation table */
-.cancel-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
-.cancel-tbl th{font-size:10px;font-weight:700;color:var(--ink4);text-align:left;padding:5px 8px;border-bottom:1px solid var(--bdr);text-transform:uppercase;letter-spacing:0.04em;background:var(--bg)}
-.cancel-tbl td{padding:7px 8px;border-bottom:1px solid var(--bdr2);vertical-align:top;line-height:1.4}
-.cancel-tbl tr:last-child td{border:none}
+    .pop.right {
+      left: auto;
+      right: 0
+    }
 
-/* Payment */
-.pay-row{display:grid;grid-template-columns:82px 110px 52px 68px 105px 90px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bdr2);font-size:13px}
-.pay-row:last-child{border:none}
+    .pop-info {
+      background: var(--ink);
+      color: #fff
+    }
 
-/* Notes */
-.note-item{border-left:3px solid var(--gm);padding:10px 12px;background:var(--bg);border-radius:0 8px 8px 0;margin-bottom:8px}
-.note-item.flag{border-left-color:var(--rm);background:var(--rl)}
-.note-by{font-size:11px;color:var(--ink4);margin-bottom:4px}
-.note-txt{font-size:13px;color:var(--ink2);line-height:1.5}
-textarea.n-input{width:100%;font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);resize:vertical;min-height:60px;outline:none;margin-top:8px}
-textarea.n-input:focus{border-color:var(--gm)}
+    .pop-info .pop-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
 
-/* Buttons */
-.btn-sm{border:1px solid var(--gb);background:var(--gl);color:var(--g);border-radius:var(--r);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
-.btn-act{border:1px solid var(--bdr);background:var(--s);color:var(--ink2);border-radius:var(--r);padding:7px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
-.btn-red{border:1px solid var(--rb);background:var(--rl);color:var(--rm);border-radius:var(--r);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .pop-info .pop-title::before {
+      content: '⚙';
+      font-size: 12px
+    }
 
-/* Banner */
-.banner{border-radius:var(--r);padding:10px 12px;font-size:12px;display:flex;gap:8px;line-height:1.5}
-.b-g{background:var(--gl);color:#0A5C46;border:1px solid var(--gb)}
-.b-a{background:var(--al);color:var(--am);border:1px solid var(--ab)}
-.b-r{background:var(--rl);color:var(--rm);border:1px solid var(--rb)}
+    .pop-info .pr {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 5px;
+      line-height: 1.5
+    }
 
-/* Inline rule block */
-.rule-inline{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.5;margin-top:10px}
-.rib-icon{font-size:13px;flex-shrink:0;margin-top:1px}
-.rib-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:3px}
-.rt-s{background:var(--bl);color:var(--bm)}
-.rt-b{background:var(--gl);color:var(--g)}
-.rt-o{background:var(--al);color:var(--am)}
-.rt-q{background:var(--rl);color:var(--rm)}
+    .pop-info .pr:last-child {
+      margin-bottom: 0
+    }
 
-select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%}
+    .pop-q {
+      background: #1C0A0A;
+      color: #FFE4E4;
+      border: 1px solid rgba(240, 170, 170, 0.3)
+    }
 
-/* Edit attendance button */
-.btn-att-edit{border:1px solid var(--bdr);background:var(--s);color:var(--ink2);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
-.btn-att-edit:hover{background:var(--bg);border-color:var(--gm);color:var(--g)}
+    .pop-q .pop-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 200, 200, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
 
-/* Attendance edit modal */
-.att-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:500}
-.att-modal-box{background:var(--s);border-radius:var(--rl2);width:420px;box-shadow:0 16px 48px rgba(0,0,0,0.28);overflow:hidden}
-.att-modal-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--bdr)}
-.att-modal-title{font-size:14px;font-weight:700;flex:1}
-.att-modal-close{border:none;background:none;font-size:18px;cursor:pointer;color:var(--ink4);line-height:1;padding:0}
-.att-modal-body{padding:18px}
-.att-modal-footer{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--bdr);background:var(--bg)}
-.att-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.att-field label{display:block;font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.att-field input{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%}
-.att-field input:focus{border-color:var(--gm);background:var(--s)}
-.att-warning{background:var(--al);border:1px solid var(--ab);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--am);line-height:1.55;display:flex;gap:8px;align-items:flex-start}
+    .pop-q .pop-title::before {
+      content: '?';
+      font-size: 12px;
+      color: var(--rb)
+    }
 
-/* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
-.sop-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.sop-footer .btn-sop-delete{margin-right:auto;}            /* Delete anchored far-left */
-.btn-sop{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r,10px);padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;line-height:1.2;}
-.btn-sop-submit{background:var(--g,#13795B);color:#fff;border:none;}
-.btn-sop-submit:hover{background:#0A5C46;}
-.btn-sop-submit:disabled{background:#B9C4C0;cursor:not-allowed;}
-.btn-sop-draft{background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);}
-.btn-sop-draft:hover{background:var(--bl,#EBF3FD);}
-.btn-sop-cancel{background:none;border:none;color:var(--ink3,#777);padding:8px 10px;}
-.btn-sop-cancel:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
-.btn-sop-delete{background:transparent;color:var(--rm,#B03030);border:1px solid var(--rm,#B03030);}
-.btn-sop-delete:hover{background:var(--rl,#FDF0F0);}
-/* List view */
-.btn-sop-add{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--bm,#1A5FA8);border:1px solid var(--bm,#1A5FA8);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;}
-.btn-sop-add:hover{background:var(--bl,#EBF3FD);}
-.row-acts{display:inline-flex;align-items:center;gap:12px;justify-content:center;}
-.row-act{cursor:pointer;font-size:15px;line-height:1;background:none;border:none;padding:0;}
-.row-act.ra-view,.row-act.ra-edit{color:var(--g,#13795B);}
-.row-act.ra-del{color:var(--rm,#B03030);}
-.row-act:hover{opacity:.7;}
-/* Approval row */
-.appr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2,#F0F0F0);}
-.appr-row:last-child{border-bottom:none;}
-.appr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
-.appr-badge.pending{background:var(--al,#FDF3E3);color:var(--am,#C07A1A);border:1px solid var(--ab,#F0C060);}
-.appr-badge.approved{background:var(--g,#13795B);color:#fff;}
-.appr-spacer{margin-left:auto;}
-.btn-sop-approve{display:inline-flex;align-items:center;gap:6px;background:var(--g,#13795B);color:#fff;border:none;border-radius:var(--r,10px);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.btn-sop-approve:hover{background:#0A5C46;}
-.link-undo{background:none;border:none;color:var(--ink3,#777);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'DM Sans',sans-serif;}
-.link-undo:hover{color:var(--ink,#1C1C1E);text-decoration:underline;}
-</style>
+    .pop-q .pr {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 5px;
+      line-height: 1.5;
+      color: #FFD0D0
+    }
+
+    .pop-q .pr:last-child {
+      margin-bottom: 0
+    }
+
+    .pop-q .note {
+      font-size: 10px;
+      color: rgba(255, 200, 200, 0.4);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 150, 150, 0.15)
+    }
+
+    .pd {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px
+    }
+
+    .pd-g {
+      background: var(--gm)
+    }
+
+    .pd-a {
+      background: #F0C060
+    }
+
+    .pd-r {
+      background: #F0AAAA
+    }
+
+    .pd-q {
+      background: #F0AAAA
+    }
+
+    /* Hero */
+    .hero {
+      background: var(--s);
+      border-bottom: 1px solid var(--bdr);
+      padding: 16px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-shrink: 0;
+      position: relative
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1D9E75, #0A5C46);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .p-g {
+      background: var(--gl);
+      color: var(--g);
+      border: 1px solid var(--gb)
+    }
+
+    .p-b {
+      background: var(--bl);
+      color: var(--bm)
+    }
+
+    .p-a {
+      background: var(--al);
+      color: var(--am);
+      border: 1px solid var(--ab)
+    }
+
+    .p-r {
+      background: var(--rl);
+      color: var(--rm)
+    }
+
+    .p-gr {
+      background: #F1F1F0;
+      color: #777
+    }
+
+    .p-p {
+      background: var(--pl);
+      color: var(--pm);
+      border: 1px solid var(--pb)
+    }
+
+    .upd-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--pl);
+      color: var(--pm);
+      border: 1px solid var(--pb);
+      border-radius: 20px;
+      padding: 1px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-left: 6px
+    }
+
+    /* Tabs */
+    .tabs {
+      background: var(--s);
+      border-bottom: 1px solid var(--bdr);
+      padding: 0 24px;
+      display: flex;
+      flex-shrink: 0;
+      overflow-x: auto
+    }
+
+    .tab {
+      padding: 11px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--ink3);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .tab.on {
+      color: var(--g);
+      border-bottom-color: var(--gm)
+    }
+
+    .tc {
+      display: none;
+      overflow-y: auto;
+      padding: 20px 24px;
+      flex: 1
+    }
+
+    .tc.on {
+      display: block
+    }
+
+    /* Grid helpers */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px
+    }
+
+    .g4payment {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px
+    }
+
+    /* Stat */
+    .stat {
+      background: var(--s);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      padding: 14px;
+      text-align: center
+    }
+
+    .sn {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--g)
+    }
+
+    .sl {
+      font-size: 11px;
+      color: var(--ink4);
+      margin-top: 3px
+    }
+
+    .stat.warn .sn {
+      color: var(--am)
+    }
+
+    /* Card */
+    .card {
+      background: var(--s);
+      border: 1px solid var(--bdr);
+      border-radius: var(--rl2);
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative
+    }
+
+    .card-t {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .dl {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 5px 12px;
+      font-size: 13px
+    }
+
+    .dl dt {
+      color: var(--ink4)
+    }
+
+    .dl dd {
+      color: var(--ink2);
+      font-weight: 500
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px
+    }
+
+    .filter-bar label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      white-space: nowrap
+    }
+
+    .filter-bar select,
+    .filter-bar input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink2);
+      outline: none;
+      transition: border-color .15s
+    }
+
+    .filter-bar select:focus,
+    .filter-bar input:focus {
+      border-color: var(--gm);
+      background: var(--s)
+    }
+
+    /* Engagement */
+    .eng-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 4px;
+      margin: 6px 0 8px
+    }
+
+    .eng {
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600
+    }
+
+    .eng-y {
+      background: var(--gl);
+      color: var(--g)
+    }
+
+    .eng-n {
+      background: var(--bg);
+      color: var(--ink4);
+      border: 1px solid var(--bdr)
+    }
+
+    .eng-p {
+      background: #EBEBEB;
+      color: #CCC
+    }
+
+    /* Table */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    .tbl th {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink4);
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--bdr);
+      text-transform: uppercase;
+      letter-spacing: 0.03em
+    }
+
+    .tbl td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--bdr2);
+      vertical-align: middle
+    }
+
+    .tbl tr:last-child td {
+      border: none
+    }
+
+    .st {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .d-g {
+      background: var(--gm)
+    }
+
+    .d-a {
+      background: #EF9F27
+    }
+
+    .d-n {
+      background: #DDD
+    }
+
+    /* Status table (MJ app statuses) */
+    .status-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px
+    }
+
+    .status-tbl th {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink4);
+      text-align: left;
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--bdr);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--bg)
+    }
+
+    .status-tbl td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--bdr2);
+      vertical-align: top;
+      line-height: 1.4;
+      font-size: 12px
+    }
+
+    .status-tbl tr:last-child td {
+      border: none
+    }
+
+    /* Job rows */
+    .jrow {
+      display: grid;
+      grid-template-columns: 82px 95px 95px 1fr 72px;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bdr2);
+      font-size: 13px
+    }
+
+    .jrow:last-child {
+      border: none
+    }
+
+    /* Cancellation table */
+    .cancel-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px
+    }
+
+    .cancel-tbl th {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink4);
+      text-align: left;
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--bdr);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--bg)
+    }
+
+    .cancel-tbl td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--bdr2);
+      vertical-align: top;
+      line-height: 1.4
+    }
+
+    .cancel-tbl tr:last-child td {
+      border: none
+    }
+
+    /* Payment */
+    .pay-row {
+      display: grid;
+      grid-template-columns: 82px 110px 52px 68px 105px 90px;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--bdr2);
+      font-size: 13px
+    }
+
+    .pay-row:last-child {
+      border: none
+    }
+
+    /* Notes */
+    .note-item {
+      border-left: 3px solid var(--gm);
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 8px
+    }
+
+    .note-item.flag {
+      border-left-color: var(--rm);
+      background: var(--rl)
+    }
+
+    .note-by {
+      font-size: 11px;
+      color: var(--ink4);
+      margin-bottom: 4px
+    }
+
+    .note-txt {
+      font-size: 13px;
+      color: var(--ink2);
+      line-height: 1.5
+    }
+
+    textarea.n-input {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 9px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      background: var(--bg);
+      color: var(--ink);
+      resize: vertical;
+      min-height: 60px;
+      outline: none;
+      margin-top: 8px
+    }
+
+    textarea.n-input:focus {
+      border-color: var(--gm)
+    }
+
+    /* Buttons */
+    .btn-sm {
+      border: 1px solid var(--gb);
+      background: var(--gl);
+      color: var(--g);
+      border-radius: var(--r);
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 6px
+    }
+
+    .btn-act {
+      border: 1px solid var(--bdr);
+      background: var(--s);
+      color: var(--ink2);
+      border-radius: var(--r);
+      padding: 7px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif
+    }
+
+    .btn-red {
+      border: 1px solid var(--rb);
+      background: var(--rl);
+      color: var(--rm);
+      border-radius: var(--r);
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif
+    }
+
+    /* Banner */
+    .banner {
+      border-radius: var(--r);
+      padding: 10px 12px;
+      font-size: 12px;
+      display: flex;
+      gap: 8px;
+      line-height: 1.5
+    }
+
+    .b-g {
+      background: var(--gl);
+      color: #0A5C46;
+      border: 1px solid var(--gb)
+    }
+
+    .b-a {
+      background: var(--al);
+      color: var(--am);
+      border: 1px solid var(--ab)
+    }
+
+    .b-r {
+      background: var(--rl);
+      color: var(--rm);
+      border: 1px solid var(--rb)
+    }
+
+    /* Inline rule block */
+    .rule-inline {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 10px
+    }
+
+    .rib-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .rib-type {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1px 5px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 3px
+    }
+
+    .rt-s {
+      background: var(--bl);
+      color: var(--bm)
+    }
+
+    .rt-b {
+      background: var(--gl);
+      color: var(--g)
+    }
+
+    .rt-o {
+      background: var(--al);
+      color: var(--am)
+    }
+
+    .rt-q {
+      background: var(--rl);
+      color: var(--rm)
+    }
+
+    select.st-sel {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 8px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      background: var(--bg);
+      color: var(--ink);
+      outline: none;
+      width: 100%
+    }
+
+    /* Edit attendance button */
+    .btn-att-edit {
+      border: 1px solid var(--bdr);
+      background: var(--s);
+      color: var(--ink2);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background .15s
+    }
+
+    .btn-att-edit:hover {
+      background: var(--bg);
+      border-color: var(--gm);
+      color: var(--g)
+    }
+
+    /* Attendance edit modal */
+    .att-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500
+    }
+
+    .att-modal-box {
+      background: var(--s);
+      border-radius: var(--rl2);
+      width: 420px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+      overflow: hidden
+    }
+
+    .att-modal-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--bdr)
+    }
+
+    .att-modal-title {
+      font-size: 14px;
+      font-weight: 700;
+      flex: 1
+    }
+
+    .att-modal-close {
+      border: none;
+      background: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--ink4);
+      line-height: 1;
+      padding: 0
+    }
+
+    .att-modal-body {
+      padding: 18px
+    }
+
+    .att-modal-footer {
+      display: flex;
+      gap: 8px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--bdr);
+      background: var(--bg)
+    }
+
+    .att-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px
+    }
+
+    .att-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 4px
+    }
+
+    .att-field input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 8px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      background: var(--bg);
+      color: var(--ink);
+      outline: none;
+      width: 100%
+    }
+
+    .att-field input:focus {
+      border-color: var(--gm);
+      background: var(--s)
+    }
+
+    .att-warning {
+      background: var(--al);
+      border: 1px solid var(--ab);
+      border-radius: var(--r);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--am);
+      line-height: 1.55;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start
+    }
+
+    /* ── WF Form — Button Design Standards (SOP) ───────────────────────── */
+    .sop-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sop-footer .btn-sop-delete {
+      margin-right: auto;
+    }
+
+    /* Delete anchored far-left */
+    .btn-sop {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--r, 10px);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .btn-sop-submit {
+      background: var(--g, #13795B);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-sop-submit:hover {
+      background: #0A5C46;
+    }
+
+    .btn-sop-submit:disabled {
+      background: #B9C4C0;
+      cursor: not-allowed;
+    }
+
+    .btn-sop-draft {
+      background: transparent;
+      color: var(--bm, #1A5FA8);
+      border: 1px solid var(--bm, #1A5FA8);
+    }
+
+    .btn-sop-draft:hover {
+      background: var(--bl, #EBF3FD);
+    }
+
+    .btn-sop-cancel {
+      background: none;
+      border: none;
+      color: var(--ink3, #777);
+      padding: 8px 10px;
+    }
+
+    .btn-sop-cancel:hover {
+      color: var(--ink, #1C1C1E);
+      text-decoration: underline;
+    }
+
+    .btn-sop-delete {
+      background: transparent;
+      color: var(--rm, #B03030);
+      border: 1px solid var(--rm, #B03030);
+    }
+
+    .btn-sop-delete:hover {
+      background: var(--rl, #FDF0F0);
+    }
+
+    /* List view */
+    .btn-sop-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--bm, #1A5FA8);
+      border: 1px solid var(--bm, #1A5FA8);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+    }
+
+    .btn-sop-add:hover {
+      background: var(--bl, #EBF3FD);
+    }
+
+    .row-acts {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .row-act {
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .row-act.ra-view,
+    .row-act.ra-edit {
+      color: var(--g, #13795B);
+    }
+
+    .row-act.ra-del {
+      color: var(--rm, #B03030);
+    }
+
+    .row-act:hover {
+      opacity: .7;
+    }
+
+    /* Approval row */
+    .appr-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--bdr2, #F0F0F0);
+    }
+
+    .appr-row:last-child {
+      border-bottom: none;
+    }
+
+    .appr-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .appr-badge.pending {
+      background: var(--al, #FDF3E3);
+      color: var(--am, #C07A1A);
+      border: 1px solid var(--ab, #F0C060);
+    }
+
+    .appr-badge.approved {
+      background: var(--g, #13795B);
+      color: #fff;
+    }
+
+    .appr-spacer {
+      margin-left: auto;
+    }
+
+    .btn-sop-approve {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--g, #13795B);
+      color: #fff;
+      border: none;
+      border-radius: var(--r, 10px);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-sop-approve:hover {
+      background: #0A5C46;
+    }
+
+    .link-undo {
+      background: none;
+      border: none;
+      color: var(--ink3, #777);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .link-undo:hover {
+      color: var(--ink, #1C1C1E);
+      text-decoration: underline;
+    }
+  </style>
   <!-- Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <!-- Bootstrap Icons -->
@@ -216,546 +1176,880 @@ select.st-sel{font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;b
   <!-- V2 Sidebar CSS -->
   <link rel="stylesheet" href="../portal/index.css">
   <style>
-    body { display: block !important; }
-    #wrapper { display: flex; height: 100vh; }
-    #sidebar { background-color: #6B21A8 !important; flex-shrink: 0; }
-    #page-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    body {
+      display: block !important;
+    }
+
+    #wrapper {
+      display: flex;
+      height: 100vh;
+    }
+
+    #sidebar {
+      background-color: #6B21A8 !important;
+      flex-shrink: 0;
+    }
+
+    #page-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
   </style>
 </head>
+
 <body>
 
-<div class="d-flex" id="wrapper">
+  <div class="d-flex" id="wrapper">
 
-<nav id="sidebar" class="sidebar d-flex flex-column">
-  <div class="sidebar-profile p-3 text-center">
-    <div class="sidebar-avatar mx-auto mb-2">
-      <i class="bi bi-person-fill fs-3 text-white"></i>
-    </div>
-    <div class="sidebar-username text-white fw-semibold small">John David</div>
-    <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
-      Admin
-      <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
-    </div>
-  </div>
-  <ul class="nav flex-column sidebar-nav mt-1">
-    <li class="nav-item">
-      <a class="nav-link sidebar-link" href="./index.html">
-        <i class="bi bi-grid-fill me-2"></i>Dashboard
-      </a>
-    </li>
-    <ul class="nav flex-column sidebar">
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./attendance.html">Attendance</a></li>
-      <li class="nav-item"><a class="nav-link sidebar-sublink" href="./settings.html">Settings</a></li>
-    </ul>
-  </ul>
-</nav>
-
-<div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden">
-
-<div class="main">
-  <div class="topbar"><button id="sidebarToggle" class="btn btn-sm me-2" type="button" style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8"><i class="bi bi-list fs-5"></i></button>
-    <div class="crumb"><a href="#">MJ Registry</a><span>›</span><a href="#">Active MJs</a><span>›</span>Tan Siew Ling</div>
-    <div style="margin-left:auto;display:flex;gap:8px">
-      <button class="btn-act">Edit profile</button>
-      <button class="btn-red">Suspend MJ</button>
-    </div>
-  </div>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="avatar">TSL</div>
-    <div style="flex:1">
-      <div style="display:flex;align-items:center;gap:8px;position:relative">
-        <div style="font-size:17px;font-weight:700">Tan Siew Ling</div>
-      </div>
-      <div style="font-size:12px;color:var(--ink3);margin-top:3px">Female · 68 yrs · Mandarin, Hokkien · Clementi (District 12) · Joined March 2025</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">
-        <span class="pill p-g">● Active</span>
-        <span class="pill p-b">Senior + MJ</span>
-        <span class="pill p-g">Chaperone</span>
-        <span class="pill p-g">Befriending</span>
-        <span class="pill p-a">Home Assessment — OJT Pending</span>
-      </div>
-    </div>
-    <div style="text-align:right;flex-shrink:0;position:relative">
-      <div style="font-size:28px;font-weight:800;color:var(--rm);line-height:1">1</div>
-      <div style="font-size:11px;color:var(--ink4);margin-top:2px">No-show flags</div>
-      <div style="font-size:10px;color:var(--am);margin-top:3px;background:var(--al);padding:2px 6px;border-radius:20px">2 more = auto-blacklist</div>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab on" onclick="showTab('ov',this)">Overview</div>
-    <div class="tab" onclick="showTab('tr',this)">Training & OJT</div>
-    <div class="tab" onclick="showTab('at',this)">Attendance</div>
-    <div class="tab" onclick="showTab('jh',this)">Job history</div>
-    <div class="tab" onclick="showTab('py',this)">Payment</div>
-    <div class="tab" onclick="showTab('cx',this)" style="display:none;">Cancellations</div>
-    <div class="tab" onclick="showTab('st',this)" style="display:none;">MJ App statuses</div>
-    <div class="tab" onclick="showTab('nt',this)">Notes</div>
-  </div>
-
-  <!-- OVERVIEW -->
-  <div class="tc on" id="tc-ov">
-    <div class="g4" style="margin-bottom:14px">
-      <div class="stat"><div class="sn">14</div><div class="sl">Jobs completed</div></div>
-      <div class="stat"><div class="sn">28h</div><div class="sl">Hours this year</div></div>
-      <div class="stat"><div class="sn">$392</div><div class="sl">YTD earnings</div></div>
-      <div class="stat warn"><div class="sn">1</div><div class="sl">No-show flags</div></div>
-    </div>
-    <div class="card">
-      <div class="card-t" style="position:relative">
-        Engagement — 2026
-      </div>
-      <div style="font-size:12px;color:var(--ink4);margin-bottom:6px">Green = ≥1 job completed · Grey = no data yet</div>
-      <div class="eng-grid">
-        <div class="eng eng-y">Jan</div><div class="eng eng-y">Feb</div><div class="eng eng-y">Mar</div><div class="eng eng-y">Apr</div><div class="eng eng-y">May</div>
-        <div class="eng eng-p">Jun</div><div class="eng eng-p">Jul</div><div class="eng eng-p">Aug</div><div class="eng eng-p">Sep</div><div class="eng eng-p">Oct</div><div class="eng eng-p">Nov</div><div class="eng eng-p">Dec</div>
-      </div>
-      <div style="display:flex;gap:16px;font-size:11px;color:var(--ink4)">
-        <span>5 months engaged</span><span>·</span><span>Last job: 3 May 2026</span><span>·</span>
-      </div>
-    </div>
-    <div class="g2">
-      <div class="card">
-        <div class="card-t">Profile</div>
-        <dl class="dl">
-          <dt>NRIC</dt><dd>SXXXX456A</dd>
-          <dt>Date of birth</dt><dd>12 Apr 1958 (68 yr)</dd>
-          <dt>Mobile</dt><dd>9123 4567</dd>
-          <dt>Address</dt><dd>Blk 301 Clementi Ave 4, S120301</dd>
-          <dt>Languages</dt><dd>Mandarin, Hokkien</dd>
-          <dt>MJ type</dt><dd>Senior + MJ</dd>
-          <dt>Interests</dt><dd>Health, Gardening</dd>
-          <dt>C4Me access</dt><dd style="color:var(--g)">Granted</dd>
-        </dl>
-      </div>
-      <div class="card" style="position:relative">
-        <div class="card-t">
-          Status management
+    <nav id="sidebar" class="sidebar d-flex flex-column">
+      <div class="sidebar-profile p-3 text-center">
+        <div class="sidebar-avatar mx-auto mb-2">
+          <i class="bi bi-person-fill fs-3 text-white"></i>
         </div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div>
-            <div style="font-size:12px;color:var(--ink4);margin-bottom:4px">MJ status</div>
-            <select class="st-sel"><option>Active</option><option>Undergoing Training</option><option>Screening</option><option>Suspended</option><option>Withdrawn</option><option>Terminated</option><option>Blacklisted</option></select>
+        <div class="sidebar-username text-white fw-semibold small">John David</div>
+        <div class="sidebar-role text-white-50 small" style="font-size:0.75rem;">
+          Admin
+          <i class="bi bi-chevron-down ms-1" style="font-size:0.65rem;"></i>
+        </div>
+      </div>
+      <ul class="nav flex-column sidebar-nav mt-1">
+        <li class="nav-item">
+          <a class="nav-link sidebar-link" href="./index.html">
+            <i class="bi bi-grid-fill me-2"></i>Dashboard
+          </a>
+        </li>
+        <ul class="nav flex-column sidebar">
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_mj_listing.html">MJ Registry</a></li>
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./proto1_v3_publish.html">Post Job</a></li>
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./v1_aic_report.html">Reports</a></li>
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./finance.html">Finance</a></li>
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./attendance.html">Attendance</a></li>
+          <li class="nav-item"><a class="nav-link sidebar-sublink" href="./settings.html">Settings</a></li>
+        </ul>
+      </ul>
+    </nav>
+
+    <div id="page-content" class="d-flex flex-column flex-grow-1" style="overflow:hidden">
+
+      <div class="main">
+        <div class="topbar"><button id="sidebarToggle" class="btn btn-sm me-2" type="button"
+            style="background:rgba(107,33,168,0.12);border:1px solid rgba(107,33,168,0.25);color:#6B21A8"><i
+              class="bi bi-list fs-5"></i></button>
+          <div class="crumb"><a href="#">MJ Registry</a><span>›</span><a href="#">Active MJs</a><span>›</span>Tan Siew
+            Ling</div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn-act">Edit profile</button>
+            <button class="btn-red">Suspend MJ</button>
           </div>
-          <div class="banner b-a"><strong>1 no-show</strong> recorded (10 Apr 2026). Auto-blacklist at 3.</div>
-          <div class="banner b-g">Service contract signed · Bank details on file · GIRO active</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TRAINING -->
-  <div class="tc" id="tc-tr">
-    <div class="card" style="position:relative">
-      <div class="card-t">
-        Training & OJT by service role
-        <button class="btn-sop-add" style="margin-left:auto"><i class="bi bi-plus-lg"></i> Enroll</button>
-      </div>
-      <table class="tbl">
-        <thead><tr><th>Role</th><th>Training</th><th>OJT</th><th>Job eligible</th><th>Certificate / Notes</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Chaperone</strong></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><span class="pill p-g">Yes</span></td><td style="font-size:12px;color:var(--ink4)">Cert #CH-2025-014 · Jan 2025</td></tr>
-          <tr><td><strong>Befriending</strong></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><span class="pill p-g">Yes</span></td><td style="font-size:12px;color:var(--ink4)">Cert #BF-2025-008 · Feb 2025</td></tr>
-          <tr><td><strong>Home Assessment</strong><br><span style="font-size:11px;color:var(--ink4)">Safe Steps Associate</span></td><td><div class="st"><div class="dot d-g"></div>Completed</div></td><td><div class="st"><div class="dot d-a"></div>In Progress</div></td><td><span class="pill p-a">No — OJT pending</span></td><td style="font-size:12px;color:var(--ink4)">OJT scheduled 20 May 2026</td></tr>
-          <tr><td><strong>Centre Assistant</strong></td><td><div class="st"><div class="dot d-n"></div>Not enrolled</div></td><td><div class="st"><div class="dot d-n"></div>N/A</div></td><td><span class="pill p-gr">Not enrolled</span></td><td></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ATTENDANCE -->
-  <div class="tc" id="tc-at">
-    <div class="card" style="position:relative">
-
-        <div class="filter-bar">
-          <label>From</label>
-          <input type="date" id="attFrom" onchange="filterAttendance()">
-          <label>To</label>
-          <input type="date" id="attTo" onchange="filterAttendance()">
-          <button class="btn-act" onclick="clearAttFilters()">Clear</button>
-          <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;" onclick="exportAttendance()">Export to Excel</button>
         </div>
 
-      <div class="card-t">Attendance record</div>
-      <div style="overflow-x:auto">
-        <table class="tbl" id="attTbl">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Duration</th>
-              <th>Location</th>
-              <th>Job ID</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr data-date="2026-05-03" data-jobid="mj-2026-037">
-              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">3 May 2026</td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--g)">14:02</span></td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">16:10</span></td>
-              <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
-              <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
-              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
-              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'3 May 2026','MJ-2026-037','14:02','16:10')"><i class="bi bi-pencil"></i></button></span></td>
-            </tr>
-            <tr data-date="2026-04-22" data-jobid="mj-2026-029">
-              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--g)">10:05</span></td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:08</span></td>
-              <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
-              <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
-              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
-              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'22 Apr 2026','MJ-2026-029','10:05','11:08')"><i class="bi bi-pencil"></i></button></span></td>
-            </tr>
-            <tr data-date="2026-04-02" data-jobid="mj-2026-018">
-              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:58</span></td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">10:55</span></td>
-              <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
-              <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
-              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
-              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'2 Apr 2026','MJ-2026-018','09:58','10:55')"><i class="bi bi-pencil"></i></button></span></td>
-            </tr>
-            <tr data-date="2026-03-10" data-jobid="mj-2026-009">
-              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--g)">13:01</span></td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">15:05</span></td>
-              <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
-              <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
-              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
-              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'10 Mar 2026','MJ-2026-009','13:01','15:05')"><i class="bi bi-pencil"></i></button></span></td>
-            </tr>
-            <tr data-date="2026-02-14" data-jobid="mj-2026-004">
-              <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:55</span></td>
-              <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:10</span></td>
-              <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
-              <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
-              <td><span class="pill p-b" style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
-              <td><span class="row-acts"><button class="row-act ra-edit" title="Edit" onclick="openAttEdit(this,'14 Feb 2026','MJ-2026-004','09:55','11:10')"><i class="bi bi-pencil"></i></button></span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="font-size:11px;color:var(--ink4);margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)">Check-in and check-out times are recorded via the C4Me mobile app. MJ payment is calculated from these timestamps.</div>
-    </div>
-  </div>
-
-  <!-- JOB HISTORY -->
-  <div class="tc" id="tc-jh">
-    <div class="filter-bar" style="margin-bottom:14px">
-      <label>From</label>
-      <input type="date" id="jhFrom" onchange="filterJobHistory()">
-      <label>To</label>
-      <input type="date" id="jhTo" onchange="filterJobHistory()">
-      <label>Status</label>
-      <select id="jhStatus" onchange="filterJobHistory()">
-        <option value="">All</option>
-        <option value="completed">Completed</option>
-        <option value="no-show">No-show</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-      <button class="btn-act" onclick="clearJhFilters()">Clear</button>
-      <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;" onclick="exportJobHistory()">Export to Excel</button>
-    </div>
-    <div class="card" style="position:relative">
-      <div class="card-t">Job history</div>
-      <div style="display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)"><span>Date</span><span>Status</span><span>Type</span><span>Details</span><span>Earned</span></div>
-      <div id="jhRows">
-        <div class="jrow" data-date="2026-05-03" data-status="completed"><span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Lee Geok Eng → SGH A&E · 2h</span><span style="color:var(--g);font-weight:600">$28</span></div>
-        <div class="jrow" data-date="2026-04-22" data-status="completed"><span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Befriending</span><span style="color:var(--ink3)">Ng Ah Beng (AAC) · 1h · Recurring</span><span style="color:var(--g);font-weight:600">$14</span></div>
-        <div class="jrow" data-date="2026-04-10" data-status="no-show"><span style="font-size:11px;color:var(--ink4)">10 Apr 2026</span><span class="pill p-r" style="font-size:10px">No-show</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Tan Ah Kow → NUH · Flagged by SCC</span><span style="color:var(--ink4)">—</span></div>
-        <div class="jrow" data-date="2026-04-02" data-status="completed"><span style="font-size:11px;color:var(--ink4)">2 Apr 2026</span><span class="pill p-g" style="font-size:10px">Completed</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Chan Bee Kim → Polyclinic · 1h</span><span style="color:var(--g);font-weight:600">$14</span></div>
-        <div class="jrow" data-date="2026-03-15" data-status="cancelled"><span style="font-size:11px;color:var(--ink4)">15 Mar 2026</span><span class="pill p-a" style="font-size:10px">Cancelled</span><span class="pill p-b" style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Client cancelled with sufficient notice</span><span style="color:var(--ink4)">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAYMENT -->
-  <div class="tc" id="tc-py">
-    <div class="g4payment" style="margin-bottom:14px">
-      <div class="stat"><div class="sn">$392</div><div class="sl">YTD paid</div></div>
-      <div class="stat warn"><div class="sn">$42</div><div class="sl">Pending verification</div></div>
-      <div class="stat"><div class="sn">$15/h</div><div class="sl">Chaperone rate*</div></div>
-      <div class="stat"><div class="sn">$12/h</div><div class="sl">Safe Steps rate*</div></div>
-      <div class="stat"><div class="sn">$10/h</div><div class="sl">Befriending rate*</div></div>
-      <div class="stat"><div class="sn">$10/h</div><div class="sl">Centre Assistant rate*</div></div>
-    </div>
-    <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders</div>
-    <div class="card" style="position:relative">
-      <div class="card-t">
-        Claims — May 2026
-      </div>
-      <div style="display:grid;grid-template-columns:82px 110px 52px 68px 105px 90px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)"><span>Date</span><span>Role</span><span>Hours</span><span>Amount</span><span>Status</span><span></span></div>
-      <div class="pay-row">
-        <span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span>Chaperone</span><span>2h</span><span style="font-weight:600">$28</span>
-        <span class="pill p-a" style="font-size:10px">Pending</span>
-        <button class="btn-sop-approve"><i class="bi bi-check-lg"></i> Verify</button>
-      </div>
-      <div class="pay-row">
-        <span style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span>Befriending</span><span>1h</span><span style="font-weight:600">$14</span>
-        <span class="pill p-g" style="font-size:10px">Paid</span>
-        <span style="font-size:11px;color:var(--ink4)">2 May 2026</span>
-      </div>
-      <div style="margin-top:10px"><button class="btn-sm">Export timesheet (Excel)</button></div>
-    </div>
-  </div>
-
-  <!-- CANCELLATIONS (updated) -->
-  <div class="tc" id="tc-cx" style="display:none;">
-    <div class="card" style="position:relative">
-      <div class="card-t">
-        MJ cancellation policy
-        <span class="upd-badge">↻ Waitlist model revised</span>
-      </div>
-      <table class="cancel-tbl">
-        <thead><tr><th>Appointment day</th><th>MJ must cancel by</th><th>Auto-cancel if no taker by</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Monday</strong></td><td>Prev Thursday, 9AM</td><td>Friday, 9AM (1 BD before)</td></tr>
-          <tr><td><strong>Tuesday</strong></td><td>Prev Friday, 9AM</td><td>Monday, 9AM</td></tr>
-          <tr><td><strong>Wednesday</strong></td><td>Monday, 9AM</td><td>Tuesday, 9AM</td></tr>
-          <tr><td><strong>Thursday</strong></td><td>Tuesday, 9AM</td><td>Wednesday, 9AM</td></tr>
-          <tr><td><strong>Friday</strong></td><td>Wednesday, 9AM</td><td>Thursday, 9AM</td></tr>
-          <tr><td colspan="3" style="background:var(--al);color:var(--am);font-size:11px;padding:7px 8px">If deadline falls on / before a PH: system blocks. Staff to handle manually by phone.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card" style="position:relative">
-      <div class="card-t">
-        Client cancellation & no-show rules
-      </div>
-      <table class="cancel-tbl">
-        <thead><tr><th>Scenario</th><th>SCC action</th><th>AAC / MJ payment</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Sufficient notice</strong><br><span style="font-size:11px;color:var(--ink4)">≥24h (Tue–Fri) · Fri 5PM for Mon</span></td><td>Cancel in CARES. Inform client.</td><td>MJ not paid (job cancelled).</td></tr>
-          <tr><td><strong>Short notice</strong></td><td>Charge client in full (option to waive).</td><td>MJ paid <strong>1 hour</strong> by AAC.</td></tr>
-          <tr><td><strong>Client no-show</strong></td><td>Charge client in full.</td><td>MJ paid accordingly. Record "No Show" in CARES.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- MJ APP STATUSES (new tab) -->
-  <div class="tc" id="tc-st">
-    <div class="card" style="position:relative">
-      <div class="card-t">
-        MJ app job statuses (C4Me)
-      </div>
-      <table class="status-tbl">
-        <thead><tr><th>Status</th><th>Chaperone</th><th>Home Assessment</th><th>Centre Assistant</th><th>Befriending</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><span class="pill p-b" style="font-size:11px">Registered</span></td>
-            <td>MJ grabbed job</td><td>MJ grabbed job</td><td>MJ expressed interest</td><td>Staff assigned MJ</td>
-          </tr>
-          <tr>
-            <td><span class="pill p-g" style="font-size:11px">Confirmed</span></td>
-            <td>1st grab = confirmed</td><td>Up to 2 = confirmed (names shown)</td><td>Staff confirmed in CARES</td><td>Up to 2 = confirmed</td>
-          </tr>
-          <tr>
-            <td><span class="pill p-a" style="font-size:11px">Waitlisted</span></td>
-            <td>Up to 4</td><td>Up to 4</td><td>Staff waitlists backend</td><td>Staff waitlists backend</td>
-          </tr>
-          <tr>
-            <td><span class="pill p-gr" style="font-size:11px">No longer available</span></td>
-            <td>1 confirmed + 4 waitlist taken</td><td>2 confirmed + 4 waitlist taken</td><td>Event is over</td><td>Event over or care staff assigned</td>
-          </tr>
-          <tr>
-            <td><span class="pill p-r" style="font-size:11px">Cancelled</span></td>
-            <td colspan="4">Staff cancels backend. For Home Assessment: if cannot get 2 MJs 24h before → auto-cancelled by system.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- NOTES -->
-  <div class="tc" id="tc-nt">
-    <div class="card">
-      <div class="card-t">Staff notes</div>
-      <div class="note-item flag">
-        <div class="note-by">Maisarah Binte Hassan · 10 Apr 2026 · No-show incident</div>
-        <div class="note-txt">MJ called in sick on day of job (10 Apr — Chaperone for Tan Ah Kow → NUH). Late notice, verbal only. No-show flag recorded. MJ verbally advised of 48h cancellation policy. To monitor.</div>
-      </div>
-      <div class="note-item">
-        <div class="note-by">Aileen Chua · 2 Mar 2026</div>
-        <div class="note-txt">Excellent feedback from Tan Bee Lian for Feb and Mar Chaperone jobs. Client specifically asked for Siew Ling again. Reliable, calm, patient with anxious seniors. Recommended for Befriending recurring assignment.</div>
-      </div>
-      <div class="note-item">
-        <div class="note-by">Maisarah Binte Hassan · 15 Jan 2026 · Onboarding</div>
-        <div class="note-txt">Onboarding done. Service contract signed, GIRO set up. Chaperone + Befriending OJT completed. Home Assessment training done Jan 2026 — OJT to be scheduled separately.</div>
-      </div>
-      <textarea class="n-input" placeholder="Add a staff note…"></textarea>
-      <div class="sop-footer" style="margin-top:8px"><button class="btn-sop btn-sop-submit"><i class="bi bi-plus-lg"></i> Add note</button></div>
-    </div>
-  </div>
-
-</div>
-</div>
-
-<script>
-let activePop = null;
-function togglePop(id, btn) {
-  const pop = document.getElementById(id);
-  if (activePop && activePop !== pop) {
-    activePop.classList.remove('on');
-    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
-  }
-  const isOn = pop.classList.contains('on');
-  pop.classList.toggle('on');
-  btn.classList.toggle('active', !isOn);
-  activePop = isOn ? null : pop;
-}
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
-    document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
-    document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
-    activePop = null;
-  }
-});
-function showTab(id, el) {
-  document.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.getElementById('tc-' + id).classList.add('on');
-  el.classList.add('on');
-}
-
-function filterAttendance() {
-  const from = document.getElementById('attFrom').value;
-  const to   = document.getElementById('attTo').value;
-  document.querySelectorAll('#attTbl tbody tr').forEach(function(row) {
-    const d = row.getAttribute('data-date');
-    let show = true;
-    if (from && d < from) show = false;
-    if (to   && d > to)   show = false;
-    row.style.display = show ? '' : 'none';
-  });
-}
-
-function clearAttFilters() {
-  document.getElementById('attFrom').value = '';
-  document.getElementById('attTo').value   = '';
-  filterAttendance();
-}
-
-function exportAttendance() {
-  alert('Exporting attendance records to Excel...');
-}
-
-function filterJobHistory() {
-  var from   = document.getElementById('jhFrom').value;
-  var to     = document.getElementById('jhTo').value;
-  var status = document.getElementById('jhStatus').value;
-  document.querySelectorAll('#jhRows .jrow').forEach(function(row) {
-    var d = row.getAttribute('data-date');
-    var s = row.getAttribute('data-status');
-    var show = true;
-    if (from && d < from) show = false;
-    if (to   && d > to)   show = false;
-    if (status && s !== status) show = false;
-    row.style.display = show ? '' : 'none';
-  });
-}
-
-function clearJhFilters() {
-  document.getElementById('jhFrom').value   = '';
-  document.getElementById('jhTo').value     = '';
-  document.getElementById('jhStatus').value = '';
-  filterJobHistory();
-}
-
-function exportJobHistory() {
-  alert('Exporting job history to Excel...');
-}
-
-var _attEditRow = null;
-function openAttEdit(btn, date, jobId, checkin, checkout) {
-  _attEditRow = btn.closest('tr');
-  document.getElementById('attEditLabel').textContent = date + ' \u00b7 ' + jobId;
-  document.getElementById('attEditCheckin').value  = checkin;
-  document.getElementById('attEditCheckout').value = checkout;
-  document.getElementById('attEditReason').value   = '';
-  document.getElementById('attEditModal').style.display = 'flex';
-}
-
-function closeAttEdit() {
-  document.getElementById('attEditModal').style.display = 'none';
-  _attEditRow = null;
-}
-
-function handleAttModalOverlay(e) {
-  if (e.target.id === 'attEditModal') closeAttEdit();
-}
-
-function submitAttEdit() {
-  var reason = document.getElementById('attEditReason').value.trim();
-  if (!reason) { alert('Please enter a reason for the amendment.'); return; }
-  var cin  = document.getElementById('attEditCheckin').value;
-  var cout = document.getElementById('attEditCheckout').value;
-  if (!cin || !cout) { alert('Please enter both check-in and check-out times.'); return; }
-  if (cout <= cin) { alert('Check-out time must be after check-in time.'); return; }
-  if (_attEditRow) {
-    var cells = _attEditRow.querySelectorAll('td');
-    cells[1].querySelector('span').textContent = cin;
-    cells[2].querySelector('span').textContent = cout;
-    // Recalculate duration
-    var [ch, cm] = cin.split(':').map(Number);
-    var [oh, om] = cout.split(':').map(Number);
-    var totalMin = (oh * 60 + om) - (ch * 60 + cm);
-    if (totalMin > 0) {
-      cells[3].textContent = Math.floor(totalMin / 60) + 'h ' + (totalMin % 60) + 'm';
-    }
-  }
-  closeAttEdit();
-}
-</script>
-</div><!-- end #page-content -->
-</div><!-- end #wrapper -->
-
-<!-- Attendance Edit Modal -->
-<div id="attEditModal" class="att-modal-overlay" style="display:none" onclick="handleAttModalOverlay(event)">
-  <div class="att-modal-box" onclick="event.stopPropagation()">
-    <div class="att-modal-head">
-      <div class="att-modal-title">Edit Attendance — <span id="attEditLabel"></span></div>
-      <button class="att-modal-close" onclick="closeAttEdit()">&#x2715;</button>
-    </div>
-    <div class="att-modal-body">
-      <div class="att-warning">
-        <span style="font-size:15px;flex-shrink:0">&#x26A0;</span>
-        <div><strong>Payment impact:</strong> Editing check-in or check-out times will recalculate the MJ's billable hours and directly affect the payment amount for this job. Ensure the amended times are accurate and supported by documentation before saving.</div>
-      </div>
-      <div class="att-field-row">
-        <div class="att-field">
-          <label>Check-in time</label>
-          <input type="time" id="attEditCheckin">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="avatar">TSL</div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;position:relative">
+              <div style="font-size:17px;font-weight:700">Tan Siew Ling</div>
+            </div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:3px">Female · 68 yrs · Mandarin, Hokkien · Clementi
+              (District 12) · Joined March 2025</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">
+              <span class="pill p-g">● Active</span>
+              <span class="pill p-b">Senior + MJ</span>
+              <span class="pill p-g">Chaperone</span>
+              <span class="pill p-g">Befriending</span>
+              <span class="pill p-a">Home Assessment — OJT Pending</span>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;position:relative">
+            <div style="font-size:28px;font-weight:800;color:var(--rm);line-height:1">1</div>
+            <div style="font-size:11px;color:var(--ink4);margin-top:2px">No-show flags</div>
+            <div
+              style="font-size:10px;color:var(--am);margin-top:3px;background:var(--al);padding:2px 6px;border-radius:20px">
+              2 more = auto-blacklist</div>
+          </div>
         </div>
-        <div class="att-field">
-          <label>Check-out time</label>
-          <input type="time" id="attEditCheckout">
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab on" onclick="showTab('ov',this)">Overview</div>
+          <div class="tab" onclick="showTab('tr',this)">Training & OJT</div>
+          <div class="tab" onclick="showTab('at',this)">Attendance</div>
+          <div class="tab" onclick="showTab('jh',this)">Job history</div>
+          <div class="tab" onclick="showTab('py',this)">Payment</div>
+          <div class="tab" onclick="showTab('cx',this)" style="display:none;">Cancellations</div>
+          <div class="tab" onclick="showTab('st',this)" style="display:none;">MJ App statuses</div>
+          <div class="tab" onclick="showTab('nt',this)">Notes</div>
         </div>
-      </div>
-      <div style="margin-top:12px">
-        <div class="att-field">
-          <label>Reason for amendment</label>
-          <textarea id="attEditReason" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%;resize:vertical;min-height:56px" placeholder="e.g. MJ forgot to check out — confirmed by SCC staff on duty"></textarea>
+
+        <!-- OVERVIEW -->
+        <div class="tc on" id="tc-ov">
+          <div class="g4" style="margin-bottom:14px">
+            <div class="stat">
+              <div class="sn">14</div>
+              <div class="sl">Jobs completed</div>
+            </div>
+            <div class="stat">
+              <div class="sn">28h</div>
+              <div class="sl">Hours this year</div>
+            </div>
+            <div class="stat">
+              <div class="sn">$392</div>
+              <div class="sl">YTD earnings</div>
+            </div>
+            <div class="stat warn">
+              <div class="sn">1</div>
+              <div class="sl">No-show flags</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-t" style="position:relative">
+              Engagement — 2026
+            </div>
+            <div style="font-size:12px;color:var(--ink4);margin-bottom:6px">Green = ≥1 job completed · Grey = no data
+              yet</div>
+            <div class="eng-grid">
+              <div class="eng eng-y">Jan</div>
+              <div class="eng eng-y">Feb</div>
+              <div class="eng eng-y">Mar</div>
+              <div class="eng eng-y">Apr</div>
+              <div class="eng eng-y">May</div>
+              <div class="eng eng-p">Jun</div>
+              <div class="eng eng-p">Jul</div>
+              <div class="eng eng-p">Aug</div>
+              <div class="eng eng-p">Sep</div>
+              <div class="eng eng-p">Oct</div>
+              <div class="eng eng-p">Nov</div>
+              <div class="eng eng-p">Dec</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:11px;color:var(--ink4)">
+              <span>5 months engaged</span><span>·</span><span>Last job: 3 May 2026</span><span>·</span>
+            </div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-t">Profile</div>
+              <dl class="dl">
+                <dt>NRIC</dt>
+                <dd>SXXXX456A</dd>
+                <dt>Date of birth</dt>
+                <dd>12 Apr 1958 (68 yr)</dd>
+                <dt>Mobile</dt>
+                <dd>9123 4567</dd>
+                <dt>Address</dt>
+                <dd>Blk 301 Clementi Ave 4, S120301</dd>
+                <dt>Languages</dt>
+                <dd>Mandarin, Hokkien</dd>
+                <dt>MJ type</dt>
+                <dd>Senior + MJ</dd>
+                <dt>Interests</dt>
+                <dd>Health, Gardening</dd>
+                <dt>C4Me access</dt>
+                <dd style="color:var(--g)">Granted</dd>
+              </dl>
+            </div>
+            <div class="card" style="position:relative">
+              <div class="card-t">
+                Status management
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div>
+                  <div style="font-size:12px;color:var(--ink4);margin-bottom:4px">MJ status</div>
+                  <select class="st-sel">
+                    <option>Active</option>
+                    <option>Undergoing Training</option>
+                    <option>Screening</option>
+                    <option>Suspended</option>
+                    <option>Withdrawn</option>
+                    <option>Terminated</option>
+                    <option>Blacklisted</option>
+                  </select>
+                </div>
+                <div class="banner b-a"><strong>1 no-show</strong> recorded (10 Apr 2026). Auto-blacklist at 3.</div>
+                <div class="banner b-g">Service contract signed · Bank details on file · GIRO active</div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- TRAINING -->
+        <div class="tc" id="tc-tr">
+          <div class="card" style="position:relative">
+            <div class="card-t">
+              Training & OJT by service role
+              <button class="btn-sop-add" style="margin-left:auto"><i class="bi bi-plus-lg"></i> Enroll</button>
+            </div>
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Training</th>
+                  <th>OJT</th>
+                  <th>Job eligible</th>
+                  <th>Certificate / Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Chaperone</strong></td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-g"></div>Completed
+                    </div>
+                  </td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-g"></div>Completed
+                    </div>
+                  </td>
+                  <td><span class="pill p-g">Yes</span></td>
+                  <td style="font-size:12px;color:var(--ink4)">Cert #CH-2025-014 · Jan 2025</td>
+                </tr>
+                <tr>
+                  <td><strong>Befriending</strong></td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-g"></div>Completed
+                    </div>
+                  </td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-g"></div>Completed
+                    </div>
+                  </td>
+                  <td><span class="pill p-g">Yes</span></td>
+                  <td style="font-size:12px;color:var(--ink4)">Cert #BF-2025-008 · Feb 2025</td>
+                </tr>
+                <tr>
+                  <td><strong>Home Assessment</strong><br><span style="font-size:11px;color:var(--ink4)">Safe Steps
+                      Associate</span></td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-g"></div>Completed
+                    </div>
+                  </td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-a"></div>In Progress
+                    </div>
+                  </td>
+                  <td><span class="pill p-a">No — OJT pending</span></td>
+                  <td style="font-size:12px;color:var(--ink4)">OJT scheduled 20 May 2026</td>
+                </tr>
+                <tr>
+                  <td><strong>Centre Assistant</strong></td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-n"></div>Not enrolled
+                    </div>
+                  </td>
+                  <td>
+                    <div class="st">
+                      <div class="dot d-n"></div>N/A
+                    </div>
+                  </td>
+                  <td><span class="pill p-gr">Not enrolled</span></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ATTENDANCE -->
+        <div class="tc" id="tc-at">
+          <div class="card" style="position:relative">
+
+            <div class="filter-bar">
+              <label>From</label>
+              <input type="date" id="attFrom" onchange="filterAttendance()">
+              <label>To</label>
+              <input type="date" id="attTo" onchange="filterAttendance()">
+              <button class="btn-act" onclick="clearAttFilters()">Clear</button>
+              <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;"
+                onclick="exportAttendance()">Export to Excel</button>
+            </div>
+
+            <div class="card-t">Attendance record</div>
+            <div style="overflow-x:auto">
+              <table class="tbl" id="attTbl">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Duration</th>
+                    <th>Location</th>
+                    <th>Job ID</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-date="2026-05-03" data-jobid="mj-2026-037">
+                    <td style="font-size:12px;color:var(--ink4);white-space:nowrap">3 May 2026</td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--g)">14:02</span></td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--rm)">16:10</span></td>
+                    <td style="font-size:12px;color:var(--ink3)">2h 8m</td>
+                    <td style="font-size:12px;color:var(--ink2)">SGH A&amp;E, Block 6, Level 1<br><span
+                        style="font-size:11px;color:var(--ink4)">1 Hospital Dr, S169608</span></td>
+                    <td><span class="pill p-b"
+                        style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-037</span></td>
+                    <td><span class="row-acts"><button class="row-act ra-edit" title="Edit"
+                          onclick="openAttEdit(this,'3 May 2026','MJ-2026-037','14:02','16:10')"><i
+                            class="bi bi-pencil"></i></button></span></td>
+                  </tr>
+                  <tr data-date="2026-04-22" data-jobid="mj-2026-029">
+                    <td style="font-size:12px;color:var(--ink4);white-space:nowrap">22 Apr 2026</td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--g)">10:05</span></td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:08</span></td>
+                    <td style="font-size:12px;color:var(--ink3)">1h 3m</td>
+                    <td style="font-size:12px;color:var(--ink2)">Clementi Community Centre<br><span
+                        style="font-size:11px;color:var(--ink4)">Blk 352 Clementi Ave 2, S120352</span></td>
+                    <td><span class="pill p-b"
+                        style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-029</span></td>
+                    <td><span class="row-acts"><button class="row-act ra-edit" title="Edit"
+                          onclick="openAttEdit(this,'22 Apr 2026','MJ-2026-029','10:05','11:08')"><i
+                            class="bi bi-pencil"></i></button></span></td>
+                  </tr>
+                  <tr data-date="2026-04-02" data-jobid="mj-2026-018">
+                    <td style="font-size:12px;color:var(--ink4);white-space:nowrap">2 Apr 2026</td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:58</span></td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--rm)">10:55</span></td>
+                    <td style="font-size:12px;color:var(--ink3)">0h 57m</td>
+                    <td style="font-size:12px;color:var(--ink2)">Buona Vista Polyclinic<br><span
+                        style="font-size:11px;color:var(--ink4)">Blk 278 Buona Vista Ave, S118214</span></td>
+                    <td><span class="pill p-b"
+                        style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-018</span></td>
+                    <td><span class="row-acts"><button class="row-act ra-edit" title="Edit"
+                          onclick="openAttEdit(this,'2 Apr 2026','MJ-2026-018','09:58','10:55')"><i
+                            class="bi bi-pencil"></i></button></span></td>
+                  </tr>
+                  <tr data-date="2026-03-10" data-jobid="mj-2026-009">
+                    <td style="font-size:12px;color:var(--ink4);white-space:nowrap">10 Mar 2026</td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--g)">13:01</span></td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--rm)">15:05</span></td>
+                    <td style="font-size:12px;color:var(--ink3)">2h 4m</td>
+                    <td style="font-size:12px;color:var(--ink2)">NUH Main Building, Level 2<br><span
+                        style="font-size:11px;color:var(--ink4)">5 Lower Kent Ridge Rd, S119074</span></td>
+                    <td><span class="pill p-b"
+                        style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-009</span></td>
+                    <td><span class="row-acts"><button class="row-act ra-edit" title="Edit"
+                          onclick="openAttEdit(this,'10 Mar 2026','MJ-2026-009','13:01','15:05')"><i
+                            class="bi bi-pencil"></i></button></span></td>
+                  </tr>
+                  <tr data-date="2026-02-14" data-jobid="mj-2026-004">
+                    <td style="font-size:12px;color:var(--ink4);white-space:nowrap">14 Feb 2026</td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--g)">09:55</span></td>
+                    <td><span style="font-size:13px;font-weight:500;color:var(--rm)">11:10</span></td>
+                    <td style="font-size:12px;color:var(--ink3)">1h 15m</td>
+                    <td style="font-size:12px;color:var(--ink2)">Queenstown Polyclinic<br><span
+                        style="font-size:11px;color:var(--ink4)">580 Commonwealth Rd, S149979</span></td>
+                    <td><span class="pill p-b"
+                        style="font-size:10px;font-family:monospace;font-weight:600">MJ-2026-004</span></td>
+                    <td><span class="row-acts"><button class="row-act ra-edit" title="Edit"
+                          onclick="openAttEdit(this,'14 Feb 2026','MJ-2026-004','09:55','11:10')"><i
+                            class="bi bi-pencil"></i></button></span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              style="font-size:11px;color:var(--ink4);margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr2)">
+              Check-in and check-out times are recorded via the C4Me mobile app. MJ payment is calculated from these
+              timestamps.</div>
+          </div>
+        </div>
+
+        <!-- JOB HISTORY -->
+        <div class="tc" id="tc-jh">
+          <div class="filter-bar" style="margin-bottom:14px">
+            <label>From</label>
+            <input type="date" id="jhFrom" onchange="filterJobHistory()">
+            <label>To</label>
+            <input type="date" id="jhTo" onchange="filterJobHistory()">
+            <label>Status</label>
+            <select id="jhStatus" onchange="filterJobHistory()">
+              <option value="">All</option>
+              <option value="completed">Completed</option>
+              <option value="no-show">No-show</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button class="btn-act" onclick="clearJhFilters()">Clear</button>
+            <button class="btn-act" style="margin-left:auto; background-color:#1a9e80; color:#fff;"
+              onclick="exportJobHistory()">Export to Excel</button>
+          </div>
+          <div class="card" style="position:relative">
+            <div class="card-t">Job history</div>
+            <div
+              style="display:grid;grid-template-columns:82px 95px 95px 1fr 72px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)">
+              <span>Date</span><span>Status</span><span>Type</span><span>Details</span><span>Earned</span></div>
+            <div id="jhRows">
+              <div class="jrow" data-date="2026-05-03" data-status="completed"><span
+                  style="font-size:11px;color:var(--ink4)">3 May 2026</span><span class="pill p-g"
+                  style="font-size:10px">Completed</span><span class="pill p-b"
+                  style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Lee Geok Eng → SGH A&E ·
+                  2h</span><span style="color:var(--g);font-weight:600">$28</span></div>
+              <div class="jrow" data-date="2026-04-22" data-status="completed"><span
+                  style="font-size:11px;color:var(--ink4)">22 Apr 2026</span><span class="pill p-g"
+                  style="font-size:10px">Completed</span><span class="pill p-b"
+                  style="font-size:10px">Befriending</span><span style="color:var(--ink3)">Ng Ah Beng (AAC) · 1h ·
+                  Recurring</span><span style="color:var(--g);font-weight:600">$14</span></div>
+              <div class="jrow" data-date="2026-04-10" data-status="no-show"><span
+                  style="font-size:11px;color:var(--ink4)">10 Apr 2026</span><span class="pill p-r"
+                  style="font-size:10px">No-show</span><span class="pill p-b"
+                  style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Tan Ah Kow → NUH · Flagged by
+                  SCC</span><span style="color:var(--ink4)">—</span></div>
+              <div class="jrow" data-date="2026-04-02" data-status="completed"><span
+                  style="font-size:11px;color:var(--ink4)">2 Apr 2026</span><span class="pill p-g"
+                  style="font-size:10px">Completed</span><span class="pill p-b"
+                  style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Chan Bee Kim → Polyclinic ·
+                  1h</span><span style="color:var(--g);font-weight:600">$14</span></div>
+              <div class="jrow" data-date="2026-03-15" data-status="cancelled"><span
+                  style="font-size:11px;color:var(--ink4)">15 Mar 2026</span><span class="pill p-a"
+                  style="font-size:10px">Cancelled</span><span class="pill p-b"
+                  style="font-size:10px">Chaperone</span><span style="color:var(--ink3)">Client cancelled with
+                  sufficient notice</span><span style="color:var(--ink4)">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYMENT -->
+        <div class="tc" id="tc-py">
+          <div class="g4" style="margin-bottom:14px">
+            <div class="stat">
+              <div class="sn">$392</div>
+              <div class="sl">YTD paid</div>
+            </div>
+            <div class="stat warn">
+              <div class="sn">$42</div>
+              <div class="sl">Pending verification</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--am);margin-bottom:12px">* Rates are placeholders</div>
+
+          <div class="card" style="position:relative">
+            <div class="card-t">
+              Claims — May 2026
+            </div>
+            <div
+              style="display:grid;grid-template-columns:82px 110px 52px 68px 105px 90px;gap:8px;font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:0.04em;padding-bottom:6px;border-bottom:1px solid var(--bdr)">
+              <span>Date</span><span>Role</span><span>Hours</span><span>Amount</span><span>Status</span><span></span>
+            </div>
+            <div class="pay-row">
+              <span style="font-size:11px;color:var(--ink4)">3 May 2026</span><span>Chaperone</span><span>2h</span><span
+                style="font-weight:600">$28</span>
+              <span class="pill p-a" style="font-size:10px">Pending</span>
+              <button class="btn-sop-approve"><i class="bi bi-check-lg"></i> Verify</button>
+            </div>
+            <div class="pay-row">
+              <span style="font-size:11px;color:var(--ink4)">22 Apr
+                2026</span><span>Befriending</span><span>1h</span><span style="font-weight:600">$14</span>
+              <span class="pill p-g" style="font-size:10px">Paid</span>
+              <span style="font-size:11px;color:var(--ink4)">2 May 2026</span>
+            </div>
+            <div style="margin-top:10px"><button class="btn-sm">Export timesheet (Excel)</button></div>
+          </div>
+
+          <div class="card" id="mj-rate-card">
+            <div class="card-t">
+              Individual MJ rate
+              <button class="btn-sop-add" id="mj-rate-edit-btn" style="margin-left:auto"
+                onclick="toggleMjRateEdit()"><i class="bi bi-pencil"></i> Edit</button>
+              <button class="btn-sop-submit" id="mj-rate-save-btn" style="margin-left:auto;display:none"
+                onclick="saveMjRate()"><i class="bi bi-check-lg"></i> Save</button>
+            </div>
+            <div style="font-size:11px;color:var(--ink4);margin-bottom:12px">
+              Adjust this MJ's hourly rate per service role. Defaults to the standard fee table.
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Chaperone
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input mj-rate-input" value="15" min="5" max="120" readonly>
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Safe Steps
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input mj-rate-input" value="12" min="5" max="120" readonly>
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Befriending
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input mj-rate-input" value="10" min="5" max="120" readonly>
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+
+            <div class="rule-row">
+              <div class="rule-label">
+                Centre Assistant
+              </div>
+              <div class="rule-ctrl">
+                <input type="number" class="rule-input mj-rate-input" value="10" min="5" max="120" readonly>
+                <span class="rule-unit">/hr</span>
+              </div>
+            </div>
+          </div>
+          <script>
+            function toggleMjRateEdit() {
+              document.querySelectorAll('#mj-rate-card .mj-rate-input').forEach(function (i) {
+                i.removeAttribute('readonly');
+              });
+              document.getElementById('mj-rate-edit-btn').style.display = 'none';
+              document.getElementById('mj-rate-save-btn').style.display = '';
+            }
+            function saveMjRate() {
+              document.querySelectorAll('#mj-rate-card .mj-rate-input').forEach(function (i) {
+                i.setAttribute('readonly', '');
+                i.setAttribute('value', i.value);
+              });
+              document.getElementById('mj-rate-save-btn').style.display = 'none';
+              document.getElementById('mj-rate-edit-btn').style.display = '';
+            }
+          </script>
+        </div>
+
+        
+
+        <!-- CANCELLATIONS (updated) -->
+        <div class="tc" id="tc-cx" style="display:none;">
+          <div class="card" style="position:relative">
+            <div class="card-t">
+              MJ cancellation policy
+              <span class="upd-badge">↻ Waitlist model revised</span>
+            </div>
+            <table class="cancel-tbl">
+              <thead>
+                <tr>
+                  <th>Appointment day</th>
+                  <th>MJ must cancel by</th>
+                  <th>Auto-cancel if no taker by</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Monday</strong></td>
+                  <td>Prev Thursday, 9AM</td>
+                  <td>Friday, 9AM (1 BD before)</td>
+                </tr>
+                <tr>
+                  <td><strong>Tuesday</strong></td>
+                  <td>Prev Friday, 9AM</td>
+                  <td>Monday, 9AM</td>
+                </tr>
+                <tr>
+                  <td><strong>Wednesday</strong></td>
+                  <td>Monday, 9AM</td>
+                  <td>Tuesday, 9AM</td>
+                </tr>
+                <tr>
+                  <td><strong>Thursday</strong></td>
+                  <td>Tuesday, 9AM</td>
+                  <td>Wednesday, 9AM</td>
+                </tr>
+                <tr>
+                  <td><strong>Friday</strong></td>
+                  <td>Wednesday, 9AM</td>
+                  <td>Thursday, 9AM</td>
+                </tr>
+                <tr>
+                  <td colspan="3" style="background:var(--al);color:var(--am);font-size:11px;padding:7px 8px">If
+                    deadline falls on / before a PH: system blocks. Staff to handle manually by phone.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card" style="position:relative">
+            <div class="card-t">
+              Client cancellation & no-show rules
+            </div>
+            <table class="cancel-tbl">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>SCC action</th>
+                  <th>AAC / MJ payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sufficient notice</strong><br><span style="font-size:11px;color:var(--ink4)">≥24h
+                      (Tue–Fri) · Fri 5PM for Mon</span></td>
+                  <td>Cancel in CARES. Inform client.</td>
+                  <td>MJ not paid (job cancelled).</td>
+                </tr>
+                <tr>
+                  <td><strong>Short notice</strong></td>
+                  <td>Charge client in full (option to waive).</td>
+                  <td>MJ paid <strong>1 hour</strong> by AAC.</td>
+                </tr>
+                <tr>
+                  <td><strong>Client no-show</strong></td>
+                  <td>Charge client in full.</td>
+                  <td>MJ paid accordingly. Record "No Show" in CARES.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MJ APP STATUSES (new tab) -->
+        <div class="tc" id="tc-st">
+          <div class="card" style="position:relative">
+            <div class="card-t">
+              MJ app job statuses (C4Me)
+            </div>
+            <table class="status-tbl">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Chaperone</th>
+                  <th>Home Assessment</th>
+                  <th>Centre Assistant</th>
+                  <th>Befriending</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="pill p-b" style="font-size:11px">Registered</span></td>
+                  <td>MJ grabbed job</td>
+                  <td>MJ grabbed job</td>
+                  <td>MJ expressed interest</td>
+                  <td>Staff assigned MJ</td>
+                </tr>
+                <tr>
+                  <td><span class="pill p-g" style="font-size:11px">Confirmed</span></td>
+                  <td>1st grab = confirmed</td>
+                  <td>Up to 2 = confirmed (names shown)</td>
+                  <td>Staff confirmed in CARES</td>
+                  <td>Up to 2 = confirmed</td>
+                </tr>
+                <tr>
+                  <td><span class="pill p-a" style="font-size:11px">Waitlisted</span></td>
+                  <td>Up to 4</td>
+                  <td>Up to 4</td>
+                  <td>Staff waitlists backend</td>
+                  <td>Staff waitlists backend</td>
+                </tr>
+                <tr>
+                  <td><span class="pill p-gr" style="font-size:11px">No longer available</span></td>
+                  <td>1 confirmed + 4 waitlist taken</td>
+                  <td>2 confirmed + 4 waitlist taken</td>
+                  <td>Event is over</td>
+                  <td>Event over or care staff assigned</td>
+                </tr>
+                <tr>
+                  <td><span class="pill p-r" style="font-size:11px">Cancelled</span></td>
+                  <td colspan="4">Staff cancels backend. For Home Assessment: if cannot get 2 MJs 24h before →
+                    auto-cancelled by system.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="tc" id="tc-nt">
+          <div class="card">
+            <div class="card-t">Staff notes</div>
+            <div class="note-item flag">
+              <div class="note-by">Maisarah Binte Hassan · 10 Apr 2026 · No-show incident</div>
+              <div class="note-txt">MJ called in sick on day of job (10 Apr — Chaperone for Tan Ah Kow → NUH). Late
+                notice, verbal only. No-show flag recorded. MJ verbally advised of 48h cancellation policy. To monitor.
+              </div>
+            </div>
+            <div class="note-item">
+              <div class="note-by">Aileen Chua · 2 Mar 2026</div>
+              <div class="note-txt">Excellent feedback from Tan Bee Lian for Feb and Mar Chaperone jobs. Client
+                specifically asked for Siew Ling again. Reliable, calm, patient with anxious seniors. Recommended for
+                Befriending recurring assignment.</div>
+            </div>
+            <div class="note-item">
+              <div class="note-by">Maisarah Binte Hassan · 15 Jan 2026 · Onboarding</div>
+              <div class="note-txt">Onboarding done. Service contract signed, GIRO set up. Chaperone + Befriending OJT
+                completed. Home Assessment training done Jan 2026 — OJT to be scheduled separately.</div>
+            </div>
+            <textarea class="n-input" placeholder="Add a staff note…"></textarea>
+            <div class="sop-footer" style="margin-top:8px"><button class="btn-sop btn-sop-submit"><i
+                  class="bi bi-plus-lg"></i> Add note</button></div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="att-modal-footer sop-footer">
-      <button class="btn-sop btn-sop-cancel" onclick="closeAttEdit()">Cancel</button>
-      <button class="btn-sop btn-sop-submit" onclick="submitAttEdit()" style="margin-left:auto"><i class="bi bi-check-lg"></i> Save changes</button>
+
+    <script>
+      let activePop = null;
+      function togglePop(id, btn) {
+        const pop = document.getElementById(id);
+        if (activePop && activePop !== pop) {
+          activePop.classList.remove('on');
+          document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+        }
+        const isOn = pop.classList.contains('on');
+        pop.classList.toggle('on');
+        btn.classList.toggle('active', !isOn);
+        activePop = isOn ? null : pop;
+      }
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.br-btn') && !e.target.closest('.q-btn') && !e.target.closest('.pop')) {
+          document.querySelectorAll('.pop.on').forEach(p => p.classList.remove('on'));
+          document.querySelectorAll('.br-btn.active,.q-btn.active').forEach(b => b.classList.remove('active'));
+          activePop = null;
+        }
+      });
+      function showTab(id, el) {
+        document.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+        document.getElementById('tc-' + id).classList.add('on');
+        el.classList.add('on');
+      }
+
+      function filterAttendance() {
+        const from = document.getElementById('attFrom').value;
+        const to = document.getElementById('attTo').value;
+        document.querySelectorAll('#attTbl tbody tr').forEach(function (row) {
+          const d = row.getAttribute('data-date');
+          let show = true;
+          if (from && d < from) show = false;
+          if (to && d > to) show = false;
+          row.style.display = show ? '' : 'none';
+        });
+      }
+
+      function clearAttFilters() {
+        document.getElementById('attFrom').value = '';
+        document.getElementById('attTo').value = '';
+        filterAttendance();
+      }
+
+      function exportAttendance() {
+        alert('Exporting attendance records to Excel...');
+      }
+
+      function filterJobHistory() {
+        var from = document.getElementById('jhFrom').value;
+        var to = document.getElementById('jhTo').value;
+        var status = document.getElementById('jhStatus').value;
+        document.querySelectorAll('#jhRows .jrow').forEach(function (row) {
+          var d = row.getAttribute('data-date');
+          var s = row.getAttribute('data-status');
+          var show = true;
+          if (from && d < from) show = false;
+          if (to && d > to) show = false;
+          if (status && s !== status) show = false;
+          row.style.display = show ? '' : 'none';
+        });
+      }
+
+      function clearJhFilters() {
+        document.getElementById('jhFrom').value = '';
+        document.getElementById('jhTo').value = '';
+        document.getElementById('jhStatus').value = '';
+        filterJobHistory();
+      }
+
+      function exportJobHistory() {
+        alert('Exporting job history to Excel...');
+      }
+
+      var _attEditRow = null;
+      function openAttEdit(btn, date, jobId, checkin, checkout) {
+        _attEditRow = btn.closest('tr');
+        document.getElementById('attEditLabel').textContent = date + ' \u00b7 ' + jobId;
+        document.getElementById('attEditCheckin').value = checkin;
+        document.getElementById('attEditCheckout').value = checkout;
+        document.getElementById('attEditReason').value = '';
+        document.getElementById('attEditModal').style.display = 'flex';
+      }
+
+      function closeAttEdit() {
+        document.getElementById('attEditModal').style.display = 'none';
+        _attEditRow = null;
+      }
+
+      function handleAttModalOverlay(e) {
+        if (e.target.id === 'attEditModal') closeAttEdit();
+      }
+
+      function submitAttEdit() {
+        var reason = document.getElementById('attEditReason').value.trim();
+        if (!reason) { alert('Please enter a reason for the amendment.'); return; }
+        var cin = document.getElementById('attEditCheckin').value;
+        var cout = document.getElementById('attEditCheckout').value;
+        if (!cin || !cout) { alert('Please enter both check-in and check-out times.'); return; }
+        if (cout <= cin) { alert('Check-out time must be after check-in time.'); return; }
+        if (_attEditRow) {
+          var cells = _attEditRow.querySelectorAll('td');
+          cells[1].querySelector('span').textContent = cin;
+          cells[2].querySelector('span').textContent = cout;
+          // Recalculate duration
+          var [ch, cm] = cin.split(':').map(Number);
+          var [oh, om] = cout.split(':').map(Number);
+          var totalMin = (oh * 60 + om) - (ch * 60 + cm);
+          if (totalMin > 0) {
+            cells[3].textContent = Math.floor(totalMin / 60) + 'h ' + (totalMin % 60) + 'm';
+          }
+        }
+        closeAttEdit();
+      }
+    </script>
+  </div><!-- end #page-content -->
+  </div><!-- end #wrapper -->
+
+  <!-- Attendance Edit Modal -->
+  <div id="attEditModal" class="att-modal-overlay" style="display:none" onclick="handleAttModalOverlay(event)">
+    <div class="att-modal-box" onclick="event.stopPropagation()">
+      <div class="att-modal-head">
+        <div class="att-modal-title">Edit Attendance — <span id="attEditLabel"></span></div>
+        <button class="att-modal-close" onclick="closeAttEdit()">&#x2715;</button>
+      </div>
+      <div class="att-modal-body">
+        <div class="att-warning">
+          <span style="font-size:15px;flex-shrink:0">&#x26A0;</span>
+          <div><strong>Payment impact:</strong> Editing check-in or check-out times will recalculate the MJ's billable
+            hours and directly affect the payment amount for this job. Ensure the amended times are accurate and
+            supported by documentation before saving.</div>
+        </div>
+        <div class="att-field-row">
+          <div class="att-field">
+            <label>Check-in time</label>
+            <input type="time" id="attEditCheckin">
+          </div>
+          <div class="att-field">
+            <label>Check-out time</label>
+            <input type="time" id="attEditCheckout">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="att-field">
+            <label>Reason for amendment</label>
+            <textarea id="attEditReason"
+              style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border:1px solid var(--bdr);border-radius:var(--r);background:var(--bg);color:var(--ink);outline:none;width:100%;resize:vertical;min-height:56px"
+              placeholder="e.g. MJ forgot to check out — confirmed by SCC staff on duty"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="att-modal-footer sop-footer">
+        <button class="btn-sop btn-sop-cancel" onclick="closeAttEdit()">Cancel</button>
+        <button class="btn-sop btn-sop-submit" onclick="submitAttEdit()" style="margin-left:auto"><i
+            class="bi bi-check-lg"></i> Save changes</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -780,4 +2074,5 @@ function submitAttEdit() {
     })();
   </script>
 </body>
+
 </html>
