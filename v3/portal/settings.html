@@ -85,7 +85,7 @@
             <i class="bi bi-sliders me-1"></i>Business Rules
           </button>
         </li>
-        <li class="nav-item" role="presentation" style="display: none;">
+        <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-pic" type="button" role="tab">
             <i class="bi bi-person-vcard-fill me-1"></i>Person of Contact
           </button>
@@ -330,35 +330,6 @@
             </div>
           </div>
 
-          <!-- Email PIC -->
-          <div class="set-card" style="display:block;">
-            <div class="set-card-title">
-              <i class="bi bi-envelope"></i> Person of Contact
-            </br>
-            <span style="all: unset; font-size: 9px; font-style: italic;">
-              *This will be the Person of Contact (PIC) that will be included in all job reminder emails.
-            </span>
-            </div>
-
-            <div class="rule-row">
-              <div class="rule-label">
-                Contact Name
-              </div>
-              <div class="rule-ctrl">
-                <input type="text" class="rule-input-name" value="Michael">
-              </div>
-            </div>
-
-            <div class="rule-row">
-              <div class="rule-label">
-                Contact Number
-              </div>
-              <div class="rule-ctrl">
-                <input type="text" class="rule-input-name" value="91234567">
-              </div>
-            </div>
-          </div>
-
           <!-- Save -->
           <div class="sop-footer justify-content-end mb-2">
             <button class="btn-sop btn-sop-draft">Cancel Changes</button>
@@ -400,7 +371,7 @@
         <div class="tab-pane fade" id="pane-pic" role="tabpanel">
           <div class="set-card">
             <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5;">
-              These contacts are included in the job reminder emails sent to MicroJobbers. Set one or more Persons of Contact per facility.
+              These contacts are included in the job reminder emails sent to MicroJobbers. Set one or more Persons of Contact per facility. Email will only include active PICs.
             </div>
 
             <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
@@ -410,7 +381,7 @@
               </div>
               <div class="position-relative" style="width:220px;">
                 <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
-                <input id="pic-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search name or number...">
+                <input id="pic-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search name">
               </div>
               <button class="btn-sop-add ms-auto" onclick="openAddPic()">
                 <i class="bi bi-plus-lg"></i>Add PIC
@@ -423,6 +394,7 @@
                   <th>Facility</th>
                   <th>Contact Name</th>
                   <th>Contact Number</th>
+                  <th>Status</th>
                   <th></th>
                 </tr>
               </thead>
@@ -755,10 +727,20 @@ document.addEventListener('click', function (e) {
             <div class="invalid-feedback" style="font-size:11px;">Required.</div>
           </div>
 
-          <div class="mb-1">
+          <div class="mb-3">
             <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Contact Number <span class="text-danger">*</span></label>
             <input type="text" id="picPhone" class="form-control form-control-sm" placeholder="e.g. 91234567" maxlength="8" pattern="[0-9]{8}" required>
             <div class="invalid-feedback" style="font-size:11px;">Enter a valid 8-digit number.</div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2" style="background:#F9F6FF;border-radius:8px;padding:10px 14px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:var(--ink2);">Active</div>
+              <div style="font-size:11px;color:var(--ink4);">Only active contacts are included in reminder emails.</div>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="picActive" checked style="width:40px;height:22px;cursor:pointer;">
+            </div>
           </div>
         </form>
       </div>
@@ -1716,10 +1698,10 @@ new Choices('#mySelect', {
 <script>
 /* ══ PERSON OF CONTACT (PIC) DATA ═════════════════════════════════ */
 var PIC_DATA = [
-  { id:1, facility:'Clementi', name:'Michael Tan', phone:'91234567' },
-  { id:2, facility:'Clementi', name:'Sarah Lim',   phone:'98761234' },
-  { id:3, facility:'Bedok',    name:'Priya Nair',  phone:'90011234' },
-  { id:4, facility:'Hougang',  name:'David Ong',   phone:'92223333' }
+  { id:1, facility:'Clementi', name:'Michael Tan', phone:'91234567', active:true },
+  { id:2, facility:'Clementi', name:'Sarah Lim',   phone:'98761234', active:true },
+  { id:3, facility:'Bedok',    name:'Priya Nair',  phone:'90011234', active:false },
+  { id:4, facility:'Hougang',  name:'David Ong',   phone:'92223333', active:true }
 ];
 var picSeq = 100;
 
@@ -1754,10 +1736,16 @@ function renderPicTable() {
     if (q && p.name.toLowerCase().indexOf(q) === -1 && p.phone.toLowerCase().indexOf(q) === -1) return false;
     return true;
   }).map(function (p) {
+    var badge = p.active
+      ? '<span class="role-badge" style="background:#E8F7F2;color:#13795B;">Active</span>'
+      : '<span class="role-badge" style="background:#F0F0F0;color:#AAA;">Inactive</span>';
+    var nameClr = p.active ? 'var(--ink)' : 'var(--ink4)';
+    var metaClr = p.active ? 'var(--ink3)' : 'var(--ink4)';
     return '<tr>' +
-      '<td style="color:var(--ink2);font-size:13px;">' + p.facility + '</td>' +
-      '<td style="color:var(--ink);font-size:13px;font-weight:500;">' + p.name + '</td>' +
-      '<td style="color:var(--ink3);font-size:13px;">' + p.phone + '</td>' +
+      '<td style="color:' + metaClr + ';font-size:13px;">' + p.facility + '</td>' +
+      '<td style="color:' + nameClr + ';font-size:13px;font-weight:500;">' + p.name + '</td>' +
+      '<td style="color:' + metaClr + ';font-size:13px;">' + p.phone + '</td>' +
+      '<td>' + badge + '</td>' +
       '<td><div class="row-acts">' +
         '<span class="row-act ra-edit" title="Edit" onclick="openEditPic(' + p.id + ')"><i class="bi bi-pencil"></i></span>' +
         '<span class="row-act ra-del" title="Delete" onclick="deletePic(' + p.id + ')"><i class="bi bi-trash"></i></span>' +
@@ -1767,7 +1755,7 @@ function renderPicTable() {
 
   document.getElementById('tbl-pic-body').innerHTML = rows.length
     ? rows.join('')
-    : '<tr><td colspan="4" style="text-align:center;color:var(--ink4);font-size:12px;padding:20px;">No contacts found.</td></tr>';
+    : '<tr><td colspan="5" style="text-align:center;color:var(--ink4);font-size:12px;padding:20px;">No contacts found.</td></tr>';
 }
 
 /* ══ OPEN ADD MODAL ═══════════════════════════════════════════════ */
@@ -1777,6 +1765,7 @@ function openAddPic() {
   form.classList.remove('was-validated');
   form.reset();
   document.getElementById('picId').value = '';
+  document.getElementById('picActive').checked = true;
   document.getElementById('modalPicLabel').textContent = 'Add Person of Contact';
   document.getElementById('btnPicSaveLabel').textContent = 'Add PIC';
   document.getElementById('btnPicDelete').classList.add('d-none');
@@ -1799,6 +1788,7 @@ function openEditPic(id) {
   document.getElementById('picFacility').value = p.facility;
   document.getElementById('picName').value = p.name;
   document.getElementById('picPhone').value = p.phone;
+  document.getElementById('picActive').checked = p.active;
   document.getElementById('modalPicLabel').textContent = 'Edit Person of Contact';
   document.getElementById('btnPicSaveLabel').textContent = 'Save Changes';
   document.getElementById('btnPicDelete').classList.remove('d-none');
@@ -1816,12 +1806,13 @@ function savePic() {
   var facility = document.getElementById('picFacility').value;
   var name     = document.getElementById('picName').value.trim();
   var phone    = document.getElementById('picPhone').value.trim();
+  var active   = document.getElementById('picActive').checked;
 
   if (id) {
     var p = PIC_DATA.find(function (x) { return x.id === parseInt(id, 10); });
-    if (p) { p.facility = facility; p.name = name; p.phone = phone; }
+    if (p) { p.facility = facility; p.name = name; p.phone = phone; p.active = active; }
   } else {
-    PIC_DATA.push({ id: ++picSeq, facility: facility, name: name, phone: phone });
+    PIC_DATA.push({ id: ++picSeq, facility: facility, name: name, phone: phone, active: active });
   }
 
   form.classList.remove('was-validated');
