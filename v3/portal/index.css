@@ -208,6 +208,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
 .b-com{background:#E8E8ED;color:#555}.b-can{background:var(--rl);color:var(--rm)}
 .b-wl{background:var(--al);color:var(--am)}.b-risk{background:#FF6B35;color:#fff}
 .b-reopen{background:var(--pl);color:var(--pm);border:1px solid var(--pb)}
+.b-inProgress{background:rgb(122, 195, 122);color:rgb(252, 252, 252);border:1px solid;}
 .b-urg{background:#FF6B35;color:#fff}.b-std{background:var(--bg);color:var(--ink4);border:1px solid var(--bdr)}
 
 /* ── DataTable overrides ── */
