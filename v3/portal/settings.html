@@ -85,6 +85,11 @@
             <i class="bi bi-sliders me-1"></i>Business Rules
           </button>
         </li>
+        <li class="nav-item" role="presentation" style="display: none;">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-pic" type="button" role="tab">
+            <i class="bi bi-person-vcard-fill me-1"></i>Person of Contact
+          </button>
+        </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pane-facilities" type="button" role="tab">
             <i class="bi bi-building-fill me-1"></i>Facilities
@@ -391,6 +396,41 @@
           </div><!-- /set-card -->
         </div><!-- /pane-rules -->
 
+        <!-- ══ PERSON OF CONTACT (PIC) ════════════════════════════ -->
+        <div class="tab-pane fade" id="pane-pic" role="tabpanel">
+          <div class="set-card">
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5;">
+              These contacts are included in the job reminder emails sent to MicroJobbers. Set one or more Persons of Contact per facility.
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+              <div class="d-flex align-items-center gap-1">
+                <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3);white-space:nowrap;">Facility</label>
+                <select id="pic-facility-filter" class="form-select form-select-sm" style="width:190px;font-size:12px;"></select>
+              </div>
+              <div class="position-relative" style="width:220px;">
+                <i class="bi bi-search position-absolute" style="left:9px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:12px;"></i>
+                <input id="pic-search" type="text" class="form-control form-control-sm" style="padding-left:28px;font-size:12px;" placeholder="Search name or number...">
+              </div>
+              <button class="btn-sop-add ms-auto" onclick="openAddPic()">
+                <i class="bi bi-plus-lg"></i>Add PIC
+              </button>
+            </div>
+
+            <table class="table tbl-users mb-0">
+              <thead>
+                <tr>
+                  <th>Facility</th>
+                  <th>Contact Name</th>
+                  <th>Contact Number</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbl-pic-body"></tbody>
+            </table>
+          </div><!-- /set-card -->
+        </div><!-- /pane-pic -->
+
       </div><!-- /tab-content -->
     </div><!-- /left-scroll -->
   </div><!-- /layout -->
@@ -680,6 +720,55 @@ document.addEventListener('click', function (e) {
         <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn-sop btn-sop-submit" id="btnAddFacilitySave">
           <i class="bi bi-check-lg"></i>Add Facility
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add / Edit PIC ════════════════════════════ -->
+<div class="modal fade" id="modalPic" tabindex="-1" aria-labelledby="modalPicLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #F0EBF8;padding:18px 24px 14px;">
+        <div>
+          <h5 class="modal-title fw-semibold mb-0" id="modalPicLabel" style="font-size:15px;color:var(--ink);">Add Person of Contact</h5>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">Contact shown in job reminder emails for the selected facility</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <form id="formPic" novalidate>
+          <input type="hidden" id="picId">
+
+          <div class="mb-3">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Facility <span class="text-danger">*</span></label>
+            <select id="picFacility" class="form-select form-select-sm" required>
+              <option value="" disabled selected>Select facility…</option>
+            </select>
+            <div class="invalid-feedback" style="font-size:11px;">Select a facility.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Contact Name <span class="text-danger">*</span></label>
+            <input type="text" id="picName" class="form-control form-control-sm" placeholder="e.g. Michael Tan" required>
+            <div class="invalid-feedback" style="font-size:11px;">Required.</div>
+          </div>
+
+          <div class="mb-1">
+            <label class="form-label" style="font-size:12px;font-weight:600;color:var(--ink2);">Contact Number <span class="text-danger">*</span></label>
+            <input type="text" id="picPhone" class="form-control form-control-sm" placeholder="e.g. 91234567" maxlength="8" pattern="[0-9]{8}" required>
+            <div class="invalid-feedback" style="font-size:11px;">Enter a valid 8-digit number.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer sop-footer" style="border-top:1px solid #F0EBF8;padding:14px 24px;">
+        <button type="button" id="btnPicDelete" class="btn-sop btn-sop-delete d-none" onclick="deletePic()">
+          <i class="bi bi-trash"></i>Delete
+        </button>
+        <button type="button" class="btn-sop btn-sop-cancel" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn-sop btn-sop-submit" onclick="savePic()">
+          <i class="bi bi-check-lg"></i><span id="btnPicSaveLabel">Add PIC</span>
         </button>
       </div>
     </div>
@@ -1621,6 +1710,143 @@ new Choices('#mySelect', {
   removeItemButton: true,
   placeholderValue: 'Select facility',
   searchEnabled: true
+});
+</script>
+
+<script>
+/* ══ PERSON OF CONTACT (PIC) DATA ═════════════════════════════════ */
+var PIC_DATA = [
+  { id:1, facility:'Clementi', name:'Michael Tan', phone:'91234567' },
+  { id:2, facility:'Clementi', name:'Sarah Lim',   phone:'98761234' },
+  { id:3, facility:'Bedok',    name:'Priya Nair',  phone:'90011234' },
+  { id:4, facility:'Hougang',  name:'David Ong',   phone:'92223333' }
+];
+var picSeq = 100;
+
+/* ══ FACILITY OPTION LIST (active facilities) ═════════════════════ */
+function activeFacilityNames() {
+  return FACILITIES_DATA.filter(function (f) { return f.active; })
+                        .map(function (f) { return f.name; });
+}
+
+/* ══ POPULATE FILTER + MODAL SELECTS ══════════════════════════════ */
+function populatePicSelects() {
+  var names = activeFacilityNames();
+
+  var filter = document.getElementById('pic-facility-filter');
+  var prev = filter.value || 'ALL';
+  filter.innerHTML = '<option value="ALL">All Facilities</option>' +
+    names.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+  filter.value = names.indexOf(prev) > -1 || prev === 'ALL' ? prev : 'ALL';
+
+  var modalSel = document.getElementById('picFacility');
+  modalSel.innerHTML = '<option value="" disabled selected>Select facility…</option>' +
+    names.map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+}
+
+/* ══ RENDER PIC TABLE (filtered by facility + search) ═════════════ */
+function renderPicTable() {
+  var fac = document.getElementById('pic-facility-filter').value;
+  var q   = (document.getElementById('pic-search').value || '').trim().toLowerCase();
+
+  var rows = PIC_DATA.filter(function (p) {
+    if (fac !== 'ALL' && p.facility !== fac) return false;
+    if (q && p.name.toLowerCase().indexOf(q) === -1 && p.phone.toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  }).map(function (p) {
+    return '<tr>' +
+      '<td style="color:var(--ink2);font-size:13px;">' + p.facility + '</td>' +
+      '<td style="color:var(--ink);font-size:13px;font-weight:500;">' + p.name + '</td>' +
+      '<td style="color:var(--ink3);font-size:13px;">' + p.phone + '</td>' +
+      '<td><div class="row-acts">' +
+        '<span class="row-act ra-edit" title="Edit" onclick="openEditPic(' + p.id + ')"><i class="bi bi-pencil"></i></span>' +
+        '<span class="row-act ra-del" title="Delete" onclick="deletePic(' + p.id + ')"><i class="bi bi-trash"></i></span>' +
+      '</div></td>' +
+    '</tr>';
+  });
+
+  document.getElementById('tbl-pic-body').innerHTML = rows.length
+    ? rows.join('')
+    : '<tr><td colspan="4" style="text-align:center;color:var(--ink4);font-size:12px;padding:20px;">No contacts found.</td></tr>';
+}
+
+/* ══ OPEN ADD MODAL ═══════════════════════════════════════════════ */
+function openAddPic() {
+  populatePicSelects();
+  var form = document.getElementById('formPic');
+  form.classList.remove('was-validated');
+  form.reset();
+  document.getElementById('picId').value = '';
+  document.getElementById('modalPicLabel').textContent = 'Add Person of Contact';
+  document.getElementById('btnPicSaveLabel').textContent = 'Add PIC';
+  document.getElementById('btnPicDelete').classList.add('d-none');
+
+  /* default facility to the current filter selection */
+  var fac = document.getElementById('pic-facility-filter').value;
+  if (fac && fac !== 'ALL') document.getElementById('picFacility').value = fac;
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalPic')).show();
+}
+
+/* ══ OPEN EDIT MODAL ══════════════════════════════════════════════ */
+function openEditPic(id) {
+  var p = PIC_DATA.find(function (x) { return x.id === id; });
+  if (!p) return;
+  populatePicSelects();
+  var form = document.getElementById('formPic');
+  form.classList.remove('was-validated');
+  document.getElementById('picId').value = p.id;
+  document.getElementById('picFacility').value = p.facility;
+  document.getElementById('picName').value = p.name;
+  document.getElementById('picPhone').value = p.phone;
+  document.getElementById('modalPicLabel').textContent = 'Edit Person of Contact';
+  document.getElementById('btnPicSaveLabel').textContent = 'Save Changes';
+  document.getElementById('btnPicDelete').classList.remove('d-none');
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalPic')).show();
+}
+
+/* ══ SAVE (ADD or EDIT) ═══════════════════════════════════════════ */
+function savePic() {
+  var form = document.getElementById('formPic');
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  var id       = document.getElementById('picId').value;
+  var facility = document.getElementById('picFacility').value;
+  var name     = document.getElementById('picName').value.trim();
+  var phone    = document.getElementById('picPhone').value.trim();
+
+  if (id) {
+    var p = PIC_DATA.find(function (x) { return x.id === parseInt(id, 10); });
+    if (p) { p.facility = facility; p.name = name; p.phone = phone; }
+  } else {
+    PIC_DATA.push({ id: ++picSeq, facility: facility, name: name, phone: phone });
+  }
+
+  form.classList.remove('was-validated');
+  renderPicTable();
+  bootstrap.Modal.getInstance(document.getElementById('modalPic')).hide();
+}
+
+/* ══ DELETE (from row action or modal) ════════════════════════════ */
+function deletePic(id) {
+  /* called from modal without an id argument */
+  if (typeof id === 'undefined') id = parseInt(document.getElementById('picId').value, 10);
+  var p = PIC_DATA.find(function (x) { return x.id === id; });
+  if (!p) return;
+  if (!confirm('Remove "' + p.name + '" as a Person of Contact for ' + p.facility + '?')) return;
+  PIC_DATA = PIC_DATA.filter(function (x) { return x.id !== id; });
+  renderPicTable();
+  var modalEl = document.getElementById('modalPic');
+  if (modalEl.classList.contains('show')) bootstrap.Modal.getInstance(modalEl).hide();
+}
+
+$(document).ready(function () {
+  populatePicSelects();
+  renderPicTable();
+  $('#pic-facility-filter').on('change', renderPicTable);
+  $('#pic-search').on('keyup', renderPicTable);
 });
 </script>
 
