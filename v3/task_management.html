@@ -485,13 +485,15 @@
               <div class="ff">
                 <span class="ff-lbl">Status</span>
                 <select id="fStatus" onchange="applyFilters()">
-                  <option value="">All statuses</option>
+                  <option value="">All</option>
                   <option>Open</option>
                   <option>Urgent</option>
                   <option>Waitlisted</option>
                   <option>In Progress</option>
                   <option>Re-opened</option>
                   <option>Completed</option>
+                  <option>Incomplete</option>
+                  <option>Confirmed</option>
                   <option>Cancelled</option>
                   <option>Draft</option>
                 </select>
@@ -742,7 +744,8 @@
         {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'In Progress',mj:'Nigel Tan, Lawrence Tan', wl:0, urgency:'Standard', sccStaff:null          },
         {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown', date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',      status:'Re-opened',  mj:null,                      wl:2, urgency:'Standard', sccStaff:null,          cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
         {id:'MJ-2026-025',type:'Chaperone',       facility:'SCC — Queenstown', date:'22 May 2026',sd:'2026-05-22',time:'09:00–11:00',client:'Goh Poh Choo',      status:'Taken',      mj:'Melissa Chua',            wl:1, urgency:'Standard', sccStaff:null          },
-        {id:'MJ-2026-026',type:'Befriending',     facility:'VG — Clementi',    date:'22 May 2026',sd:'2026-05-22',time:'14:00–15:00',client:'Ong Kim Guan',      status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null          }
+        {id:'MJ-2026-026',type:'Befriending',     facility:'VG — Clementi',    date:'22 May 2026',sd:'2026-05-22',time:'14:00–15:00',client:'Ong Kim Guan',      status:'Open',       mj:null,                      wl:0, urgency:'Standard', sccStaff:null          },
+        {id:'MJ-2026-028',type:'Chaperone',       facility:'SCC — Queenstown', date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',      status:'Incomplete',  mj:'Melissa Chua',           wl:0, urgency:'Standard', sccStaff:null,          cancelledBy:'Staff', cancelledAt:'20 May 14:32'},
       ];
 
       /* Waitlist entries keyed by job id (mirrors v3/portal/index.html WAITLIST_DATA) */
@@ -773,7 +776,8 @@
         'Confirmed':   '#F9DCF2',
         'Completed':   '#13795B',
         'Cancelled':   '#878787',
-        'Draft':       '#EAB308'
+        'Draft':       '#EAB308',
+        'Incomplete':  '#B09D1F'
       };
 
       /* Pick readable text colour (dark on light fills, white on dark) */
@@ -992,6 +996,8 @@
           banner = '<div class="banner bn-r"><div><strong>Urgent:</strong> No confirmed MicroJobber yet. Auto-cancel triggers 1 business day before the job date.</div></div>';
         else if (j.status === 'Cancelled')
           banner = '<div class="banner bn-r"><div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
+        else if (j.status === 'Incomplete')
+          banner = '<div class="banner bn-r"><div><strong>Incomplete — cancelled late:</strong> This job was cancelled a few hours before the scheduled start time. As the cancellation fell within the chargeable window, payment is incurred to <strong>both the MicroJobber and the client</strong>. Records are locked.</div></div>';
         else if (j.status === 'Completed')
           banner = '<div class="banner bn-g"><div><strong>Completed:</strong> This job was successfully completed.</div></div>';
         else if (isHA)

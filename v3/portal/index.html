@@ -225,15 +225,16 @@
           <label>Status</label>
           <select id="fStatus" onchange="applyFilters()">
             <option value="">All</option>
-            <option>In Progress</option>
             <option>Open</option>
-            <option>Draft</option>
-            <option>Waitlisted</option>
             <option>Urgent</option>
+            <option>Waitlisted</option>
+            <option>In Progress</option>
             <option>Re-opened</option>
             <option>Completed</option>
+            <option>Incomplete</option>
             <option>Confirmed</option>
             <option>Cancelled</option>
+            <option>Draft</option>
           </select>
           <label>Urgency</label>
           <select id="fUrgency" onchange="applyFilters()">
@@ -378,6 +379,7 @@ const JOB_DATA = [
   {id:'MJ-2026-023',type:'Home Assessment', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'Ho Bee Geok',       status:'In Progress',mj:'Nigel Tan, Lawrence Tan', wl:0, urgency:'Standard', sccStaff:null              },
   {id:'MJ-2026-023',type:'Centre Assistant', facility:'SCC — Queenstown', date:'03 Jun 2026',sd:'2026-06-03',time:'10:00–12:00',client:'',       status:'Open',mj:'Nigel Tan, Lawrence Tan',       wl:0, urgency:'Standard', sccStaff:null              },
   {id:'MJ-2026-024',type:'Chaperone',       facility:'SCC — Queenstown', date:'25 May 2026',sd:'2026-05-25',time:'10:00–12:00',client:'Lim Siew Har',      status:'Re-opened',  mj:null,                      wl:2, urgency:'Standard', sccStaff:null,              cancelledBy:'Ahmad Razif', cancelledAt:'20 May 14:32'},
+  {id:'MJ-2026-028',type:'Chaperone',       facility:'SCC — Queenstown', date:'22 May 2026',sd:'2026-05-22',time:'10:00–12:00',client:'Goh Poh Choo',      status:'Incomplete', mj:'Melissa Chua',            wl:0, urgency:'Standard', sccStaff:null,              cancelledBy:'Client', cancelledAt:'22 May 07:45'},
 ];
 
 const WAITLIST_DATA = {
@@ -400,6 +402,7 @@ const TYPE_ICON = {'Chaperone':'🤝','Befriending':'💬','Home Assessment':'�
 const STATUS_HTML = {
   'Open':      '<span class="badge b-pub"> Open</span>',
   'Completed': '<span class="badge b-com"> Completed</span>',
+  'Incomplete':'<span class="badge" style="background:#FBF3D0;color:#8A7414;border:1px solid #E4CE6A"> Incomplete</span>',
   'Cancelled': '<span class="badge b-can"> Cancelled</span>',
   'Waitlisted':'<span class="badge b-wl">Waitlisted</span>',
   'Urgent':    '<span class="badge b-risk">⚠ Urgent</span>',
@@ -542,8 +545,8 @@ function openModal(jobId) {
   var isBef = j.type === 'Befriending';
   var slots = isHA ? 2 : 1;
   var isReopen = j.status === 'Re-opened';
-  var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress';
-  var displayNoShow = j.status === 'Completed' || j.status === 'In Progress'|| j.status === 'Cancelled';
+  var locked = j.status === 'Completed' || j.status === 'Cancelled' || j.status === 'In Progress' || j.status === 'Incomplete';
+  var displayNoShow = j.status === 'Completed' || j.status === 'In Progress'|| j.status === 'Cancelled' || j.status === 'Incomplete';
 
   document.getElementById('modal-title').textContent = j.type + ' · ' + j.facility;
 
@@ -552,6 +555,8 @@ function openModal(jobId) {
     banner = '<div class="banner bn-r">⚠️ <div><strong>Urgent:</strong> No confirmed MJ. Auto-cancel triggers 1 BD before job date. Escalate to SCC Nurse and assign manually if needed.</div></div>';
   else if (j.status === 'Cancelled')
     banner = '<div class="banner bn-r">✕ <div><strong>Cancelled:</strong> This job has been cancelled. Records are locked.</div></div>';
+  else if (j.status === 'Incomplete')
+    banner = '<div class="banner bn-r">✕ <div><strong>Incomplete — cancelled late:</strong> This job was cancelled a few hours before the scheduled start time. As the cancellation fell within the chargeable window, payment is incurred to <strong>both the MJ and the client</strong>. Records are locked.</div></div>';
   else if (j.status === 'Completed')
     banner = '<div class="banner bn-g">✓ <div><strong>Completed:</strong> Job was successfully completed. Records are locked.</div></div>';
   else if (isHA)
