@@ -91,6 +91,19 @@ textarea{resize:vertical;min-height:60px}
 .tag-g{background:var(--gl);color:var(--g);font-weight:500}
 .tag-add{background:var(--bg);color:var(--ink3);border:1px dashed var(--bdr)}
 
+/* Nearest AAC auto-match */
+.aac-match{display:flex;align-items:center;gap:10px;margin-top:4px;padding:10px 12px;border:1px solid var(--gb);background:var(--gl);border-radius:var(--r)}
+.aac-match.aac-pending{border-color:var(--bdr);background:var(--bg)}
+.aac-match.aac-error{border-color:var(--rb);background:var(--rl)}
+.aac-match-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;border-radius:8px;background:var(--g);color:#fff;font-size:15px}
+.aac-match.aac-pending .aac-match-icon{background:var(--ink4)}
+.aac-match.aac-error .aac-match-icon{background:var(--rm)}
+.aac-match-body{display:flex;flex-direction:column;min-width:0;flex:1}
+.aac-match-name{font-size:14px;font-weight:600;color:var(--ink)}
+.aac-match-sub{font-size:12px;color:var(--ink3);margin-top:1px}
+.aac-match-refresh{flex:none;border:1px solid var(--bdr);background:var(--s);color:var(--ink3);width:30px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.aac-match-refresh:hover{color:var(--g);border-color:var(--gb)}
+
 /* Toggles */
 .tog-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2);font-size:13px;color:var(--ink2);position:relative}
 .tog-row:last-child{border-bottom:none}
@@ -327,7 +340,7 @@ textarea{resize:vertical;min-height:60px}
           </div>
           <div class="fl">
             <label>Postal code</label>
-            <input type="text" value="120301" readonly style="background:var(--bdr2);color:var(--ink3)">
+            <input type="text" id="clientPostal" value="120301" readonly style="background:var(--bdr2);color:var(--ink3)" onchange="matchNearestAAC()">
           </div>
           <div class="fl">
             <label>Contact number</label>
@@ -385,7 +398,16 @@ textarea{resize:vertical;min-height:60px}
             <label>MicroJobbers Required</label>
             <input type="number" value="1" min="1">
           </div>
-          <div class="fl"><label>Service boundary (postal code)</label><input type="text" value="409051" placeholder="Postal code"></div>
+          <div class="fl fg-full" id="aacMatchField" style="display:none">
+            <label>Nearest AAC</label>
+            <div id="nearestAAC" class="aac-match">
+              <span class="aac-match-icon"><i class="bi bi-geo-alt-fill"></i></span>
+              <span class="aac-match-body">
+                <span class="aac-match-name">Matching…</span>
+                <span class="aac-match-sub"></span>
+              </span>
+            </div>
+          </div>
           <div class="fl fg-full">
             <label>Skills / OJT required</label>
             <div class="tags">
@@ -498,6 +520,13 @@ function onJobType() {
 
   clientProfileBlock.style.display = (t === 'centreassist') ? 'none' : '';
 
+  // Nearest-AAC matching applies to befriending, Safe Steps and centre assistant — not chaperone.
+  const aacField = document.getElementById('aacMatchField');
+  if (aacField) {
+    aacField.style.display = (t === 'chaperone') ? 'none' : '';
+    if (t !== 'chaperone') matchNearestAAC();
+  }
+
   if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
   else { note.style.display = 'none'; sc.textContent = '1'; }
 
@@ -522,6 +551,78 @@ function onJobType() {
     document.getElementById('searchStaff').style.display = 'none';
   }
 }
+
+/* ---- Nearest AAC matching (Google Maps) ----
+   In production this calls the Google Maps Geocoding API to turn the client's
+   postal code into coordinates, then the Distance Matrix API to find the closest
+   AAC by travelling distance. Here the API responses are mocked so the prototype
+   runs offline, but the flow (client postal -> geocode -> nearest AAC) is the same. */
+const AAC_CENTRES = [
+  { name: 'AAC — Toa Payoh Central', postal: '310079', lat: 1.3329, lng: 103.8470 },
+  { name: 'AAC — Bishan',            postal: '570153', lat: 1.3508, lng: 103.8485 },
+  { name: 'AAC — Kallang',           postal: '330001', lat: 1.3100, lng: 103.8710 },
+  { name: 'AAC — Geylang East',      postal: '389707', lat: 1.3187, lng: 103.8876 },
+  { name: 'AAC — Bukit Merah',       postal: '150119', lat: 1.2819, lng: 103.8239 },
+  { name: 'AAC — Queenstown',        postal: '140053', lat: 1.2942, lng: 103.8058 }
+];
+
+/* Mock geocode table. A real Google Maps Geocoding call replaces this lookup. */
+const POSTAL_GEO = {
+  '120301': { lat: 1.3235, lng: 103.8455 }, // client (Toa Payoh vicinity)
+  '409051': { lat: 1.3187, lng: 103.8876 }
+};
+
+function geocodePostal(postal) {
+  if (POSTAL_GEO[postal]) return POSTAL_GEO[postal];
+  // Deterministic fallback so the prototype never breaks on an unknown code.
+  const sector = parseInt((postal || '').slice(0, 2), 10);
+  if (isNaN(sector)) return null;
+  return { lat: 1.29 + (sector % 20) * 0.006, lng: 103.80 + (sector % 20) * 0.009 };
+}
+
+function haversineKm(a, b) {
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const s = Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+function matchNearestAAC() {
+  const box = document.getElementById('nearestAAC');
+  if (!box) return;
+  const nameEl = box.querySelector('.aac-match-name');
+  const subEl = box.querySelector('.aac-match-sub');
+  const postal = (document.getElementById('clientPostal').value || '').trim();
+
+  box.classList.remove('aac-error', 'aac-pending');
+
+  if (!/^\d{6}$/.test(postal)) {
+    box.classList.add('aac-error');
+    nameEl.textContent = 'No client selected';
+    subEl.textContent = 'Select a client with a valid postal code to auto-match an AAC.';
+    return;
+  }
+
+  const origin = geocodePostal(postal);
+  if (!origin) {
+    box.classList.add('aac-error');
+    nameEl.textContent = 'Unable to locate postal code';
+    subEl.textContent = 'Google Maps could not geocode ' + postal + '.';
+    return;
+  }
+
+  let best = null;
+  AAC_CENTRES.forEach(a => {
+    const km = haversineKm(origin, { lat: a.lat, lng: a.lng });
+    if (!best || km < best.km) best = { aac: a, km };
+  });
+
+  nameEl.textContent = best.aac.name;
+  subEl.textContent = 'Approx. ' + best.km.toFixed(1) + ' km from client (postal ' + postal + ')';
+}
+
+document.addEventListener('DOMContentLoaded', matchNearestAAC);
 </script>
 </div><!-- end #page-content -->
 </div><!-- end #wrapper -->
