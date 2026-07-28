@@ -355,13 +355,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
             <option>Terminated</option>
           </select>
           <label>MJ Type</label>
-          <select id="fType" onchange="applyFilters()">
-            <option value="">All</option>
-            <option>Pure MJ</option>
-            <option>MJ + Senior</option>
-            <option>MJ + Volunteer</option>
-            <option>MJ + Vol + Senior</option>
-          </select>
           <label>Eligible for</label>
           <select id="fRole" onchange="applyFilters()">
             <option value="">Any role</option>
@@ -951,7 +944,7 @@ $(document).ready(function() {
       {title:'Last active'},
       {title:'Actions', orderable:false},
     ],
-    columnDefs:[{visible:false, targets:0}],
+    columnDefs:[{visible:false, targets:[0,2]}],
     pageLength: 10,
     order: [[0,'asc']],
     dom: 't<"dt-pg-wrap"ip>',
@@ -976,11 +969,9 @@ $(document).ready(function() {
 $.fn.dataTable.ext.search.push(function(settings, data, idx) {
   var m = MJ_DATA[idx]; if(!m) return true;
   var fStat = document.getElementById('fStatus').value;
-  var fType = document.getElementById('fType').value;
   var fRole = document.getElementById('fRole').value;
   var fSrch = document.getElementById('fSearch').value.toLowerCase().trim();
   if (fStat && m.status !== fStat) return false;
-  if (fType && m.type !== fType) return false;
   if (fRole) {
     var roleMap = {'Chaperone':'chaperone','Befriending':'befriending','Home Assessment':'homeAssessment','Centre Assistant':'centreAssistant'};
     var key = roleMap[fRole];
@@ -995,7 +986,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, idx) {
 
 function applyFilters() { if(dt) dt.draw(); }
 function clearFilters() {
-  ['fStatus','fType','fRole'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['fStatus','fRole'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('fSearch').value = '';
   if(dt) dt.draw();
 }
@@ -1049,7 +1040,6 @@ function openModal(mjId) {
   var typePill = '<span class="type-pill ' + TYPE_CLASS[m.type] + '">' + m.type + '</span>';
   var grid = '<div class="m-info-grid">' +
     '<div class="m-info-box"><div class="m-info-label">Status</div><div class="m-info-val" style="margin-top:2px">' + (STAT_HTML[m.status]||m.status) + '</div></div>' +
-    '<div class="m-info-box"><div class="m-info-label">MJ Type</div><div class="m-info-val" style="margin-top:2px">' + typePill + '</div></div>' +
     '<div class="m-info-box"><div class="m-info-label">Joined</div><div class="m-info-val">' + m.joined + '</div></div>' +
     '<div class="m-info-box"><div class="m-info-label">Language(s)</div><div class="m-info-val">' + m.language + '</div></div>' +
     '<div class="m-info-box"><div class="m-info-label">Service district</div><div class="m-info-val">District ' + m.district + '</div></div>' +
