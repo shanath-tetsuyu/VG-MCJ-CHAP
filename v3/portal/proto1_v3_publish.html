@@ -516,8 +516,8 @@ function onJobType() {
   const note = document.getElementById('ha-note');
   const sc = document.getElementById('confirmedSlots');
   const isBefriending = t === 'befriending';
+  const isCentreAssistant = t === 'centreassist'
   const clientProfileBlock = document.getElementById('clientCardBlock');
-
   clientProfileBlock.style.display = (t === 'centreassist') ? 'none' : '';
 
   // Nearest-AAC matching applies to befriending, Safe Steps and centre assistant — not chaperone.
@@ -530,8 +530,8 @@ function onJobType() {
   if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
   else { note.style.display = 'none'; sc.textContent = '1'; }
 
-  document.getElementById('venueFrom').style.display = isBefriending ? 'none' : '';
-  document.getElementById('venueTo').style.display = isBefriending ? 'none' : '';
+  document.getElementById('venueFrom').style.display = isBefriending || isCentreAssistant ? 'none' : '';
+  document.getElementById('venueTo').style.display = isBefriending || isCentreAssistant ? 'none' : '';
   document.getElementById('clientAddress').style.display = '';
 
   const staffOption = document.getElementById('staffOption');
