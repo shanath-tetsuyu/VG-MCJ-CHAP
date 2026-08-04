@@ -522,10 +522,10 @@ function onJobType() {
 
   // Nearest-AAC matching applies to befriending, Safe Steps and centre assistant — not chaperone.
   const aacField = document.getElementById('aacMatchField');
-  if (aacField) {
-    aacField.style.display = (t === 'chaperone') ? 'none' : '';
-    if (t !== 'chaperone') matchNearestAAC();
-  }
+  //if (aacField) {
+    //aacField.style.display = (t === 'chaperone') ? 'none' : '';
+    //if (t !== 'chaperone') matchNearestAAC();
+  //}
 
   if (t === 'homeassess') { note.style.display = 'flex'; sc.textContent = '2'; }
   else { note.style.display = 'none'; sc.textContent = '1'; }
