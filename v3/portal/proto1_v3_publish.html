@@ -326,6 +326,25 @@ textarea{resize:vertical;min-height:60px}
         </div>
       </div>
 
+      <!-- Centre Assistant activity details -->
+      <div class="card" id="centreAssistBlock" style="display:none">
+        <div class="card-head"><div class="card-icon ci-b"></div><div class="card-label">Activity details</div></div>
+        <div class="fg">
+          <div class="fl fg-full">
+            <label>Venue</label>
+            <input type="text" placeholder="e.g. AAC — Queenstown, Activity Room 2">
+          </div>
+          <div class="fl fg-full">
+            <label>Name of activity</label>
+            <input type="text" placeholder="e.g. Morning Exercise Session">
+          </div>
+          <div class="fl fg-full">
+            <label>Remarks</label>
+            <textarea placeholder="Anything the MJ should know about this activity"></textarea>
+          </div>
+        </div>
+      </div>
+
       <!-- Client Profile -->
       <div class="card" id="clientCardBlock">
         <div class="card-head"><div class="card-icon ci-b"></div><div class="card-label">Client profile <span style="font-size:11px;color:var(--ink4);font-weight:400">(shown to eligible MJs on listing)</span></div></div>
@@ -362,8 +381,8 @@ textarea{resize:vertical;min-height:60px}
             <label>Languages</label>
             <input type="text" value="Chinese | English" readonly style="background:var(--bdr2);color:var(--ink3)">
           </div>
-          <div class="fl"><label>Functionality level</label><select><option>Independent</option><option selected>Needs assistance</option><option>Dependent</option></select></div>
-          <div class="fl">
+          <div class="fl" id="funcLevelField"><label>Functionality level</label><select><option>Independent</option><option selected>Needs assistance</option><option>Dependent</option></select></div>
+          <div class="fl" id="weightField">
             <div class="fl-label">
               <label>Weight (kg)</label>
             </div>
@@ -518,7 +537,12 @@ function onJobType() {
   const isBefriending = t === 'befriending';
   const isCentreAssistant = t === 'centreassist'
   const clientProfileBlock = document.getElementById('clientCardBlock');
-  clientProfileBlock.style.display = (t === 'centreassist') ? 'none' : '';
+  clientProfileBlock.style.display = isCentreAssistant ? 'none' : '';
+  document.getElementById('centreAssistBlock').style.display = isCentreAssistant ? '' : 'none';
+
+  // Befriending does not capture functionality level or weight.
+  document.getElementById('funcLevelField').style.display = isBefriending ? 'none' : '';
+  document.getElementById('weightField').style.display = isBefriending ? 'none' : '';
 
   // Nearest-AAC matching applies to befriending, Safe Steps and centre assistant — not chaperone.
   const aacField = document.getElementById('aacMatchField');

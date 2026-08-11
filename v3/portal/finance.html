@@ -327,7 +327,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);disp
               <option value="Pending">Pending</option>
               <option value="Approved">Approved</option>
               <option value="Paid">Paid</option>
-              <option value="signoff">Needs sign-off</option>
             </select>
             <button class="btn-clear" onclick="clearFilters()">Clear</button>
             <div style="margin-left:auto;display:flex;gap:8px;">
@@ -569,15 +568,13 @@ function renderTable(data) {
       'Center Assistant': `<span class="badge b-cent">Center Asst.</span>`
     }[row.service] || row.service;
 
-    const statusBadge = statusBadgeHtml(row.status) +
-      (row.isAmended ? `<span class="signoff-tag">needs sign-off</span>` : '');
+    const statusBadge = statusBadgeHtml(row.status);
 
     const actualDisplay = row.isNoShow
       ? `<span style="font-size:11px;color:var(--g);font-weight:600;">No-show<br><span class="round-explain">min 1 hr</span></span>`
       : `<span class="hours-cell">${fmtDuration(row.actualMins)}${isRoundedUp ? '<br><span class="round-explain">↑ rounded</span>' : ''}</span>`;
 
-    const amendTag = hasDiscrepancy
-      ? `<span class="amend-tag">⚠ needs sign-off</span>` : '';
+    const amendTag = '';
 
     const tr = document.createElement('tr');
     tr.dataset.idx = idx;
@@ -672,8 +669,7 @@ function applyFilters() {
     if (!rowMatchesMonth(r, activeFilters.month)) return false;
     if (activeFilters.service !== 'all' && r.service !== activeFilters.service) return false;
     if (activeFilters.name && !r.name.toLowerCase().includes(activeFilters.name)) return false;
-    if (activeFilters.status === 'signoff') { if (!r.isAmended) return false; }
-    else if (activeFilters.status !== 'all' && r.status !== activeFilters.status) return false;
+    if (activeFilters.status !== 'all' && r.status !== activeFilters.status) return false;
     return true;
   });
 
@@ -819,7 +815,6 @@ function openModal(row) {
     <div class="sect-title">Payment Status</div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       ${statusBadgeHtml(row.status)}
-      ${row.isAmended ? '<span class="signoff-tag">needs sign-off</span>' : ''}
       ${row.status === 'Paid' && row.paidAt ? `<span style="font-size:11px;color:var(--ink3);">Paid on ${row.paidAt}</span>` : ''}
     </div>
 

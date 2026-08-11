@@ -431,6 +431,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
             <label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Contact Number <span style="color:var(--rm)">*</span></label>
             <input type="tel" class="form-control form-control-sm" placeholder="e.g. 9123 4567" style="font-size:13px;border-color:var(--bdr);border-radius:8px">
           </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Email <span style="color:var(--rm)">*</span></label>
+            <input type="email" class="form-control form-control-sm" placeholder="e.g. name@example.com" style="font-size:13px;border-color:var(--bdr);border-radius:8px">
+          </div>
         </div>
 
         <div style="margin-bottom:18px">
@@ -589,6 +593,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);heig
             </div>
           </div>
           <div style="font-size:10px;color:var(--ink4);margin-top:6px">* Each microjob requires a minimum engagement period of one hour.</div>
+        </div>
+
+        <!-- ── PART 5: BACKGROUND ── -->
+        <div class="sect-title">Part 5 — Background, Experience, Skills &amp; Services Offered</div>
+        <div style="font-size:11px;color:var(--ink4);margin-bottom:8px">Tell us about your background, relevant experience, skills and the services you can offer.</div>
+        <div style="margin-bottom:18px">
+          <textarea id="mjBackground" class="form-control form-control-sm" rows="5" maxlength="500"
+            placeholder="e.g. Retired nurse with 10 years of experience caring for seniors. Comfortable with wheelchair transfers. Speaks Hokkien."
+            style="font-size:13px;border-color:var(--bdr);border-radius:8px;resize:vertical"
+            oninput="document.getElementById('mjBackgroundCount').textContent = this.value.length"></textarea>
+          <div style="font-size:10px;color:var(--ink4);margin-top:4px;text-align:right"><span id="mjBackgroundCount">0</span> / 500 characters</div>
         </div>
 
         <!-- ── ACKNOWLEDGEMENT ── -->
